@@ -11,7 +11,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 
 __PowerfulSeal__ works in two modes: interactive and autonomous.
 
-__Interactive__ mode is designed to discover your cluster, and manually break things and see what happens. It operates on nodes, pods, deployments and namespaces.
+__Interactive__ mode is designed to allow you to discover your cluster's components, and manually break things to see what happens. It operates on nodes, pods, deployments and namespaces.
 
 __Autonomous__ mode reads a policy file, which can contain any number of pod and node scenarios. Each scenario describes a list of matches, filters and actions to execute on your cluster.
 

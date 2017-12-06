@@ -6,6 +6,9 @@ It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/),
 
 Embrace the inevitable failure. __Embrace The Seal__.
 
+[![Build
+Status](https://travis-ci.org/bloomberg/powerfulseal.svg?branch=master)](https://travis-ci.org/bloomberg/powerfulseal)
+
 
 ## Introduction
 

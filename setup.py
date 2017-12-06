@@ -5,6 +5,7 @@ setup(
     name='powerfulseal',
     version='2.0.0',
     author='Mikolaj Pawlikowski',
+    url='https://github.com/bloomberg/powerfulseal',
     packages=find_packages(),
     license=open('LICENSE').read(),
     description='Powerfulseal kubernetes reliablity tester',

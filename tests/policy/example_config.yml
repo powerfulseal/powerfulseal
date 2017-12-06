@@ -1,0 +1,171 @@
+config:
+  minSecondsBetweenRuns: 60
+  maxSecondsBetweenRuns: 360
+
+# the scenarios describing actions on nodes
+nodeScenarios:
+
+  # example of a policy using al the filters available
+  - name: "kill all the baddies"
+
+    # Choose the initial set of nodes to operate on.
+    # Note that this will be an union of all the notes you match (logical OR)
+    match:
+      - property:
+          name: "name"
+          value: "minion-*"
+      - property:
+          name: "ip"
+          value: "127.0.0.1"
+      - property:
+          name: "group"
+          value: "minion"
+      - property:
+          name: "az"
+          value: "AZ1|AZ2"
+      - property:
+          name: "state"
+          value: "UP"
+
+    # The filters are executed in the order specified and can be
+    # used mutiple times, and piped from one to the next.
+    filters:
+
+      # property filters (all the property filters support regexp)
+      - property:
+          name: "name"
+          value: "minion-*"
+      - property:
+          name: "ip"
+          value: "127.0.0.1"
+      - property:
+          name: "group"
+          value: "minion"
+      - property:
+          name: "az"
+          value: "AZ1|AZ2"
+      - property:
+          name: "state"
+          value: "UP"
+
+      # time of execution filters
+      # to restrict the actions to work days, you can do
+      - dayTime:
+          onlyDays:
+            - "monday"
+            - "tuesday"
+            - "wednesday"
+            - "thursday"
+            - "friday"
+          startTime:
+            hour: 10
+            minute: 0
+            second: 0
+          endTime:
+            hour: 17
+            minute: 30
+            second: 0
+
+      # to pick a random sample of nodes/pods, you can specify either a size
+      - randomSample:
+          size: 5
+
+      # or a percentage (will be rounded down to an integer)
+      - randomSample:
+          percentage: 0.2
+
+      # this will pass all the nodes with the given probability,
+      # or none otherwise
+      - probability:
+          probabilityPassAll: 0.5
+
+    # The actions will be executed in the order specified
+    actions:
+      - stop:
+          force: false
+      - wait:
+          seconds: 30
+      - start:
+      - execute:
+          cmd: "sudo service docker restart"
+
+# the scenarios describing actions on kubernetes pods
+podScenarios:
+  - name: "delete random pods"
+
+    # Match the intial set of pods.
+    # The set of pods will be a union of all matches.
+    match:
+
+      # you can pick a whole namespace
+      - namespace:
+          name: "doomsday"
+
+      # you can pick a particular deployment
+      - deployment:
+          name: "doomsday"
+          namespace: "example"
+
+      # throw in another one to the union
+      - deployment:
+          name: "dangerous"
+          namespace: "moyk"
+
+      # you can also select labels in a namespace
+      # (note that for the labels are always strings)
+      - labels:
+          namespace: "something"
+          selector: "app=true,something=1"
+
+    filters:
+
+      # property filters (all the property filters support regexp)
+      - property:
+          name: "name"
+          value: "application-X-*"
+      - property:
+          name: "state"
+          value: "Running"
+
+      # time of execution filters
+      # to restrict the actions to work days, you can do
+      - dayTime:
+          onlyDays:
+            - "monday"
+            - "tuesday"
+            - "wednesday"
+            - "thursday"
+            - "friday"
+          startTime:
+            hour: 10
+            minute: 0
+            second: 0
+          endTime:
+            hour: 17
+            minute: 30
+            second: 0
+
+      # to pick a random sample of nodes/pods, you can specify either a size
+      - randomSample:
+          size: 5
+
+      # or a percentage (will be rounded down to an integer)
+      - randomSample:
+          percentage: 0.2
+
+      # this will pass all the nodes with the given probability,
+      # or none otherwise
+      - probability:
+          probabilityPassAll: 0.5
+
+    # The actions will be executed in the order specified
+    actions:
+      - kill:
+          probability: 0.5
+          force: true
+      - wait:
+          seconds: 5
+      - kill:
+          probability: 1
+          force: true
+

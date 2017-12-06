@@ -1,0 +1,14 @@
+[groupA]
+192.168.1.1
+
+[groupB]
+192.168.2.1
+
+[groupC]
+192.168.3.1 someattr=yes
+
+[workers:children]
+groupA
+groupB
+groupC
+

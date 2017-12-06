@@ -1,0 +1,20 @@
+config:
+  minSecondsBetweenRuns: 77
+  maxSecondsBetweenRuns: 100
+
+nodeScenarios:
+  - name: "scenario1"
+    match: []
+    filters: []
+    actions: []
+  - name: "scenario2"
+    match: []
+    filters: []
+    actions: []
+
+podScenarios:
+  - name: "something1"
+    match: []
+    filters: []
+    actions: []
+

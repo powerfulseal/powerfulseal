@@ -1,0 +1,7 @@
+include LICENSE
+include README.md
+include powerfulseal/policy/ps-schema.json
+include powerfulseal/policy/example-config.yml
+include tests/node/example_inventory
+include tests/policy/example_config.yml
+include tests/policy/example_config2.yml

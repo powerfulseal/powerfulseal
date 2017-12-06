@@ -180,5 +180,8 @@ def main(argv):
         PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
 
 
-if __name__ == '__main__':
+def start():
     main(sys.argv[1:])
+
+if __name__ == '__main__':
+    start()

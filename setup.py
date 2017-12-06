@@ -22,8 +22,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'seal = powerfulseal.cli.__main__:main',
-            'powerfulseal = powerfulseal.cli.__main__:main',
+            'seal = powerfulseal.cli.__main__:start',
+            'powerfulseal = powerfulseal.cli.__main__:start',
         ]
     },
     include_package_data=True,

@@ -69,6 +69,13 @@ These interactions are available:
 
 ## FAQ
 
+### Where can I learn more about Chaos Engineering ?
+
+We found these two links to be a good start:
+
+- http://principlesofchaos.org/
+- https://github.com/dastergon/awesome-chaos-engineering
+
 ### How is it different from Chaos Monkey ?
 
 PowerfulSeal was inspired by Chaos Monkey, but it differs in a couple of important ways.

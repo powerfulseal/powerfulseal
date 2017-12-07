@@ -28,5 +28,12 @@ setup(
             'powerfulseal = powerfulseal.cli.__main__:start',
         ]
     },
+    classifiers=[
+	    'Development Status :: 4 - Beta',
+	    'Intended Audience :: Developers',
+	    'Topic :: Software Development :: Test Tools',
+	    'Programming Language :: Python :: 3',
+    ],
+    python_requires='>=3',
     include_package_data=True,
 )

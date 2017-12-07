@@ -69,6 +69,17 @@ These interactions are available:
 
 ![pipeline](./media/setup.png)
 
+## Getting started
+
+`PowerfulSeal` is available to install through pip:
+
+```sh
+pip install powerfulseal
+seal --help
+powerfulseal --help
+```
+
+
 
 ## FAQ
 

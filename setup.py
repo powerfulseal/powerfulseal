@@ -1,15 +1,18 @@
+import os
 from setuptools import setup, find_packages
 
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name='powerfulseal',
-    version='2.0.0',
+    version='1.0.0',
     author='Mikolaj Pawlikowski',
     url='https://github.com/bloomberg/powerfulseal',
     packages=find_packages(),
-    license=open('LICENSE').read(),
-    description='Powerfulseal kubernetes reliablity tester',
-    long_description=open('README.md').read(),
+    license=read('LICENSE'),
+    description='PowerfulSeal - a powerful testing tool for Kubernetes clusters',
+    long_description=read('README.md'),
     install_requires=[
         'ConfigArgParse>=0.11.0,<1',
         'Flask>=0.12.2,<0.13',
@@ -26,5 +29,12 @@ setup(
             'powerfulseal = powerfulseal.cli.__main__:start',
         ]
     },
+    classifiers=[
+	    'Development Status :: 4 - Beta',
+	    'Intended Audience :: Developers',
+	    'Topic :: Software Development :: Test Tools',
+	    'Programming Language :: Python :: 3',
+    ],
+    python_requires='>=3',
     include_package_data=True,
 )

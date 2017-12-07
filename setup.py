@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name='powerfulseal',
@@ -7,9 +9,9 @@ setup(
     author='Mikolaj Pawlikowski',
     url='https://github.com/bloomberg/powerfulseal',
     packages=find_packages(),
-    license=open('LICENSE').read(),
-    description='Powerfulseal kubernetes reliablity tester',
-    long_description=open('README.md').read(),
+    license=read('LICENSE'),
+    description='PowerfulSeal - a powerful testing tool for Kubernetes clusters',
+    long_description=read('README.md'),
     install_requires=[
         'ConfigArgParse>=0.11.0,<1',
         'Flask>=0.12.2,<0.13',

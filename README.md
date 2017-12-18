@@ -6,8 +6,10 @@ It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/),
 
 Embrace the inevitable failure. __Embrace The Seal__.
 
-[![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)]()
-[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)]()
+[![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
+[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.org/bloomberg/powerfulseal)
+
+[Watch us introduce the Seal at Kubecon 2017 Austin](https://youtu.be/00BMn0UjsG4)
 
 
 ## Introduction

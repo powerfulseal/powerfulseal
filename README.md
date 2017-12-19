@@ -108,7 +108,7 @@ The Seal does:
   - provide interactive mode with awesome tab-completion
 
 The Seal doesn't:
-  - need external dependencies (db, Spinnaker), apart from SSH, cloud and Kubernetes API access 
+  - need external dependencies (db, Spinnaker), apart from SSH, cloud and Kubernetes API access
   - need you to setup ```cron```
 
 ### Can I contribute to The Seal ?

@@ -84,6 +84,9 @@ powerfulseal --help # or seal --help
 
 - https://www.techatbloomberg.com/blog/powerfulseal-testing-tool-kubernetes-clusters/
 - https://siliconangle.com/blog/2017/12/17/bloomberg-open-sources-powerfulseal-new-tool-testing-kubernetes-clusters/
+- https://github.com/ramitsurana/awesome-kubernetes#testing
+- https://github.com/ramitsurana/awesome-kubernetes#other-useful-videos
+- https://github.com/dastergon/awesome-chaos-engineering#notable-tools
 
 
 ## FAQ

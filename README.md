@@ -77,10 +77,13 @@ These interactions are available:
 
 ```sh
 pip install powerfulseal
-seal --help
-powerfulseal --help
+powerfulseal --help # or seal --help
 ```
 
+## Read about the PowerfulSeal
+
+- https://www.techatbloomberg.com/blog/powerfulseal-testing-tool-kubernetes-clusters/
+- https://siliconangle.com/blog/2017/12/17/bloomberg-open-sources-powerfulseal-new-tool-testing-kubernetes-clusters/
 
 
 ## FAQ

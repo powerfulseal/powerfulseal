@@ -70,9 +70,9 @@ nodeScenarios:
       - randomSample:
           size: 5
 
-      # or a percentage (will be rounded down to an integer)
+      # or a ratio (will be rounded down to an integer)
       - randomSample:
-          percentage: 0.2
+          ratio: 0.2
 
       # this will pass all the nodes with the given probability,
       # or none otherwise
@@ -149,9 +149,9 @@ podScenarios:
       - randomSample:
           size: 5
 
-      # or a percentage (will be rounded down to an integer)
+      # or a ratio (will be rounded down to an integer)
       - randomSample:
-          percentage: 0.2
+          ratio: 0.2
 
       # this will pass all the nodes with the given probability,
       # or none otherwise

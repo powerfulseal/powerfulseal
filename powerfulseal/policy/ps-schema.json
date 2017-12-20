@@ -78,7 +78,7 @@
                             {"$ref": "#/definitions/actionWait"}
                         ]
                     }
-                },
+                }
             },
             "required": ["name", "match", "filters", "actions"]
         },
@@ -198,7 +198,7 @@
                         },
                         "value": {
                             "type": "string"
-                        },
+                        }
                     },
                     "required": ["name", "value"]
                 }
@@ -214,7 +214,7 @@
             "properties": {
                 "start": {
                     "type": ["object", "null"],
-                    "additionalProperties": false,
+                    "additionalProperties": false
                 }
             },
             "required": ["start"]
@@ -317,7 +317,7 @@
                             {"$ref": "#/definitions/actionWait"}
                         ]
                     }
-                },
+                }
             },
             "required": ["name", "match", "filters", "actions"]
         },
@@ -371,7 +371,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "selector": {
-                            "type": "string",
+                            "type": "string"
                         },
                         "namespace": {
                             "type": "string"
@@ -400,7 +400,7 @@
                         },
                         "value": {
                             "type": "string"
-                        },
+                        }
                     },
                     "required": ["name", "value"]
                 }
@@ -427,6 +427,6 @@
                 }
             },
             "required": ["kill"]
-        },
+        }
     }
 }

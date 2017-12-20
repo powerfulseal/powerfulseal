@@ -96,7 +96,7 @@
                         "size": {
                             "type": "number"
                         },
-                        "percentage": {
+                        "ratio": {
                             "type": "number"
                         }
                     }

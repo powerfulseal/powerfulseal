@@ -2,12 +2,14 @@
 
 __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect problems in your systems as early as possible. It kills targeted pods and takes VMs up and down.
 
-It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey)
+It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey).
 
 Embrace the inevitable failure. __Embrace The Seal__.
 
-[![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)]()
-[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)]()
+[![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
+[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.org/bloomberg/powerfulseal)
+
+[Watch us introduce the Seal at Kubecon 2017 Austin](https://youtu.be/00BMn0UjsG4)
 
 
 ## Introduction
@@ -75,10 +77,17 @@ These interactions are available:
 
 ```sh
 pip install powerfulseal
-seal --help
-powerfulseal --help
+powerfulseal --help # or seal --help
 ```
 
+## Read about the PowerfulSeal
+
+- https://www.techatbloomberg.com/blog/powerfulseal-testing-tool-kubernetes-clusters/
+- https://siliconangle.com/blog/2017/12/17/bloomberg-open-sources-powerfulseal-new-tool-testing-kubernetes-clusters/
+- https://github.com/ramitsurana/awesome-kubernetes#testing
+- https://github.com/ramitsurana/awesome-kubernetes#other-useful-videos
+- https://github.com/dastergon/awesome-chaos-engineering#notable-tools
+- https://www.linux.com/news/powerfulseal-testing-tool-kubernetes-clusters-0
 
 
 ## FAQ
@@ -100,7 +109,7 @@ The Seal does:
   - provide interactive mode with awesome tab-completion
 
 The Seal doesn't:
-  - need external dependencies (db, Spinnaker), apart from SSH, cloud and Kubernetes API access 
+  - need external dependencies (db, Spinnaker), apart from SSH, cloud and Kubernetes API access
   - need you to setup ```cron```
 
 ### Can I contribute to The Seal ?

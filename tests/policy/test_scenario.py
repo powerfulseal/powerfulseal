@@ -168,7 +168,7 @@ def test_random_sample_percentage(noop_scenario):
     candidates = [dummy_object() for x in range(100)]
     for x in range(101):
         percentage = x / 100.00
-        sample = noop_scenario.filter_random_sample(candidates,{"percentage":percentage})
+        sample = noop_scenario.filter_random_sample(candidates,{"ratio":percentage})
         assert len(sample) == int(percentage * len(candidates))
         for elem in sample:
             assert elem in candidates

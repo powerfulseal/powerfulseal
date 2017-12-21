@@ -329,10 +329,6 @@ class PSCmd(cmd.Cmd):
         namespace = cmd.get(1)
         if len(cmd) == 1 or (len(cmd) == 2 and not cmd.finished):
             return filter_text_insensitive(self.k8s_inventory.find_namespaces(), namespace)
-        else:
-            payload = cmd.get(2)
-            if op == "namespace":
-                return filter_text_insensitive(self.k8s_inventory.find_namespaces(), payload)
         return []
 
     def do_pods(self, line):
@@ -395,13 +391,8 @@ class PSCmd(cmd.Cmd):
         """
             Auto-complete for k8s pods killing
         """
-        cmd = Command(line)
-        namespace = cmd.get(1)
-        if len(cmd) == 1 or (len(cmd) == 2 and not cmd.finished):
-            return filter_text_insensitive(self.k8s_inventory.find_namespaces(), namespace)
-        else:
-            op = cmd.get(2)
-            return filter_text_insensitive(self.k8s_inventory.find_deployments(namespace), op)
+        # TODO
+        return []
 
     def do_kill(self, line):
         """

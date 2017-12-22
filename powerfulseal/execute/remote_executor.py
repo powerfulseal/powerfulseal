@@ -24,9 +24,13 @@ class RemoteExecutor(object):
 
     PREFIX = ["sh", "-c"]
 
-    def __init__(self, nodes=None, user="cloud-user"):
+    def __init__(self, nodes=None, user="cloud-user",
+                 ssh_allow_missing_host_keys=False):
         self.nodes = nodes or []
         self.user = user
+        self.missing_host_key = (spur.ssh.MissingHostKey.accept
+                                 if ssh_allow_missing_host_keys
+                                 else spur.ssh.MissingHostKey.raise_error)
 
     def execute(self, cmd, nodes=None, debug=False):
         nodes = nodes or self.nodes
@@ -36,6 +40,7 @@ class RemoteExecutor(object):
             shell = spur.SshShell(
                 hostname=node.ip,
                 username=self.user,
+                missing_host_key=self.missing_host_key,
             )
             print("Executing '%s' on %s" % (cmd_full, node.name))
             try:

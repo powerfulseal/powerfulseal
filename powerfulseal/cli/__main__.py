@@ -68,6 +68,13 @@ def main(argv):
         action='store_true',
     )
 
+    # ssh related options
+    args_ssh = prog.add_argument_group('SSH settings')
+    args_ssh.add_argument(
+        '--remote-user',
+        default=os.environ.get("PS_REMOTE_USER", "cloud-user"),
+        help="the of the user for the ssh connections",
+    )
     args_ssh.add_argument(
         '--ssh-allow-missing-host-keys',
         default=False,
@@ -80,10 +87,6 @@ def main(argv):
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
         help="the name of the open stack cloud from your config file to use",
-    )
-    prog.add_argument('--remote-user',
-        default=os.environ.get("PS_REMOTE_USER", "cloud-user"),
-        help="the of the user for the ssh connections",
     )
 
     # KUBERNETES CONFIG

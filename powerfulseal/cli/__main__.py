@@ -68,6 +68,13 @@ def main(argv):
         action='store_true',
     )
 
+    args_ssh.add_argument(
+        '--ssh-allow-missing-host-keys',
+        default=False,
+        action='store_true',
+        help='Allow connection to hosts not present in known_hosts',
+    )
+
     # cloud driver related config
     cloud_options = prog.add_mutually_exclusive_group(required=False)
     cloud_options.add_argument('--open-stack-cloud',
@@ -152,6 +159,7 @@ def main(argv):
     # create an executor
     executor = RemoteExecutor(
         user=args.remote_user,
+        ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
     )
 
     if args.interactive:

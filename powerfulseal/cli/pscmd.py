@@ -263,7 +263,7 @@ class PSCmd(cmd.Cmd):
             prefix = prefix + " " + postfix
         self.do_exec(line, prefix=prefix)
 
-    def do_kubeclt(self, line):
+    def do_kubectl(self, line):
         """
         Executes a command on kubectl
 

@@ -85,12 +85,11 @@ class K8sInventory():
                 container_ids=[
                     status.container_id
                     for status in item.status.container_statuses
-                ],
+                ] if item.status.container_statuses else [],
                 state=item.status.phase,
                 labels=item.metadata.labels,
                 meta=item,
             ) for i, item in enumerate(pods)
-        ]
+        ] if pods else []
         self.last_pods = pod_objects
         return pod_objects
-

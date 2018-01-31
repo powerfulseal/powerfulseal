@@ -15,14 +15,14 @@
 
 
 import logging
-from openstack import connection, OpenStackConfig
+from openstack import connection, config
 from . import AbstractDriver
 from ..node import Node, NodeState
 
 
 def create_connection_from_config(name=None):
     """ Creates a new open stack connection """
-    occ = OpenStackConfig()
+    occ = config.OpenStackConfig()
     cloud = occ.get_one_cloud(name)
     return connection.from_config(cloud_config=cloud)
 

@@ -146,14 +146,14 @@ class Scenario():
 
     def filter_random_sample(self, candidates, criterion):
         """ Returns a random sample from the initial list.
-            It supports policy `size` and `percentage` features.
+            It supports policy `size` and `ratio` features.
         """
         if not criterion:
             return []
         size = criterion.get("size")
         if size is None:
-            percentage = criterion.get("percentage")
-            size = int(len(candidates)*percentage)
+            ratio = criterion.get("ratio", 1)
+            size = int(len(candidates)*ratio)
         if size == 0:
             self.logger.info("RandomSample size 0")
             return []

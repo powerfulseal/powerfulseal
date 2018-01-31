@@ -68,15 +68,25 @@ def main(argv):
         action='store_true',
     )
 
+    # ssh related options
+    args_ssh = prog.add_argument_group('SSH settings')
+    args_ssh.add_argument(
+        '--remote-user',
+        default=os.environ.get("PS_REMOTE_USER", "cloud-user"),
+        help="the of the user for the ssh connections",
+    )
+    args_ssh.add_argument(
+        '--ssh-allow-missing-host-keys',
+        default=False,
+        action='store_true',
+        help='Allow connection to hosts not present in known_hosts',
+    )
+
     # cloud driver related config
     cloud_options = prog.add_mutually_exclusive_group(required=False)
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
         help="the name of the open stack cloud from your config file to use",
-    )
-    prog.add_argument('--remote-user',
-        default=os.environ.get("PS_REMOTE_USER", "cloud-user"),
-        help="the of the user for the ssh connections",
     )
 
     # KUBERNETES CONFIG
@@ -152,6 +162,7 @@ def main(argv):
     # create an executor
     executor = RemoteExecutor(
         user=args.remote_user,
+        ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
     )
 
     if args.interactive:

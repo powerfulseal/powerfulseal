@@ -6,8 +6,9 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='1.0.1',
+    version='1.1.0',
     author='Mikolaj Pawlikowski',
+    author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
     packages=find_packages(),
     license=read('LICENSE'),

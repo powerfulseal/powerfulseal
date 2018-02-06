@@ -58,8 +58,8 @@ class AWSDriver(AbstractDriver):
         """
         self.logger.info("Synchronizing remote nodes")
         self.remote_servers = self.conn.instances.all()
-        self.amount_of_servers = sum(1 for _ in self.remote_servers)
-        self.logger.info("Fetched %s remote servers" % self.amount_of_servers)
+        self.amount_of_servers = list(self.conn.instances.all())
+        self.logger.info("Fetched %s remote servers" % len(self.amount_of_servers))
 
     def get_by_ip(self, ip):
         """ Retreive an instance of Node by its IP.

@@ -140,7 +140,7 @@ def main(argv):
 
     # build cloud inventory
     logger.debug("Fetching the remote nodes")
-    if args.open_stack_cloud != None:
+    if args.open_stack_cloud is not None:
         driver = OpenStackDriver(
             cloud=args.open_stack_cloud,
         )

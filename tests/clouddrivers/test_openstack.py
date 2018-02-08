@@ -1,9 +1,10 @@
-from mock import MagicMock
+from mock import patch, MagicMock
 import pytest
 
 from powerfulseal.clouddrivers.open_stack_driver import (
     get_all_ips,
     create_node_from_server,
+    create_connection_from_config,
     OpenStackDriver,
 )
 from powerfulseal.node import NodeState
@@ -72,4 +73,26 @@ def test_get_by_ip(driver, example_servers):
     assert node.az == server.availability_zone
     assert node.name == server.name
     assert node.state == NodeState.UP
+
+def test_get_by_ip_empty(driver):
+    driver.remote_servers = [MagicMock()]
+    node = driver.get_by_ip("1.2.3.4")
+    assert node is None
+
+@patch('powerfulseal.clouddrivers.open_stack_driver.connection')
+@patch('powerfulseal.clouddrivers.open_stack_driver.config')
+def test_create_connection_from_config(config, connection):
+    cloud_mock = MagicMock()
+    occ_mock = MagicMock()
+    occ_mock.get_one_cloud = MagicMock(return_value=cloud_mock)
+    config.OpenStackConfig = MagicMock(return_value=occ_mock)
+
+    # make the actual call
+    name = "Boaty McBoatface"
+    create_connection_from_config(name)
+
+    assert config.OpenStackConfig.called
+    assert occ_mock.get_one_cloud.called
+    assert occ_mock.get_one_cloud.call_args[0] == (name,)
+    assert connection.from_config.called
 

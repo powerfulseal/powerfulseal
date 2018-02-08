@@ -38,7 +38,7 @@ def get_all_ips(server):
             for name, val in addr.items():
                 if name == "addr":
                     output.append(val)
-    return output
+    return sorted(output)
 
 # https://developer.openstack.org/sdks/python/openstacksdk/users/resources/compute/v2/server.html#openstack.compute.v2.server.Server
 MAPPING_STATES_STATUS = {

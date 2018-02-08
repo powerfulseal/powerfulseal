@@ -68,7 +68,7 @@ class OpenStackDriver(AbstractDriver):
 
     def __init__(self, cloud=None, conn=None, logger=None):
         self.logger = logger or logging.getLogger(__name__)
-        self.conn = create_connection_from_config(cloud)
+        self.conn = conn or create_connection_from_config(cloud)
         self.remote_servers = []
 
     def sync(self):

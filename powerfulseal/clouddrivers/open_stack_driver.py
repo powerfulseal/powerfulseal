@@ -38,7 +38,7 @@ def get_all_ips(server):
             for name, val in addr.items():
                 if name == "addr":
                     output.append(val)
-    return output
+    return sorted(output)
 
 # https://developer.openstack.org/sdks/python/openstacksdk/users/resources/compute/v2/server.html#openstack.compute.v2.server.Server
 MAPPING_STATES_STATUS = {
@@ -68,7 +68,7 @@ class OpenStackDriver(AbstractDriver):
 
     def __init__(self, cloud=None, conn=None, logger=None):
         self.logger = logger or logging.getLogger(__name__)
-        self.conn = create_connection_from_config(cloud)
+        self.conn = conn or create_connection_from_config(cloud)
         self.remote_servers = []
 
     def sync(self):

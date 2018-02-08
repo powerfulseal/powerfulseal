@@ -63,3 +63,13 @@ def test_cloud_methods(driver, example_node, method, compute_method):
     getattr(driver, method)(example_node)
     assert getattr(driver.conn.compute, compute_method).called
 
+def test_get_by_ip(driver, example_servers):
+    driver.remote_servers = example_servers
+    server = example_servers[0]
+    node = driver.get_by_ip("1.2.3.4")
+    assert node.id == server.id
+    assert node.ip == server.addresses["group2"][0]["addr"]
+    assert node.az == server.availability_zone
+    assert node.name == server.name
+    assert node.state == NodeState.UP
+

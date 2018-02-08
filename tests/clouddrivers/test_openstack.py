@@ -29,6 +29,12 @@ def driver():
     mock_connection = MagicMock()
     return OpenStackDriver(conn=mock_connection)
 
+@pytest.fixture
+def example_node():
+    node = MagicMock()
+    node.id = "some_id"
+    return node
+
 
 def test_get_all_ips(example_servers):
     server = example_servers[0]
@@ -47,3 +53,13 @@ def test_create_node_from_server(example_servers):
 def test_sync(driver):
     driver.sync()
     assert driver.conn.compute.servers.called
+
+@pytest.mark.parametrize("method, compute_method", [
+    ("stop", "stop_server"),
+    ("start", "start_server"),
+    ("delete", "delete_server"),
+])
+def test_cloud_methods(driver, example_node, method, compute_method):
+    getattr(driver, method)(example_node)
+    assert getattr(driver.conn.compute, compute_method).called
+

@@ -137,7 +137,7 @@ def main(argv):
 
     # build a k8s client
     kube_config = args.kube_config
-    logger.debug("Creating kubernetes client with config %d", kube_config)
+    logger.debug("Creating kubernetes client with config %s", kube_config)
     k8s_client = K8sClient(kube_config=kube_config)
     k8s_inventory = K8sInventory(k8s_client=k8s_client)
 
@@ -187,9 +187,16 @@ def main(argv):
         PolicyRunner.validate_file(args.validate_policy_file)
         print("All good, captain")
     elif args.run_policy_file:
-        policy = PolicyRunner.validate_file(args.run_policy_file)
-        PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
-
+        try:
+            policy = PolicyRunner.validate_file(args.run_policy_file)
+            PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
+        except KeyboardInterrupt:
+            print()
+            print("Ctrl-c again to quit")
+        try:
+            input()
+        except KeyboardInterrupt:
+            sys.exit(0)
 
 def start():
     main(sys.argv[1:])

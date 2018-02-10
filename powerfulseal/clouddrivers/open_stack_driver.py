@@ -15,15 +15,14 @@
 
 
 import logging
-import os_client_config
-from openstack import connection
+from openstack import connection, config
 from . import AbstractDriver
 from ..node import Node, NodeState
 
 
 def create_connection_from_config(name=None):
     """ Creates a new open stack connection """
-    occ = os_client_config.OpenStackConfig()
+    occ = config.OpenStackConfig()
     cloud = occ.get_one_cloud(name)
     return connection.from_config(cloud_config=cloud)
 
@@ -39,7 +38,7 @@ def get_all_ips(server):
             for name, val in addr.items():
                 if name == "addr":
                     output.append(val)
-    return output
+    return sorted(output)
 
 # https://developer.openstack.org/sdks/python/openstacksdk/users/resources/compute/v2/server.html#openstack.compute.v2.server.Server
 MAPPING_STATES_STATUS = {
@@ -69,7 +68,7 @@ class OpenStackDriver(AbstractDriver):
 
     def __init__(self, cloud=None, conn=None, logger=None):
         self.logger = logger or logging.getLogger(__name__)
-        self.conn = create_connection_from_config(cloud)
+        self.conn = conn or create_connection_from_config(cloud)
         self.remote_servers = []
 
     def sync(self):

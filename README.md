@@ -88,6 +88,7 @@ powerfulseal --help # or seal --help
 - https://github.com/ramitsurana/awesome-kubernetes#other-useful-videos
 - https://github.com/dastergon/awesome-chaos-engineering#notable-tools
 - https://www.linux.com/news/powerfulseal-testing-tool-kubernetes-clusters-0
+- https://www.infoq.com/news/2018/01/powerfulseal-chaos-kubernetes
 
 
 ## FAQ

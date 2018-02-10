@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='1.1.0',
+    version='1.1.1',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
@@ -18,7 +18,7 @@ setup(
         'ConfigArgParse>=0.11.0,<1',
         'Flask>=0.12.2,<0.13',
         'termcolor>=1.1.0,<2',
-        'openstacksdk>=0.9.18,<1',
+        'openstacksdk>=0.10.0,<1',
         'spur>=0.3.20,<1',
         'kubernetes>=1.0.0,<2',
         'PyYAML>=3.12,<4',

@@ -11,6 +11,14 @@ Embrace the inevitable failure. __Embrace The Seal__.
 
 [Watch us introduce the Seal at Kubecon 2017 Austin](https://youtu.be/00BMn0UjsG4)
 
+## Highlights
+
+- works with `OpenStack`, `AWS` and local machines
+- speaks `Kubernetes` natively
+- interactive and autonomous, policy-driven mode
+- minimal setup, easy yaml-based policies
+- easy to extend
+
 
 ## Introduction
 
@@ -117,7 +125,7 @@ The Seal doesn't:
 
 We would love you to. In particular, it would be great to get help with:
 
-- get more [cloud drivers](./powerfulseal/clouddrivers/driver.py)
+- get more [cloud drivers](./powerfulseal/clouddrivers/driver.py) (currently `OpenStack` and `AWS`)
 - get more [awesome filters](./powerfulseal/policy/scenario.py)
 - __get an amazing logo__
 - make the PowerfulSeal more powerful

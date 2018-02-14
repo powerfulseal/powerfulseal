@@ -19,7 +19,7 @@ from . import AbstractDriver
 from ..node import Node, NodeState
 
 MESSAGE_IM_NO_CLOUD_DRIVER = (
-"Trying to {action} things while using a no-cloud driver. "
+"Trying to %s things while using a no-cloud driver. "
 "If you don't expect to be seeing this, you might want"
 " to rethink some of your choices"
 )
@@ -36,7 +36,7 @@ class NoCloudDriver(AbstractDriver):
     def sync(self):
         """ Noop
         """
-        self.logger.warning(
+        self.logger.error(
             MESSAGE_IM_NO_CLOUD_DRIVER, "sync"
         )
 
@@ -44,7 +44,7 @@ class NoCloudDriver(AbstractDriver):
         """ Creates a Node instance for given IP.
         """
         return Node(
-            id="fake-ip-no-cloud-driver",
+            id="fake-{ip}".format(ip=ip),
             ip=ip,
             az="nope",
             name="local-{ip}".format(ip=ip),
@@ -54,21 +54,21 @@ class NoCloudDriver(AbstractDriver):
     def stop(self, node):
         """ Noop
         """
-        self.logger.warning(
+        self.logger.error(
             MESSAGE_IM_NO_CLOUD_DRIVER, "stop"
         )
 
     def start(self, node):
         """ Noop
         """
-        self.logger.warning(
+        self.logger.error(
             MESSAGE_IM_NO_CLOUD_DRIVER, "start"
         )
 
     def delete(self, node):
         """ Noop
         """
-        self.logger.warning(
+        self.logger.error(
             MESSAGE_IM_NO_CLOUD_DRIVER, "delete"
         )
 

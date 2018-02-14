@@ -90,12 +90,22 @@ def main(argv):
     cloud_options = prog.add_mutually_exclusive_group(required=False)
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
-        help="the name of the open stack cloud from your config file to use",
+        action='store_true',
+        help="use OpenStack cloud provider",
     )
     cloud_options.add_argument('--aws-cloud',
         default=os.environ.get("AWS_CLOUD"),
         action='store_true',
-        help="aws cloud provider",
+        help="use AWS cloud provider",
+    )
+    cloud_options.add_argument('--no-cloud',
+        default=os.environ.get("NO_CLOUD"),
+        action='store_true',
+        help="don't use cloud provider",
+    )
+    prog.add_argument('--open-stack-cloud-name',
+        default=os.environ.get("OPENSTACK_CLOUD_NAME"),
+        help="the name of the open stack cloud from your config file to use (if using config file)",
     )
 
     # KUBERNETES CONFIG

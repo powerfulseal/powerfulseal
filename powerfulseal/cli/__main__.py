@@ -87,7 +87,7 @@ def main(argv):
     )
 
     # cloud driver related config
-    cloud_options = prog.add_mutually_exclusive_group(required=False)
+    cloud_options = prog.add_mutually_exclusive_group(required=True)
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',

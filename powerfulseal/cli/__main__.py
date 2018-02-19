@@ -107,11 +107,6 @@ def main(argv):
         default=os.environ.get("OPENSTACK_CLOUD_NAME"),
         help="the name of the open stack cloud from your config file to use (if using config file)",
     )
-    cloud_options.add_argument('--aws-cloud',
-        default=os.environ.get("AWS_CLOUD"),
-        action='store_true',
-        help="aws cloud provider",
-    )
 
     # KUBERNETES CONFIG
     args_kubernetes = prog.add_argument_group('Kubernetes settings')

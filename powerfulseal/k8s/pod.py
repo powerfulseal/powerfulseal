@@ -51,3 +51,11 @@ class Pod():
 
     def __repr__(self):
         return self.__str__()
+
+    def __hash__(self):
+        if self.uid:
+            return hash(self.uid)
+        return hash(self.name + self.namespace)
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()

@@ -102,12 +102,15 @@ class PodScenario(Scenario):
             signal=signal,
             container_id=container_id.replace("docker://",""),
         )
-        self.logger.info("Action execute '%s' on %r", cmd, item)
-        for value in self.executor.execute(
-            cmd, nodes=[node]
-        ).values():
-            if value["ret_code"] > 0:
-                self.logger.info("Error return code: %s", value)
+
+        probability = params.get("probability", 1)
+        if probability >= random.random():
+            self.logger.info("Action execute '%s' on %r", cmd, item)
+            for value in self.executor.execute(
+                cmd, nodes=[node]
+            ).values():
+                if value["ret_code"] > 0:
+                    self.logger.info("Error return code: %s", value)
 
     def act(self, items):
         """ Executes all the supported actions on the list of pods.

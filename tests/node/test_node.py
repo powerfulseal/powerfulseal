@@ -56,3 +56,9 @@ def test_node_repr(node):
 def test_node_raises_on_bad_state(state):
     with pytest.raises(ValueError):
         Node(id="something", state=state)
+
+def test_nodes_are_deduplicated():
+    collection = set()
+    collection.add(Node(**EXAMPLE_NODE_ARGS))
+    collection.add(Node(**EXAMPLE_NODE_ARGS))
+    assert len(collection) == 1

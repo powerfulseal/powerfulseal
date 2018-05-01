@@ -63,3 +63,9 @@ class Node(object):
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        return other.id == self.id
+
+    def __hash__(self):
+        return hash(self.id)

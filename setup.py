@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='1.2.0',
+    version='1.2.1',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',

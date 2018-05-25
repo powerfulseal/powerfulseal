@@ -134,5 +134,5 @@ Check out our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information about
 
 ### Why a Seal ?
 
-It might have been inspired by [this comic](https://randowis.com/2015/01/07/the-tower/)
+It might have been inspired by [this comic](https://randowis.com/2015/01/07/the-tower/).
 

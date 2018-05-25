@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+import random
 import pytest
 from unittest.mock import MagicMock
 
@@ -143,6 +144,42 @@ def test_kills_correctly_with_force(pod_scenario, should_force):
             container_id=items[i].container_ids[0].replace("docker://","")
         )
         assert args[0] == cmd
+
+
+@pytest.mark.parametrize("prob", [
+    0.3,
+    0.1,
+    0.5,
+    0.9
+])
+def test_kills_with_probability(pod_scenario, prob):
+    random.seed(12)
+    sample = 10000
+
+    pod_scenario.schema = {
+        "actions": [
+            {
+                "kill": {
+                    "probability": prob,
+                }
+            },
+        ]
+    }
+    mock = MagicMock(return_value={
+        "some ip": {
+            "ret_code": 0
+        },
+    })
+    pod_scenario.executor.execute = mock
+    mock_item1 = MagicMock()
+    mock_item1.container_ids = ["docker://container1"]
+    items = [mock_item1]
+
+    for _ in range(sample):
+        pod_scenario.act(items)
+
+    assert (mock.call_count/len(items)) / sample == pytest.approx(prob, 0.05)
+
 
 def test_doesnt_kill_when_cant_find_node(pod_scenario):
     pod_scenario.schema = {

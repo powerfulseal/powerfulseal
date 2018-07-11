@@ -162,7 +162,7 @@ class Scenario():
             self.logger.info("RandomSample size 0")
             return []
         sample = random.sample(candidates, size)
-        if len(sample) < criterion:
+        if len(sample) < size:
             self.metric_collector.add_filtered_to_insufficient_random_sample_metric(len(sample), criterion)
         return sample
 

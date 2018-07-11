@@ -24,8 +24,8 @@ class NodeScenario(Scenario):
     """
 
     def __init__(self, name, schema, inventory, driver,
-                 executor, logger=None):
-        Scenario.__init__(self, name, schema, logger=logger)
+                 executor, logger=None, metric_collector=None):
+        Scenario.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
         self.inventory = inventory
         self.driver = driver
         self.executor = executor
@@ -41,6 +41,8 @@ class NodeScenario(Scenario):
                 if self.match_property(node, match):
                     self.logger.info("Matching %r", node)
                     selected_nodes.add(node)
+        if len(selected_nodes) == 0:
+            self.metric_collector.add_matched_to_empty_set_metric()
         return list(selected_nodes)
 
     def action_start(self, item, params):
@@ -57,8 +59,10 @@ class NodeScenario(Scenario):
         """
         self.logger.info("Action stop on %r", item)
         try:
+            self.metric_collector.add_node_stopped_metric()
             self.driver.stop(item)
         except:
+            self.metric_collector.add_node_stop_failed_metric(node)
             self.logger.exception("Error stopping the machine")
 
     def action_execute(self, item, params):
@@ -71,6 +75,7 @@ class NodeScenario(Scenario):
         ).values():
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
+                self.metric_collector.add_action_failed_metric()
 
     def act(self, items):
         """ Executes all the supported actions on the list of nodes.

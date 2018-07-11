@@ -24,8 +24,9 @@ class PodScenario(Scenario):
         Adds metching for k8s-specific things and pod-specific actions
     """
 
-    def __init__(self, name, schema, inventory, k8s_inventory, executor, logger=None):
-        Scenario.__init__(self, name, schema, logger=logger)
+    def __init__(self, name, schema, inventory, k8s_inventory, executor,
+                 logger=None, metric_collector=None):
+        Scenario.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor
@@ -102,7 +103,7 @@ class PodScenario(Scenario):
             signal=signal,
             container_id=container_id.replace("docker://",""),
         )
-        
+
         probability = params.get("probability", 1)
         if probability >= random.random():
             self.logger.info("Action execute '%s' on %r", cmd, item)
@@ -111,6 +112,9 @@ class PodScenario(Scenario):
             ).values():
                 if value["ret_code"] > 0:
                     self.logger.info("Error return code: %s", value)
+                    self.metric_collector.add_pod_kill_failed_metric(node)
+                else:
+                    self.metric_collector.add_pod_killed_metric(node)
 
     def act(self, items):
         """ Executes all the supported actions on the list of pods.

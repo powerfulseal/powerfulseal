@@ -34,14 +34,14 @@ class StdoutCollector(AbstractCollector):
     def add_node_stop_failed_metric(self, node):
         print("Node stop failed ")
 
-    def add_action_failed_metric(self):
-        print("Action failed ")
+    def add_execute_failed_metric(self):
+        print("Execute failed ")
 
     def add_filtered_to_empty_set_metric(self):
         print("Filtered to empty set ")
 
-    def add_filtering_passed_all_nodes_metric(self):
-        print("Filtering passed all nodes ")
+    def add_probability_filter_passed_no_nodes_filter(self):
+        print("Probability filter passed no nodes ")
 
     def add_matched_to_empty_set_metric(self):
         print("Matched to empty set ")

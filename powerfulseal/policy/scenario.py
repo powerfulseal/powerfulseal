@@ -169,7 +169,7 @@ class Scenario():
         """
         proba = float(criterion.get("probabilityPassAll", 0.5))
         if random.random() > proba:
-            self.metric_collector.add_filtering_passed_all_nodes_metric()
+            self.metric_collector.add_probability_filter_passed_no_nodes_filter()
             return []
         return candidates
 
@@ -190,8 +190,11 @@ class Scenario():
                     break
             if not items:
                 self.logger.info("Empty set after %r", criterion)
-                self.metric_collector.add_filtered_to_empty_set_metric()
                 break
+
+        if not items:
+            self.metric_collector.add_filtered_to_empty_set_metric()
+
         return items
 
     @abc.abstractmethod

@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,39 +16,9 @@
 import pytest
 from mock import MagicMock
 
-from powerfulseal.policy.node_scenario import NodeScenario
-
-
-EXAMPLE_SCHEMA = {
-    "match": [
-        {
-            "property": {
-                "name": "attr",
-                "value": "a.*"
-            }
-        },
-    ]
-}
-
-class Dummy():
-    pass
-
-@pytest.fixture
-def dummy_object():
-    return Dummy()
-
-@pytest.fixture
-def node_scenario():
-    inventory = MagicMock()
-    driver = MagicMock()
-    executor = MagicMock()
-    return NodeScenario(
-        name="test scenario",
-        schema=EXAMPLE_SCHEMA,
-        inventory=inventory,
-        driver=driver,
-        executor=executor,
-    )
+# noinspection PyUnresolvedReferences
+from tests.fixtures import node_scenario
+from tests.fixtures import dummy_object
 
 
 def test_matching_matches(node_scenario):
@@ -168,4 +137,3 @@ def test_action_execute_called_correctly(node_scenario):
         args, kwargs = call
         assert args[0] == "echo lol"
         assert kwargs["nodes"] == [items[i]]
-

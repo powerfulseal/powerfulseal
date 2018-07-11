@@ -75,7 +75,7 @@ class NodeScenario(Scenario):
         ).values():
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
-                self.metric_collector.add_action_failed_metric()
+                self.metric_collector.add_execute_failed_metric()
 
     def act(self, items):
         """ Executes all the supported actions on the list of nodes.

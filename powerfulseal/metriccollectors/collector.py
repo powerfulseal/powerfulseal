@@ -34,14 +34,14 @@ class AbstractCollector(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def add_node_stopped_metric(self, node):
-        pass  #pragma: nocover
+        pass #pragma: nocover
 
     @abc.abstractmethod
     def add_node_stop_failed_metric(self, node):
         pass #pragma: nocover
 
     @abc.abstractmethod
-    def add_action_failed_metric(self):
+    def add_execute_failed_metric(self):
         pass #pragma: nocover
 
     @abc.abstractmethod
@@ -49,7 +49,7 @@ class AbstractCollector(metaclass=abc.ABCMeta):
         pass #pragma: nocover
 
     @abc.abstractmethod
-    def add_filtering_passed_all_nodes_metric(self):
+    def add_probability_filter_passed_no_nodes_filter(self):
         pass #pragma: nocover
 
     @abc.abstractmethod

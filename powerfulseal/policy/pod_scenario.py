@@ -49,6 +49,8 @@ class PodScenario(Scenario):
                     for pod in method(params):
                         self.logger.info("Matching %r", pod)
                         selected.add(pod)
+        if len(selected) == 0:
+            self.metric_collector.add_matched_to_empty_set_metric()
         return list(selected)
 
     def match_namespace(self, params):

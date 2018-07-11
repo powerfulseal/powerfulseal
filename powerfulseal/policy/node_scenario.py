@@ -59,10 +59,10 @@ class NodeScenario(Scenario):
         """
         self.logger.info("Action stop on %r", item)
         try:
-            self.metric_collector.add_node_stopped_metric()
+            self.metric_collector.add_node_stopped_metric(item)
             self.driver.stop(item)
         except:
-            self.metric_collector.add_node_stop_failed_metric(node)
+            self.metric_collector.add_node_stop_failed_metric(item)
             self.logger.exception("Error stopping the machine")
 
     def action_execute(self, item, params):

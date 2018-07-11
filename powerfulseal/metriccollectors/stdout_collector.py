@@ -40,9 +40,6 @@ class StdoutCollector(AbstractCollector):
     def add_filtered_to_empty_set_metric(self):
         print("Filtered to empty set ")
 
-    def add_filtered_to_insufficient_random_sample_metric(self, sample_size, criterion):
-        print("Filter (random sample) selected too few pods ")
-
     def add_filtering_passed_all_nodes_metric(self):
         print("Filtering passed all nodes ")
 

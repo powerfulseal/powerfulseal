@@ -49,10 +49,6 @@ class AbstractCollector(metaclass=abc.ABCMeta):
         pass #pragma: nocover
 
     @abc.abstractmethod
-    def add_filtered_to_insufficient_random_sample_metric(self, sample_size, criterion):
-        pass #pragma: nocover
-
-    @abc.abstractmethod
     def add_filtering_passed_all_nodes_metric(self):
         pass #pragma: nocover
 

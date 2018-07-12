@@ -48,12 +48,12 @@ def test_add_pod_killed_metric(pod_scenario):
             },
         ]
     }
-    magicMock = MagicMock(return_value={
+    magic_mock = MagicMock(return_value={
         "some ip": {
             "ret_code": 0
         },
     })
-    pod_scenario.executor.execute = magicMock
+    pod_scenario.executor.execute = magic_mock
     mock_item1 = MagicMock()
     mock_item1.container_ids = ["docker://container1"]
     items = [mock_item1]
@@ -75,12 +75,12 @@ def test_add_pod_kill_failed_metric(pod_scenario):
             },
         ]
     }
-    magicMock = MagicMock(return_value={
+    magic_mock = MagicMock(return_value={
         "some ip": {
             "ret_code": 1
         },
     })
-    pod_scenario.executor.execute = magicMock
+    pod_scenario.executor.execute = magic_mock
     mock_item1 = MagicMock()
     mock_item1.container_ids = ["docker://container1"]
     items = [mock_item1]
@@ -138,12 +138,12 @@ def test_add_execute_failed_metric(node_scenario):
             },
         ]
     }
-    magicMock = MagicMock(return_value={
+    magic_mock = MagicMock(return_value={
         "some ip": {
             "ret_code": 1
         },
     })
-    node_scenario.executor.execute = magicMock
+    node_scenario.executor.execute = magic_mock
     items = [dict(), dict()]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_execute_failed_metric') \

@@ -49,7 +49,8 @@ class PolicyRunner():
         return policy
 
     @classmethod
-    def run(cls, policy, inventory, k8s_inventory, driver, executor, loops=None):
+    def run(cls, policy, inventory, k8s_inventory, driver, executor, loops=None,
+            metric_collector=None):
         """ Runs a policy forever
         """
         config = policy.get("config", {})
@@ -62,6 +63,7 @@ class PolicyRunner():
                 inventory=inventory,
                 driver=driver,
                 executor=executor,
+                metric_collector=metric_collector
             )
             for item in policy.get("nodeScenarios", [])
         ]
@@ -72,6 +74,7 @@ class PolicyRunner():
                 inventory=inventory,
                 k8s_inventory=k8s_inventory,
                 executor=executor,
+                metric_collector=metric_collector
             )
             for item in policy.get("podScenarios", [])
         ]

@@ -134,6 +134,11 @@ def main(argv):
 
     args_prometheus = prog.add_argument_group('Prometheus settings')
     args_prometheus.add_argument(
+        '--prometheus-host',
+        default='127.0.0.1',
+        help='Host to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag'
+    )
+    args_prometheus.add_argument(
         '--prometheus-port',
         default=8000,
         help='Port to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag',
@@ -229,9 +234,11 @@ def main(argv):
     # create the collector which defaults to StdoutCollector()
     metric_collector = StdoutCollector()
     if args.prometheus_collector:
+        if not args.prometheus_host:
+            raise argparse.ArgumentTypeError("The Prometheus host must be specified with --prometheus-host")
         if not args.prometheus_port:
             raise argparse.ArgumentTypeError("The Prometheus port must be specified with --prometheus-port")
-        start_http_server(args.prometheus_port)
+        start_http_server(args.prometheus_port, args.prometheus_host)
         metric_collector = PrometheusCollector()
 
     if args.interactive:

@@ -1,4 +1,3 @@
-
 # Copyright 2018 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +15,11 @@
 
 import abc
 
+# Used to identify the source of metrics for actions which can be performed on
+# both pods and nodes
+POD_SOURCE = 'pods'
+NODE_SOURCE = 'nodes'
+
 
 class AbstractCollector(metaclass=abc.ABCMeta):
     """
@@ -25,33 +29,33 @@ class AbstractCollector(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def add_pod_killed_metric(self, node):
-        pass #pragma: nocover
+    def add_pod_killed_metric(self, pod):
+        pass  # pragma: nocover
 
     @abc.abstractmethod
-    def add_pod_kill_failed_metric(self, node):
-        pass #pragma: nocover
+    def add_pod_kill_failed_metric(self, pod):
+        pass  # pragma: nocover
 
     @abc.abstractmethod
     def add_node_stopped_metric(self, node):
-        pass #pragma: nocover
+        pass  # pragma: nocover
 
     @abc.abstractmethod
     def add_node_stop_failed_metric(self, node):
-        pass #pragma: nocover
+        pass  # pragma: nocover
 
     @abc.abstractmethod
-    def add_execute_failed_metric(self):
-        pass #pragma: nocover
+    def add_execute_failed_metric(self, node):
+        pass  # pragma: nocover
 
     @abc.abstractmethod
     def add_filtered_to_empty_set_metric(self):
-        pass #pragma: nocover
+        pass  # pragma: nocover
 
     @abc.abstractmethod
     def add_probability_filter_passed_no_nodes_filter(self):
-        pass #pragma: nocover
+        pass  # pragma: nocover
 
     @abc.abstractmethod
-    def add_matched_to_empty_set_metric(self):
-        pass #pragma: nocover
+    def add_matched_to_empty_set_metric(self, source):
+        pass  # pragma: nocover

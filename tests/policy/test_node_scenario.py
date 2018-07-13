@@ -80,7 +80,10 @@ def test_calls_start_on_act(node_scenario, attr):
             },
         ],
     }
-    items = [dict(), dict()]
+    mock_item = MagicMock()
+    mock_item.uid = '1'
+    mock_item.name = 'node1'
+    items = [mock_item, mock_item]
     node_scenario.act(items)
     method = getattr(node_scenario.driver, attr)
     assert method.call_count == 2
@@ -102,7 +105,10 @@ def test_calls_start_on_act_raising_exception_dont_bubble(node_scenario, attr):
             },
         ],
     }
-    items = [dict(), dict()]
+    mock_item = MagicMock()
+    mock_item.uid = '1'
+    mock_item.name = 'node1'
+    items = [mock_item, mock_item]
     method = getattr(node_scenario.driver, attr)
     method.side_effect = Exception("something bad")
     node_scenario.logger = MagicMock()
@@ -130,7 +136,10 @@ def test_action_execute_called_correctly(node_scenario):
         },
     })
     node_scenario.executor.execute = mock
-    items = [dict(), dict()]
+    mock_item = MagicMock()
+    mock_item.uid = '1'
+    mock_item.name = 'node1'
+    items = [mock_item, mock_item]
     node_scenario.act(items)
     assert mock.call_count == 2
     for i, call in enumerate(mock.call_args_list):

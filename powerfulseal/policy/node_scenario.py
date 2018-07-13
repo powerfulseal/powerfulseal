@@ -12,8 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
+from powerfulseal.metriccollectors.collector import NODE_SOURCE
 from .scenario import Scenario
 
 
@@ -42,7 +41,7 @@ class NodeScenario(Scenario):
                     self.logger.info("Matching %r", node)
                     selected_nodes.add(node)
         if len(selected_nodes) == 0:
-            self.metric_collector.add_matched_to_empty_set_metric()
+            self.metric_collector.add_matched_to_empty_set_metric(NODE_SOURCE)
         return list(selected_nodes)
 
     def action_start(self, item, params):
@@ -75,7 +74,7 @@ class NodeScenario(Scenario):
         ).values():
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
-                self.metric_collector.add_execute_failed_metric()
+                self.metric_collector.add_execute_failed_metric(item)
 
     def act(self, items):
         """ Executes all the supported actions on the list of nodes.

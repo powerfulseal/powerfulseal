@@ -15,6 +15,8 @@
 
 
 import random
+
+from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .scenario import Scenario
 
 
@@ -50,7 +52,7 @@ class PodScenario(Scenario):
                         self.logger.info("Matching %r", pod)
                         selected.add(pod)
         if len(selected) == 0:
-            self.metric_collector.add_matched_to_empty_set_metric()
+            self.metric_collector.add_matched_to_empty_set_metric(POD_SOURCE)
         return list(selected)
 
     def match_namespace(self, params):
@@ -114,9 +116,9 @@ class PodScenario(Scenario):
             ).values():
                 if value["ret_code"] > 0:
                     self.logger.info("Error return code: %s", value)
-                    self.metric_collector.add_pod_kill_failed_metric(node)
+                    self.metric_collector.add_pod_kill_failed_metric(item)
                 else:
-                    self.metric_collector.add_pod_killed_metric(node)
+                    self.metric_collector.add_pod_killed_metric(item)
 
     def act(self, items):
         """ Executes all the supported actions on the list of pods.

@@ -18,6 +18,7 @@ from mock import mock, MagicMock
 
 from powerfulseal.metriccollectors import AbstractCollector
 
+from powerfulseal.metriccollectors.collector import NODE_SOURCE, POD_SOURCE
 # noinspection PyUnresolvedReferences
 from tests.fixtures import noop_scenario
 # noinspection PyUnresolvedReferences
@@ -54,15 +55,18 @@ def test_add_pod_killed_metric(pod_scenario):
         },
     })
     pod_scenario.executor.execute = magic_mock
-    mock_item1 = MagicMock()
-    mock_item1.container_ids = ["docker://container1"]
-    items = [mock_item1]
+    mock_item = MagicMock()
+    mock_item.container_ids = ["docker://container1"]
+    mock_item.namespace = "default"
+    mock_item.name = "test_pod1"
+
+    items = [mock_item]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_pod_killed_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         pod_scenario.act(items)
-        assert metricFunction.called
+        metric_function.assert_called_with(mock_item)
 
 
 def test_add_pod_kill_failed_metric(pod_scenario):
@@ -81,15 +85,18 @@ def test_add_pod_kill_failed_metric(pod_scenario):
         },
     })
     pod_scenario.executor.execute = magic_mock
-    mock_item1 = MagicMock()
-    mock_item1.container_ids = ["docker://container1"]
-    items = [mock_item1]
+    mock_item = MagicMock()
+    mock_item.container_ids = ["docker://container1"]
+    mock_item.namespace = "default"
+    mock_item.name = "test_pod1"
+
+    items = [mock_item]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_pod_kill_failed_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         pod_scenario.act(items)
-        assert metricFunction.called
+        metric_function.assert_called_with(mock_item)
 
 
 def test_add_node_stopped_metric(node_scenario):
@@ -100,13 +107,17 @@ def test_add_node_stopped_metric(node_scenario):
             },
         ],
     }
-    items = [dict()]
+
+    mock_item = MagicMock()
+    mock_item.uid = '1'
+    mock_item.name = 'node1'
+    items = [mock_item]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_node_stopped_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         node_scenario.act(items)
-        assert metricFunction.called
+        metric_function.assert_called_once_with(mock_item)
 
 
 def test_add_node_stop_failed_metric(node_scenario):
@@ -117,15 +128,20 @@ def test_add_node_stop_failed_metric(node_scenario):
             },
         ],
     }
-    items = [dict()]
+
+    mock_item = MagicMock()
+    mock_item.uid = '1'
+    mock_item.name = 'node1'
+    items = [mock_item]
+
     method = getattr(node_scenario.driver, "stop")
     method.side_effect = Exception("something bad")
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_node_stop_failed_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         node_scenario.act(items)
-        assert metricFunction.called
+        metric_function.assert_called_once_with(mock_item)
 
 
 def test_add_execute_failed_metric(node_scenario):
@@ -144,21 +160,25 @@ def test_add_execute_failed_metric(node_scenario):
         },
     })
     node_scenario.executor.execute = magic_mock
-    items = [dict(), dict()]
+
+    mock_item = MagicMock()
+    mock_item.uid = '1'
+    mock_item.name = 'node1'
+    items = [mock_item]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_execute_failed_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         node_scenario.act(items)
-        assert metricFunction.called
+        metric_function.assert_called_once_with(mock_item)
 
 
 def test_add_filtered_to_empty_set_metric(noop_scenario):
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_filtered_to_empty_set_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         noop_scenario.execute()
-        assert metricFunction.called
+        metric_function.assert_called()
 
 
 def test_add_probability_filter_passed_no_nodes_metric(noop_scenario):
@@ -166,21 +186,21 @@ def test_add_probability_filter_passed_no_nodes_metric(noop_scenario):
     Ensures that add_probability_filter_passed_no_nodes_metric is called when
     the filter decides to pass no nodes based on a probability
     """
-    assert (noop_scenario.name == "test scenario")
+    assert noop_scenario.name == "test scenario"
     random.seed(6)  # make the tests deterministic
     candidates = [dummy_object()]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_probability_filter_passed_no_nodes_filter') \
-            as metricFunction:
+            as metric_function:
         # Ensure metric is not added when nodes are all passed
         criterion = {"probabilityPassAll": 1}
         noop_scenario.filter_probability(candidates, criterion)
-        assert not metricFunction.called
+        metric_function.assert_not_called()
 
         # Ensure metric is added when nodes are not passed
         criterion = {"probabilityPassAll": 0.00000001}
         noop_scenario.filter_probability(candidates, criterion)
-        assert metricFunction.called
+        metric_function.assert_called()
 
 
 def test_add_matched_to_empty_set_metric(node_scenario, pod_scenario):
@@ -195,10 +215,10 @@ def test_add_matched_to_empty_set_metric(node_scenario, pod_scenario):
     }
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_matched_to_empty_set_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         node_scenario.match()
-        assert metricFunction.called
+        metric_function.assert_called_once_with(NODE_SOURCE)
 
     pod_scenario.schema = {
         "match": [
@@ -211,8 +231,7 @@ def test_add_matched_to_empty_set_metric(node_scenario, pod_scenario):
     }
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_matched_to_empty_set_metric') \
-            as metricFunction:
-        assert not metricFunction.called
+            as metric_function:
+        metric_function.assert_not_called()
         pod_scenario.match()
-        assert metricFunction.called
-
+        metric_function.assert_called_once_with(POD_SOURCE)

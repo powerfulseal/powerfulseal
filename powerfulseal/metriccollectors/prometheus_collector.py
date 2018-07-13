@@ -24,16 +24,17 @@ STATUS_FAILURE = 'failure'
 POD_KILLS_METRIC_NAME = 'seal_pod_kills_total'
 POD_KILLS = Counter(POD_KILLS_METRIC_NAME,
                     'Number of pods killed (including failures)',
-                    ['status'])
+                    ['status', 'namespace', 'name'])
 
 NODE_STOPS_METRIC_NAME = 'seal_nodes_stopped_total'
 NODE_STOPS = Counter(NODE_STOPS_METRIC_NAME,
                      'Number of nodes stopped (including failures)',
-                     ['status'])
+                     ['status', 'uid', 'name'])
 
 EXECUTE_FAILED_METRIC_NAME = 'seal_execute_failed_total'
 EXECUTE_FAILURES = Counter(EXECUTE_FAILED_METRIC_NAME,
-                           'Increasing counter for command execution failures')
+                           'Increasing counter for command execution failures',
+                           ['uid', 'name'])
 
 FILTERED_TO_EMPTY_SET_METRIC_NAME = 'seal_empty_filter_total'
 FILTERED_TO_EMPTY_SET = Counter(FILTERED_TO_EMPTY_SET_METRIC_NAME,
@@ -49,24 +50,25 @@ PROBABILITY_FILTER_NOT_PASSED = Counter(PROBABILITY_FILTER_NOT_PASSED_METRIC_NAM
 MATCHED_TO_EMPTY_SET_METRIC_NAME = 'seal_empty_match_total'
 MATCHED_TO_EMPTY_SET = Counter(MATCHED_TO_EMPTY_SET_METRIC_NAME,
                                'Increasing counter for cases where matching '
-                               'returns an empty result')
+                               'returns an empty result',
+                               ['source'])
 
 
 class PrometheusCollector(AbstractCollector):
-    def add_pod_killed_metric(self, node):
-        POD_KILLS.labels(STATUS_SUCCESS).inc()
+    def add_pod_killed_metric(self, pod):
+        POD_KILLS.labels(STATUS_SUCCESS, pod.namespace, pod.name).inc()
 
-    def add_pod_kill_failed_metric(self, node):
-        POD_KILLS.labels(STATUS_FAILURE).inc()
+    def add_pod_kill_failed_metric(self, pod):
+        POD_KILLS.labels(STATUS_FAILURE, pod.namespace, pod.name).inc()
 
     def add_node_stopped_metric(self, node):
-        NODE_STOPS.labels(STATUS_SUCCESS).inc()
+        NODE_STOPS.labels(STATUS_SUCCESS, node.uid, node.name).inc()
 
     def add_node_stop_failed_metric(self, node):
-        NODE_STOPS.labels(STATUS_FAILURE).inc()
+        NODE_STOPS.labels(STATUS_FAILURE, node.uid, node.name).inc()
 
-    def add_execute_failed_metric(self):
-        EXECUTE_FAILURES.inc()
+    def add_execute_failed_metric(self, node):
+        EXECUTE_FAILURES.labels(node.uid, node.name).inc()
 
     def add_filtered_to_empty_set_metric(self):
         FILTERED_TO_EMPTY_SET.inc()
@@ -74,5 +76,5 @@ class PrometheusCollector(AbstractCollector):
     def add_probability_filter_passed_no_nodes_filter(self):
         PROBABILITY_FILTER_NOT_PASSED.inc()
 
-    def add_matched_to_empty_set_metric(self):
-        MATCHED_TO_EMPTY_SET.inc()
+    def add_matched_to_empty_set_metric(self, source):
+        MATCHED_TO_EMPTY_SET.labels(source).inc()

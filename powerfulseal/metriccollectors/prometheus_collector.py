@@ -21,32 +21,32 @@ from powerfulseal.metriccollectors import AbstractCollector
 STATUS_SUCCESS = 'success'
 STATUS_FAILURE = 'failure'
 
-POD_KILLS_METRIC_NAME = 'pod_kills_total'
+POD_KILLS_METRIC_NAME = 'seal_pod_kills_total'
 POD_KILLS = Counter(POD_KILLS_METRIC_NAME,
                     'Number of pods killed (including failures)',
                     ['status'])
 
-NODE_STOPS_METRIC_NAME = 'nodes_stopped_total'
+NODE_STOPS_METRIC_NAME = 'seal_nodes_stopped_total'
 NODE_STOPS = Counter(NODE_STOPS_METRIC_NAME,
                      'Number of nodes stopped (including failures)',
                      ['status'])
 
-EXECUTE_FAILED_METRIC_NAME = 'execute_failed_total'
+EXECUTE_FAILED_METRIC_NAME = 'seal_execute_failed_total'
 EXECUTE_FAILURES = Counter(EXECUTE_FAILED_METRIC_NAME,
                            'Increasing counter for command execution failures')
 
-FILTERED_TO_EMPTY_SET_METRIC_NAME = 'empty_filter_total'
+FILTERED_TO_EMPTY_SET_METRIC_NAME = 'seal_empty_filter_total'
 FILTERED_TO_EMPTY_SET = Counter(FILTERED_TO_EMPTY_SET_METRIC_NAME,
                                 'Increasing counter for cases where filtering '
                                 'returns an empty result')
 
-PROBABILITY_FILTER_NOT_PASSED_METRIC_NAME = "probability_filter_not_passed_total"
+PROBABILITY_FILTER_NOT_PASSED_METRIC_NAME = 'seal_probability_filter_not_passed_total'
 PROBABILITY_FILTER_NOT_PASSED = Counter(PROBABILITY_FILTER_NOT_PASSED_METRIC_NAME,
                                         'Increasing counter for cases where the'
                                         ' probability filter does not pass any '
                                         'nodes')
 
-MATCHED_TO_EMPTY_SET_METRIC_NAME = 'empty_match_total'
+MATCHED_TO_EMPTY_SET_METRIC_NAME = 'seal_empty_match_total'
 MATCHED_TO_EMPTY_SET = Counter(MATCHED_TO_EMPTY_SET_METRIC_NAME,
                                'Increasing counter for cases where matching '
                                'returns an empty result')

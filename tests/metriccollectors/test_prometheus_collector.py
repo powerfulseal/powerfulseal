@@ -70,12 +70,12 @@ def test_add_pod_killed_metric(prometheus_pod_scenario):
     mock_item2.container_ids = ["docker://container2"]
     items = [mock_item1, mock_item2]
 
-    before = REGISTRY.get_sample_value('pod_kills_total', labels={'status': STATUS_SUCCESS})
+    before = REGISTRY.get_sample_value(POD_KILLS_METRIC_NAME, labels={'status': STATUS_SUCCESS})
     assert (before is None)
 
     prometheus_pod_scenario.act(items)
 
-    after = REGISTRY.get_sample_value('pod_kills_total', labels={'status': STATUS_SUCCESS})
+    after = REGISTRY.get_sample_value(POD_KILLS_METRIC_NAME, labels={'status': STATUS_SUCCESS})
     assert (after == 2)
 
 

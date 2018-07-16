@@ -16,11 +16,12 @@
 from prometheus_client import Counter
 
 from powerfulseal.metriccollectors import AbstractCollector
+from powerfulseal.metriccollectors.collector import NODE_SOURCE, POD_SOURCE
 
-# Define Prometheus metrics to be stored in the default registry
 STATUS_SUCCESS = 'success'
 STATUS_FAILURE = 'failure'
 
+# Define Prometheus metrics to be stored in the default registry
 POD_KILLS_METRIC_NAME = 'seal_pod_kills_total'
 POD_KILLS = Counter(POD_KILLS_METRIC_NAME,
                     'Number of pods killed (including failures)',
@@ -55,6 +56,13 @@ MATCHED_TO_EMPTY_SET = Counter(MATCHED_TO_EMPTY_SET_METRIC_NAME,
 
 
 class PrometheusCollector(AbstractCollector):
+    def __init__(self):
+        # Export 0 for time series metrics which have labels which can have default
+        # values filled to avoid missing metrics. The Prometheus Python library
+        # already exports 0 for metrics which do not have any labels.
+        MATCHED_TO_EMPTY_SET.labels(NODE_SOURCE).inc(0)
+        MATCHED_TO_EMPTY_SET.labels(POD_SOURCE).inc(0)
+
     def add_pod_killed_metric(self, pod):
         POD_KILLS.labels(STATUS_SUCCESS, pod.namespace, pod.name).inc()
 

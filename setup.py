@@ -23,7 +23,11 @@ setup(
         'kubernetes>=1.0.0,<2',
         'PyYAML>=3.12,<4',
         'jsonschema>=2.6.0,<3',
-        'boto3>=1.5.15,<2.0.0'
+        'boto3>=1.5.15,<2.0.0',
+        'pytest>=3.0,<4',
+        'pytest-cov>=2.5,<3',
+        'mock>=2,<3',
+        'future>=0.16.0,<1'
     ],
     entry_points={
         'console_scripts': [

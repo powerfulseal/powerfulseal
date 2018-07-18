@@ -16,20 +16,20 @@
 
 import pytest
 import pkg_resources
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 from powerfulseal.policy import PolicyRunner
 
 
 def test_example_config_validates():
-    filename = pkg_resources.resource_filename("tests.policy", "example_config.yml")
+    filename = pkg_resources.resource_filename("policy", "example_config.yml")
     PolicyRunner.validate_file(filename)
 
 
 def test_parses_a_whole_config_correctly(monkeypatch):
     sleep_mock = MagicMock()
     monkeypatch.setattr("time.sleep", sleep_mock)
-    filename = pkg_resources.resource_filename("tests.policy", "example_config2.yml")
+    filename = pkg_resources.resource_filename("policy", "example_config2.yml")
     policy = PolicyRunner.validate_file(filename)
     inventory = MagicMock()
     k8s_inventory = MagicMock()

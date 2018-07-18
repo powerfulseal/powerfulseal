@@ -25,7 +25,7 @@ class NodeScenario(Scenario):
 
     def __init__(self, name, schema, inventory, driver,
                  executor, logger=None):
-        super().__init__(name, schema, logger=logger)
+        Scenario.__init__(self, name, schema, logger=logger)
         self.inventory = inventory
         self.driver = driver
         self.executor = executor

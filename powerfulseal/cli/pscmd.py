@@ -78,7 +78,7 @@ class PSCmd(cmd.Cmd):
     """
 
     def __init__(self, inventory, driver, executor, k8s_inventory):
-        super().__init__()
+        cmd.Cmd.__init__(self)
         self.inventory = inventory
         self.driver = driver
         self.prompt = "(seal) $ "

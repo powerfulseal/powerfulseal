@@ -17,7 +17,7 @@
 import random
 import datetime
 import pytest
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 from powerfulseal.policy.scenario import Scenario
 

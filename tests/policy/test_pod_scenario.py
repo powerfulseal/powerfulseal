@@ -16,7 +16,7 @@
 
 import random
 import pytest
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 from powerfulseal.policy.pod_scenario import PodScenario
 
@@ -178,7 +178,8 @@ def test_kills_with_probability(pod_scenario, prob):
     for _ in range(sample):
         pod_scenario.act(items)
 
-    assert (mock.call_count/len(items)) / sample == pytest.approx(prob, 0.05)
+    actual_prob = float(mock.call_count / len(items)) / sample
+    assert (actual_prob == pytest.approx(prob, 0.05))
 
 
 def test_doesnt_kill_when_cant_find_node(pod_scenario):

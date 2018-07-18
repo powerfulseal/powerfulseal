@@ -25,7 +25,7 @@ class PodScenario(Scenario):
     """
 
     def __init__(self, name, schema, inventory, k8s_inventory, executor, logger=None):
-        super().__init__(name, schema, logger=logger)
+        Scenario.__init__(self, name, schema, logger=logger)
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor

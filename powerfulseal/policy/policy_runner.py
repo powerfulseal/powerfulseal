@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +15,13 @@
 
 import random
 import time
-from jsonschema import validate
+
+import jsonschema
 import yaml
 import pkgutil
 import logging
 from .pod_scenario import PodScenario
 from .node_scenario import NodeScenario
-
 
 logger = logging.getLogger(__name__)
 
@@ -39,14 +38,19 @@ class PolicyRunner():
         return yaml.load(data)
 
     @classmethod
-    def validate_file(cls, filename, schema=None):
-        """ Validates a policy against the JSON schema
-        """
-        schema = schema or cls.get_schema()
+    def load_file(cls, filename):
         with open(filename, "r") as f:
-            policy = yaml.load(f.read())
-        validate(policy, schema)
-        return policy
+            return yaml.load(f.read())
+
+    @classmethod
+    def is_policy_valid(cls, policy, schema=None):
+        schema = schema or cls.get_schema()
+        try:
+            jsonschema.validate(policy, schema)
+        except jsonschema.ValidationError as error:
+            logger.error(error)
+            return False
+        return True
 
     @classmethod
     def run(cls, policy, inventory, k8s_inventory, driver, executor, loops=None,

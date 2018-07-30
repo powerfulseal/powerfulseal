@@ -328,7 +328,7 @@ def main(argv):
         else:
             logger.error("Policy not valid. See log output above.")
     elif args.run_policy_file:
-        policy = PolicyRunner.load_file(args.validate_policy_file)
+        policy = PolicyRunner.load_file(args.run_policy_file)
         if not PolicyRunner.is_policy_valid(policy):
             logger.error("Policy not valid. See log output above.")
         PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor,

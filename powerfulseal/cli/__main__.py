@@ -323,7 +323,7 @@ def main(argv):
 
         ServerState(policy, inventory, k8s_inventory, driver, executor,
                     policy_path=args.run_policy_file)
-        start_server(args.server_host, args.server_port)
+        start_server(args.server_host, int(args.server_port))
     elif args.interactive:
         # create a command parser
         cmd = PSCmd(

@@ -16,6 +16,7 @@ import logging
 import random
 
 import jsonschema
+import yaml
 from flask import Flask, jsonify, request
 
 from powerfulseal.policy import PolicyRunner
@@ -180,7 +181,7 @@ class ServerState:
         :except IOError
         """
         with open(self.policy_path, 'w') as f:
-            f.write(policy)
+            f.write(yaml.dump(policy, default_flow_style=False))
         self.policy = policy
         self.update_items()
 

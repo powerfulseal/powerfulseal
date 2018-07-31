@@ -14,6 +14,8 @@
 
 from __future__ import print_function
 import argparse
+
+import yaml
 from configargparse import ArgumentParser, YAMLConfigFileParser
 import logging
 import textwrap
@@ -309,7 +311,7 @@ def main(argv):
                 # Create a new policy file
                 with open(args.run_policy_file, "w") as f:
                     policy = PolicyRunner.DEFAULT_POLICY
-                    f.write(policy)
+                    f.write(yaml.dump(policy, default_flow_style=False))
             else:
                 policy = PolicyRunner.load_file(args.run_policy_file)
                 if not PolicyRunner.is_policy_valid(policy):

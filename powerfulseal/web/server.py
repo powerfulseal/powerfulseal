@@ -82,7 +82,30 @@ def items():
     Gets a list of nodes and pods
     """
     server_state.update_items()
-    return jsonify({'nodes': server_state.nodes, 'pods': server_state.pods})
+
+    nodes = [{
+        'id': node.id,
+        'name': node.name,
+        'ip': node.ip,
+        'az': node.az,
+        'groups': node.groups,
+        'no': node.no,
+        'state': node.state
+    } for node in server_state.nodes]
+
+    pods = [{
+        'name': pod.name,
+        'namespace': pod.namespace,
+        'num': pod.num,
+        'uid': pod.uid,
+        'host_ip': pod.host_ip,
+        'ip': pod.ip,
+        'container_ids': pod.container_ids,
+        'state': pod.state,
+        'labels': pod.labels
+    } for pod in server_state.pods]
+
+    return jsonify({'nodes': nodes, 'pods': pods})
 
 
 @app.route('/nodes', methods=['POST'])
@@ -101,7 +124,7 @@ def nodes():
         return jsonify({'error': 'Invalid action'}), 400
 
     for node in server_state.nodes:
-        if node['no'] == node_no:
+        if node.no == node_no:
             if action == 'start':
                 is_action_successful = server_state.start_node(node)
             else:
@@ -128,7 +151,7 @@ def pods():
         return jsonify({'error': 'pod_num field missing'}), 400
 
     for pod in server_state.pods:
-        if pods['num'] == pod_num:
+        if pod.num == pod_num:
             is_action_successful = server_state.kill_pod(pod, is_forced)
             if is_action_successful:
                 return jsonify({}), 200
@@ -228,7 +251,7 @@ class ServerState:
         container_id = random.choice(pod.container_ids)
         cmd = POD_KILL_CMD_TEMPLATE.format(
             signal=signal,
-            container_id=container_id.replace("docker://",""),
+            container_id=container_id.replace("docker://", ""),
         )
 
         # Send kill command
@@ -237,4 +260,3 @@ class ServerState:
                 return False
 
         return True
-

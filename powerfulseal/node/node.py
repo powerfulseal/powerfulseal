@@ -14,10 +14,10 @@
 # limitations under the License.
 
 
-from enum import Enum
+from enum import IntEnum
 
 
-class NodeState(Enum):
+class NodeState(IntEnum):
     """
         Enumeration to describe a Node state
     """

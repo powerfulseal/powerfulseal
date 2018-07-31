@@ -26,6 +26,7 @@ from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
 from powerfulseal.policy.label_runner import LabelRunner
 from powerfulseal.web.server import Server
+from powerfulseal.web.server import ServerState, start_server
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
@@ -318,8 +319,9 @@ def main(argv):
             print("Unable to perform file operations. Exiting.")
             sys.exit(-1)
 
-        server = Server(policy, inventory, k8s_inventory, driver, executor)
-        server.start_server(args.server_host, args.server_port)
+        ServerState(policy, inventory, k8s_inventory, driver, executor,
+                    policy_path=args.run_policy_file)
+        start_server(args.server_host, args.server_port)
     elif args.interactive:
         # create a command parser
         cmd = PSCmd(

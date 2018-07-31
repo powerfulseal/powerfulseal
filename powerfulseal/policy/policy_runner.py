@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 class PolicyRunner():
     """ Reads, validates and executes a JSON schema-compliant policy
     """
+    DEFAULT_POLICY = {}
 
     @classmethod
     def get_schema(cls):
@@ -48,7 +49,7 @@ class PolicyRunner():
         try:
             jsonschema.validate(policy, schema)
         except jsonschema.ValidationError as error:
-            logger.error(error)
+            print(error)
             return False
         return True
 

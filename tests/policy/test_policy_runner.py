@@ -21,6 +21,10 @@ from mock import MagicMock
 from powerfulseal.policy import PolicyRunner
 
 
+def test_default_policy_validates():
+    assert PolicyRunner.is_policy_valid(PolicyRunner.DEFAULT_POLICY)
+
+
 def test_example_config_validates():
     filename = pkg_resources.resource_filename("tests.policy", "example_config.yml")
     policy = PolicyRunner.load_file(filename)

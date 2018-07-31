@@ -25,6 +25,7 @@ from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
 from powerfulseal.policy.label_runner import LabelRunner
+from powerfulseal.web.server import Server
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
@@ -107,6 +108,21 @@ def parse_args(args):
         help='Maximum number of seconds between runs',
         default=300,
         type = int
+    )
+
+    # Web
+    prog.add_argument(
+        '--server',
+        help='Start PowerfulSeal in web server mode',
+        action='store_true'
+    )
+    prog.add_argument(
+        '--server-host',
+        help='Specify host for the PowerfulSeal web server'
+    )
+    prog.add_argument(
+        '--server-port',
+        help='Specify port for the PowerfulSeal web server'
     )
 
     # Inventory
@@ -284,7 +300,27 @@ def main(argv):
         start_http_server(args.prometheus_port, args.prometheus_host)
         metric_collector = PrometheusCollector()
 
-    if args.interactive:
+    if args.server:
+        # If the policy file already exists, then it must be valid. Otherwise,
+        # create the policy file and write a default, empty policy to it.
+        try:
+            if not (os.path.exists(args.run_policy_file) and os.path.isfile(args.run_policy_file)):
+                # Create a new policy file
+                with open(args.run_policy_file, "w") as f:
+                    policy = PolicyRunner.DEFAULT_POLICY
+                    f.write(policy)
+            else:
+                policy = PolicyRunner.load_file(args.run_policy_file)
+                if not PolicyRunner.is_policy_valid(policy):
+                    print("Policy file exists but is not valid. Exiting.")
+                    sys.exit(-1)
+        except IOError:
+            print("Unable to perform file operations. Exiting.")
+            sys.exit(-1)
+
+        server = Server(policy, inventory, k8s_inventory, driver, executor)
+        server.start_server(args.server_host, args.server_port)
+    elif args.interactive:
         # create a command parser
         cmd = PSCmd(
             inventory=inventory,

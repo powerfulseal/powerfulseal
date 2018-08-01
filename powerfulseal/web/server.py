@@ -147,7 +147,7 @@ def pods():
     try:
         is_forced = request.form.has_key('is_forced')
         pod_num = request.form['pod_num']
-    except:
+    except KeyError:
         return jsonify({'error': 'pod_num field missing'}), 400
 
     for pod in server_state.pods:

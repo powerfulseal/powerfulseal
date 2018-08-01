@@ -81,7 +81,6 @@ def items():
     """
     Gets a list of nodes and pods
     """
-    server_state.update_items()
 
     nodes = [{
         'id': node.id,
@@ -91,7 +90,7 @@ def items():
         'groups': node.groups,
         'no': node.no,
         'state': node.state
-    } for node in server_state.nodes]
+    } for node in server_state.get_nodes()]
 
     pods = [{
         'name': pod.name,
@@ -103,7 +102,7 @@ def items():
         'container_ids': pod.container_ids,
         'state': pod.state,
         'labels': pod.labels
-    } for pod in server_state.pods]
+    } for pod in server_state.get_pods()]
 
     return jsonify({'nodes': nodes, 'pods': pods})
 
@@ -111,20 +110,20 @@ def items():
 @app.route('/nodes', methods=['POST'])
 def nodes():
     """
-    Starts or stops a node by "no" field
+    Starts or stops a node identified by its IP address
     :return:
     """
     try:
         action = request.form['action']
-        node_no = request.form['node_no']
+        ip = request.form['ip']
     except KeyError:
-        return jsonify({'error': 'Action/node_no fields missing'}), 400
+        return jsonify({'error': 'Action/IP address fields missing'}), 400
 
     if action not in ['start', 'stop']:
         return jsonify({'error': 'Invalid action'}), 400
 
     for node in server_state.nodes:
-        if node.no == node_no:
+        if node.ip == ip:
             if action == 'start':
                 is_action_successful = server_state.start_node(node)
             else:
@@ -135,30 +134,31 @@ def nodes():
             else:
                 return jsonify({'error': 'Action on node failed'}, 500)
 
-    return jsonify({'error': 'Node "no" not found'}), 400
+    return jsonify({'error': 'Node IP address not found'}), 400
 
 
 @app.route('/pods', methods=['POST'])
 def pods():
     """
-    Kills or force kills a pod by its "num" field
+    Kills or force kills a pod by its UID field. Force kills if `is_forced` parameter
+    is the string `true`.
     :return:
     """
     try:
-        is_forced = request.form.has_key('is_forced')
-        pod_num = request.form['pod_num']
+        is_forced = request.form['is_forced'] == 'true'
+        uid = request.form['pod_num']
     except KeyError:
         return jsonify({'error': 'pod_num field missing'}), 400
 
     for pod in server_state.pods:
-        if pod.num == pod_num:
+        if pod.uid == uid:
             is_action_successful = server_state.kill_pod(pod, is_forced)
             if is_action_successful:
                 return jsonify({}), 200
             else:
                 return jsonify({'error': 'Action on pod failed'}, 500)
 
-    return jsonify({'error': 'Pod "num" not found'}), 400
+    return jsonify({'error': 'Pod UID not found'}), 400
 
 
 def start_server(host, port):
@@ -184,9 +184,6 @@ class ServerState:
         self.executor = executor
         self.policy_path = policy_path
 
-        self.nodes = []
-        self.pods = []
-
     def is_policy_valid(self):
         """
         Checks whether the specified policy is valid depending on the schema
@@ -206,14 +203,12 @@ class ServerState:
         with open(self.policy_path, 'w') as f:
             f.write(yaml.dump(policy, default_flow_style=False))
         self.policy = policy
-        self.update_items()
 
-    def update_items(self):
-        """
-        Updates the list of nodes and pods
-        """
-        self.nodes = self.inventory.get_all_nodes()
-        self.pods = self.k8s_inventory.get_all_pods()
+    def get_nodes(self):
+        return self.inventory.get_all_nodes()
+
+    def get_pods(self):
+        return self.k8s_inventory.get_all_pods()
 
     def start_node(self, node):
         """

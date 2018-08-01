@@ -94,7 +94,9 @@ Both Python 2.7 and Python 3 are supported.
 
 PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test with multiple versions on Python. The recommended setup is to install and locally activate the Python versions under `tox.ini` with [pyenv](https://github.com/pyenv/pyenv). 
 
-Once the required Python versions are set up and can be discovered by tox (e.g., by having them discoverable in your PATH), you can run the tests by running `tox`. 
+Once the required Python versions are set up and can be discovered by tox (e.g., by having them discoverable in your PATH), you can run the tests by running `tox`.
+
+More details in [TESTING.md](TESTING.md) 
 
 ## Read about the PowerfulSeal
 

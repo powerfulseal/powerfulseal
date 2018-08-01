@@ -122,7 +122,7 @@ def nodes():
     if action not in ['start', 'stop']:
         return jsonify({'error': 'Invalid action'}), 400
 
-    for node in server_state.nodes:
+    for node in server_state.get_nodes():
         if node.ip == ip:
             if action == 'start':
                 is_action_successful = server_state.start_node(node)
@@ -150,7 +150,7 @@ def pods():
     except KeyError:
         return jsonify({'error': 'is_forced/uid fields missing'}), 400
 
-    for pod in server_state.pods:
+    for pod in server_state.get_pods():
         if pod.uid == uid:
             is_action_successful = server_state.kill_pod(pod, is_forced)
             if is_action_successful:

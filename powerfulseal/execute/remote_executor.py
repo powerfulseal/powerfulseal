@@ -14,6 +14,8 @@
 # limitations under the License.
 
 from __future__ import print_function
+import logging
+
 import spur
 
 
@@ -25,13 +27,15 @@ class RemoteExecutor(object):
     PREFIX = ["sh", "-c"]
 
     def __init__(self, nodes=None, user="cloud-user",
-                 ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None):
+                 ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None,
+                 logger=None):
         self.nodes = nodes or []
         self.user = user
         self.missing_host_key = (spur.ssh.MissingHostKey.accept
                                  if ssh_allow_missing_host_keys
                                  else spur.ssh.MissingHostKey.raise_error)
         self.ssh_path_to_private_key = ssh_path_to_private_key
+        self.logger = logger or logging.getLogger(__name__)
 
     def execute(self, cmd, nodes=None, debug=False):
         nodes = nodes or self.nodes
@@ -44,7 +48,7 @@ class RemoteExecutor(object):
                 missing_host_key=self.missing_host_key,
                 private_key_file=self.ssh_path_to_private_key,
             )
-            print("Executing '%s' on %s" % (cmd_full, node.name))
+            self.logger.info("Executing '%s' on %s" % (cmd_full, node.name))
             try:
                 with shell:
                     output = shell.run(cmd_full)
@@ -58,4 +62,5 @@ class RemoteExecutor(object):
                     "ret_code": 1,
                     "error": str(e),
                 }
+                self.logger.info("Executing '%s' on %s failed with error: %s" % (cmd_full, node.name, str(e)))
         return results

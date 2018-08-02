@@ -27,8 +27,7 @@ from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
 from powerfulseal.policy.label_runner import LabelRunner
-from powerfulseal.web.server import Server
-from powerfulseal.web.server import ServerState, start_server
+from powerfulseal.web.server import ServerState, start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
@@ -245,7 +244,9 @@ def main(argv):
         stream=sys.stdout,
         level=log_level
     )
-    logger = logging.getLogger(__name__)
+
+    # Ensure the logger config propagates from the root module of this package
+    logger = logging.getLogger(__name__.split('.')[0])
     logger.setLevel(log_level)
 
     # build cloud provider driver
@@ -321,8 +322,13 @@ def main(argv):
             print("Unable to perform file operations. Exiting.")
             sys.exit(-1)
 
+        # Create an instance of the singleton server state, ensuring all logs
+        # for retrieval from the web interface
         ServerState(policy, inventory, k8s_inventory, driver, executor,
                     policy_path=args.run_policy_file)
+        server_log_handler = ServerStateLogHandler()
+        server_log_handler.setLevel(logging.DEBUG)
+        logger.addHandler(server_log_handler)
         start_server(args.server_host, int(args.server_port))
     elif args.interactive:
         # create a command parser

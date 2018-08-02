@@ -14,6 +14,7 @@
 
 import logging
 import random
+from threading import Lock
 
 import jsonschema
 import yaml
@@ -21,8 +22,6 @@ from flask import Flask, jsonify, request
 
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE
-
-logger = logging.getLogger(__name__)
 
 # Flask instance and routes
 app = Flask(__name__)
@@ -35,10 +34,11 @@ server_state = None
 def policy_actions():
     if request.method == 'GET':
         # GET request: returns a JSON representation of the policy file
+        policy = server_state.get_policy()
         return jsonify({
-            'config': server_state.policy.get('config', []),
-            'nodeScenarios': server_state.policy.get('nodeScenarios', []),
-            'podScenarios': server_state.policy.get('podScenarios', [])
+            'config': policy.get('config', []),
+            'nodeScenarios': policy.get('nodeScenarios', []),
+            'podScenarios': policy.get('podScenarios', [])
         })
     elif request.method == 'PUT':
         # POST request: modify a policy
@@ -166,7 +166,7 @@ def start_server(host, port):
 
 
 class ServerState:
-    def __init__(self, policy, inventory, k8s_inventory, driver, executor, policy_path):
+    def __init__(self, policy, inventory, k8s_inventory, driver, executor, policy_path, logger=None):
         # server_state must be accessed in a global context as Flask works within
         # a module level scope. As a result, there is no intuitive way for Flask
         # API endpoints to access the server state without first making the server
@@ -184,6 +184,13 @@ class ServerState:
         self.executor = executor
         self.policy_path = policy_path
 
+        self.logger = logger or logging.getLogger(__name__)
+        self.logs = []
+
+        # Due to concurrent requests, it is safer to acquire locks on variables
+        # where race conditions could occur
+        self.lock = Lock()
+
     def is_policy_valid(self):
         """
         Checks whether the specified policy is valid depending on the schema
@@ -196,13 +203,18 @@ class ServerState:
             return False
         return True
 
+    def get_policy(self):
+        with self.lock:
+            return self.policy
+
     def update_policy(self, policy):
         """
         :except IOError
         """
-        with open(self.policy_path, 'w') as f:
-            f.write(yaml.dump(policy, default_flow_style=False))
-        self.policy = policy
+        with self.lock:
+            with open(self.policy_path, 'w') as f:
+                f.write(yaml.dump(policy, default_flow_style=False))
+            self.policy = policy
 
     def get_nodes(self):
         return self.inventory.get_all_nodes()
@@ -218,7 +230,7 @@ class ServerState:
             self.driver.start(node)
             return True
         except:
-            logger.error("Error starting the machine")
+            self.logger.error("Error starting the machine")
             return False
 
     def stop_node(self, node):
@@ -229,7 +241,7 @@ class ServerState:
             self.driver.stop(node)
             return True
         except:
-            logger.error("Error stopping the machine")
+            self.logger.error("Error stopping the machine")
             return False
 
     def kill_pod(self, pod, is_forced):
@@ -255,3 +267,16 @@ class ServerState:
                 return False
 
         return True
+
+
+class ServerStateLogHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+
+    def emit(self, record):
+        with server_state.lock:
+            server_state.logs.append({
+                'timestamp': record.created,
+                'level': record.levelname,
+                'message': record.msg
+            })

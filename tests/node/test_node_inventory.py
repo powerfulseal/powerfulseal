@@ -15,7 +15,7 @@
 
 
 import pytest
-from unittest.mock import MagicMock
+from mock import MagicMock
 
 from powerfulseal.node import Node, NodeInventory
 

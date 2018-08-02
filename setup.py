@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='1.2.1',
+    version='1.3.0',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
@@ -23,8 +23,16 @@ setup(
         'kubernetes>=1.0.0,<2',
         'PyYAML>=3.12,<4',
         'jsonschema>=2.6.0,<3',
-        'boto3>=1.5.15,<2.0.0'
+        'boto3>=1.5.15,<2.0.0',
+        'future>=0.16.0,<1',
     ],
+    extras_require={
+        'testing': [
+            'pytest>=3.0,<4',
+            'pytest-cov>=2.5,<3',
+            'mock>=2,<3',
+        ]
+    },
     entry_points={
         'console_scripts': [
             'seal = powerfulseal.cli.__main__:start',

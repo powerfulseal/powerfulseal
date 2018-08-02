@@ -90,6 +90,16 @@ pip install powerfulseal
 powerfulseal --help # or seal --help
 ```
 
+Both Python 2.7 and Python 3 are supported.
+
+## Testing
+
+PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test with multiple versions on Python. The recommended setup is to install and locally activate the Python versions under `tox.ini` with [pyenv](https://github.com/pyenv/pyenv). 
+
+Once the required Python versions are set up and can be discovered by tox (e.g., by having them discoverable in your PATH), you can run the tests by running `tox`.
+
+More details in [TESTING.md](TESTING.md) 
+
 ## Read about the PowerfulSeal
 
 - https://www.techatbloomberg.com/blog/powerfulseal-testing-tool-kubernetes-clusters/
@@ -99,7 +109,6 @@ powerfulseal --help # or seal --help
 - https://github.com/dastergon/awesome-chaos-engineering#notable-tools
 - https://www.linux.com/news/powerfulseal-testing-tool-kubernetes-clusters-0
 - https://www.infoq.com/news/2018/01/powerfulseal-chaos-kubernetes
-
 
 ## FAQ
 

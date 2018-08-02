@@ -1,11 +1,11 @@
 INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
-PYTEST_CALL ?= pytest --cov powerfulseal/ --cov-report term-missing -vv
+TOX_CALL ?= tox
 
 test:
-	$(PYTEST_CALL)
+	$(TOX_CALL)
 
 watch:
-	$(PYTEST_CALL) && while $(INOTIFY_CALL); do $(PYTEST_CALL); done
+	$(TOX_CALL) && while $(INOTIFY_CALL); do $(TOX_CALL); done
 
 upload:
 	rm -rfv dist

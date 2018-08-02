@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +13,11 @@
 # limitations under the License.
 
 
-import abc
+import abc, six
 
 
-class AbstractDriver(metaclass=abc.ABCMeta):
+@six.add_metaclass(abc.ABCMeta)
+class AbstractDriver():
     """
         Abstract class representing a cloud driver.
         All concrete drivers should implement this.
@@ -25,20 +25,20 @@ class AbstractDriver(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def sync(self):
-        pass #pragma: no cover
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def get_by_ip(self, ip):
-        pass #pragma: no cover
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def stop(self, node):
-        pass #pragma: no cover
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def start(self, node):
-        pass #pragma: no cover
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def delete(self, node):
-        pass #pragma: no cover
+        pass  # pragma: no cover

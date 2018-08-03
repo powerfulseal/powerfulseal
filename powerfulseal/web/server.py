@@ -14,6 +14,8 @@
 
 import logging
 import random
+import threading
+import time
 from threading import Lock
 
 import jsonschema
@@ -21,7 +23,8 @@ import yaml
 from flask import Flask, jsonify, request
 
 from powerfulseal.policy import PolicyRunner
-from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE
+from powerfulseal.policy.node_scenario import NodeScenario
+from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
 
 # Flask instance and routes
 app = Flask(__name__)
@@ -64,7 +67,27 @@ def autonomousMode():
     """
     Sets the state of autonomous mode (state is either start or stop)
     """
-    pass
+    params = request.get_json()
+    action = params.get('action', None)
+    if action is None:
+        return jsonify({'error': 'Action field missing'}), 400
+
+    if action not in ['start', 'stop']:
+        return jsonify({'error': 'Action field must either be \'start\' or \'stop\''}), 400
+
+    try:
+        if action == 'start':
+            if server_state.is_policy_runner_running():
+                return jsonify({'error': 'Policy runner already running'}), 412
+            server_state.start_policy_runner()
+        else:
+            if not server_state.is_policy_runner_running():
+                return jsonify({'error': 'Policy runner already running'}), 412
+            server_state.stop_policy_runner()
+    except RuntimeError:
+        return jsonify({'error': 'Policy runner is in an inconsistent state'}), 400
+
+    return jsonify({})
 
 
 @app.route('/logs')
@@ -90,7 +113,6 @@ def items():
     """
     Gets a list of nodes and pods
     """
-
     nodes = [{
         'id': node.id,
         'name': node.name,
@@ -174,6 +196,60 @@ def start_server(host, port):
     app.run(host=host, port=port)
 
 
+class ThreadedPolicyRunner(threading.Thread):
+    def __init__(self, policy, inventory, k8s_inventory, driver, executor, logger=None):
+        super().__init__()
+        config = policy.get("config", {})
+        self.wait_min = config.get("minSecondsBetweenRuns", 0)
+        self.wait_max = config.get("maxSecondsBetweenRuns", 300)
+
+        self.node_scenarios = [
+            NodeScenario(
+                name=item.get("name"),
+                schema=item,
+                inventory=inventory,
+                driver=driver,
+                executor=executor,
+            )
+            for item in policy.get("nodeScenarios", [])
+        ]
+
+        self.pod_scenarios = [
+            PodScenario(
+                name=item.get("name"),
+                schema=item,
+                inventory=inventory,
+                k8s_inventory=k8s_inventory,
+                executor=executor,
+            )
+            for item in policy.get("podScenarios", [])
+        ]
+
+        self.inventory = inventory
+        self.k8s_inventory = k8s_inventory
+        self.driver = driver
+        self.executor = executor
+        self.logger = logger or logging.getLogger(__name__)
+
+        self.is_stopped = threading.Event()
+
+    def run(self):
+        while not self.is_stopped.is_set():
+            for scenario in self.node_scenarios:
+                scenario.execute()
+            for scenario in self.pod_scenarios:
+                scenario.execute()
+
+            sleep_time = int(random.uniform(self.wait_min, self.wait_max))
+            self.logger.debug("Sleeping for %s seconds", sleep_time)
+            time.sleep(sleep_time)
+
+            self.inventory.sync()
+
+    def stop(self):
+        self.is_stopped.set()
+
+
 class ServerState:
     def __init__(self, policy, inventory, k8s_inventory, driver, executor, policy_path, logger=None):
         # server_state must be accessed in a global context as Flask works within
@@ -194,8 +270,12 @@ class ServerState:
         self.logs = []
 
         # Due to concurrent requests, it is safer to acquire locks on variables
-        # where race conditions could occur
+        # where race conditions could occur.
         self.lock = Lock()
+
+        # Contains an instance of ThreadedPolicyRunner which is only set once
+        # autonomous mode is started and cleared once it is stopped
+        self.policyRunner = None
 
     def is_policy_valid(self):
         """
@@ -273,6 +353,29 @@ class ServerState:
                 return False
 
         return True
+
+    def is_policy_runner_running(self):
+        with self.lock:
+            return self.policyRunner is not None
+
+    def start_policy_runner(self):
+        with self.lock:
+            if self.policyRunner is not None:
+                raise RuntimeError('Policy runner is already running')
+
+            self.policyRunner = ThreadedPolicyRunner(self.policy, self.inventory,
+                                                     self.k8s_inventory, self.driver,
+                                                     self.executor)
+            self.policyRunner.start()
+
+    def stop_policy_runner(self):
+        with self.lock:
+            if self.policyRunner is None:
+                raise RuntimeError('Policy runner is already stopped')
+
+            self.policyRunner.stop()
+            self.policyRunner.join()
+            self.policyRunner = None
 
 
 class ServerStateLogHandler(logging.Handler):

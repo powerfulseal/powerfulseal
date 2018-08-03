@@ -41,10 +41,9 @@ def policy_actions():
             'podScenarios': policy.get('podScenarios', [])
         })
     elif request.method == 'PUT':
-        # POST request: modify a policy
-        try:
-            modified_policy = request.form['policy']
-        except KeyError:
+        # PUT request: modify a policy
+        modified_policy = request.get_json().get('policy', None)
+        if modified_policy is None:
             return jsonify({'error': 'Policy field missing'}), 400
 
         if not PolicyRunner.is_policy_valid(modified_policy):
@@ -73,7 +72,17 @@ def logs():
     """
     Retrieves the application logs
     """
-    pass
+    # Logs can be retrieves from the offset inclusive (e.g., if the offset is 3,
+    # then return from index three (or fourth item in the list) inclusive [3:])
+    offset = request.args.get('offset', default=0, type=int)
+
+    if offset < 0:
+        return jsonify({'error': 'Offset cannot be negative'}), 400
+
+    with server_state.lock:
+        if len(server_state.logs) < offset + 1:
+            return jsonify({'logs': []})
+        return jsonify({'logs': server_state.logs[offset:]})
 
 
 @app.route('/items')
@@ -108,15 +117,15 @@ def items():
 
 
 @app.route('/nodes', methods=['POST'])
-def nodes():
+def update_nodes():
     """
     Starts or stops a node identified by its IP address
     :return:
     """
-    try:
-        action = request.form['action']
-        ip = request.form['ip']
-    except KeyError:
+    params = request.get_json()
+    action = params.get('action', None)
+    ip = params.get('ip', None)
+    if action is None or ip is None:
         return jsonify({'error': 'Action/IP address fields missing'}), 400
 
     if action not in ['start', 'stop']:
@@ -138,17 +147,17 @@ def nodes():
 
 
 @app.route('/pods', methods=['POST'])
-def pods():
+def update_pods():
     """
     Kills or force kills a pod by its UID field. Force kills if `is_forced` parameter
     is the string `true`.
     :return:
     """
-    try:
-        is_forced = request.form['is_forced'] == 'true'
-        uid = request.form['uid']
-    except KeyError:
-        return jsonify({'error': 'is_forced/uid fields missing'}), 400
+    params = request.get_json()
+    is_forced = params.get('is_forced', False) in [True, 'true', '1', 1]
+    uid = params.get('uid', None)
+    if uid is None:
+        return jsonify({'error': 'uid field missing'}), 400
 
     for pod in server_state.get_pods():
         if pod.uid == uid:
@@ -172,9 +181,6 @@ class ServerState:
         # API endpoints to access the server state without first making the server
         # state a global singleton variable which Flask can directly access.
         global server_state
-        if server_state is not None:
-            print("Unable to create singleton server instance. Exiting.")
-            exit(-1)
         server_state = self
 
         self.policy = policy

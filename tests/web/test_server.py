@@ -32,6 +32,17 @@ def client():
     yield client
 
 
+def test_node_state_values_are_expected():
+    """
+    The API depends on the integer values of the NodeState enum. If these values
+    are changed, then the API spec and front-end need to reflect these changes.
+    """
+    assert NodeState.UNKNOWN == 1
+    assert NodeState.UP == 2
+    assert NodeState.DOWN == 3
+    assert len(NodeState) == 3
+
+
 def test_autonomous_mode_integration(client):
     policy = {
         'config': {

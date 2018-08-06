@@ -66,39 +66,39 @@ def test_autonomous_mode_integration(client):
     server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None)
 
     # Autonomous mode has not yet started
-    result = client.get('autonomous-mode')
+    result = client.get('/api/autonomous-mode')
     assert json.loads(result.data)['isStarted'] is False
 
     # Autonomous mode has not yet started so it cannot be stopped
-    result = client.post('autonomous-mode', data=json.dumps({
+    result = client.post('/api/autonomous-mode', data=json.dumps({
         'action': 'stop'
     }), content_type='application/json')
     assert result.status_code == 412
 
     # Start autonomous mode
-    result = client.post('autonomous-mode', data=json.dumps({
+    result = client.post('/api/autonomous-mode', data=json.dumps({
         'action': 'start'
     }), content_type='application/json')
     assert result.status_code == 200
 
     # Autonomous mode has started
-    result = client.get('autonomous-mode')
+    result = client.get('/api/autonomous-mode')
     assert json.loads(result.data)['isStarted'] is True
 
     # Autonomous mode has started so it cannot be started
-    result = client.post('autonomous-mode', data=json.dumps({
+    result = client.post('/api/autonomous-mode', data=json.dumps({
         'action': 'start'
     }), content_type='application/json')
     assert result.status_code == 412
 
     # Stop autonomous mode
-    result = client.post('autonomous-mode', data=json.dumps({
+    result = client.post('/api/autonomous-mode', data=json.dumps({
         'action': 'stop'
     }), content_type='application/json')
     assert result.status_code == 200
 
     # Autonomous mode has stopped
-    result = client.get('autonomous-mode')
+    result = client.get('/api/autonomous-mode')
     assert json.loads(result.data)['isStarted'] is False
 
 
@@ -106,7 +106,7 @@ def test_get_policy_actions(client):
     server_state_mock = MagicMock()
     server_state_mock.get_policy = MagicMock(return_value={})
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
-        result = client.get("policy")
+        result = client.get("/api/policy")
         assert json.loads(result.data) == {
             'config': [],
             'nodeScenarios': [],
@@ -128,12 +128,12 @@ def test_put_policy_actions(client):
     }
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
-        result = client.put("policy", data=json.dumps({
+        result = client.put("/api/policy", data=json.dumps({
             'policy': valid_policy
         }), content_type='application/json')
         assert result.status_code == 200
 
-        result = client.put("policy", data=json.dumps({
+        result = client.put("/api/policy", data=json.dumps({
             'policy': invalid_policy
         }), content_type='application/json')
         assert result.status_code == 400
@@ -148,28 +148,28 @@ def test_get_logs(client):
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
         # Test case where an offset is not specified
         server_state_mock.logs = [str(i) for i in range(3)]
-        result = client.get("logs")
+        result = client.get("/api/logs")
         assert json.loads(result.data)['logs'] == [str(i) for i in range(3)]
 
         # Test case where offset is specified and correct result is given
         server_state_mock.logs = [str(i) for i in range(9)]
-        result = client.get("logs?offset=5")
+        result = client.get("/api/logs?offset=5")
         assert json.loads(result.data)['logs'] == ['5', '6', '7', '8']
 
         # Test edge case where just within range
         server_state_mock.logs = [str(i) for i in range(9)]
-        result = client.get("logs?offset=8")
+        result = client.get("/api/logs?offset=8")
         assert json.loads(result.data)['logs'] == ['8']
 
         # Test edge case where just outside range
         server_state_mock.logs = [str(i) for i in range(9)]
-        result = client.get("logs?offset=9")
+        result = client.get("/api/logs?offset=9")
         assert json.loads(result.data)['logs'] == []
 
         # Test case where offset is negative
         # Test edge case where just within range
         server_state_mock.logs = [str(i) for i in range(9)]
-        result = client.get("logs?offset=-1")
+        result = client.get("/api/logs?offset=-1")
         assert result.status_code == 400
 
 
@@ -196,7 +196,7 @@ def test_items(client):
     server_state_mock.get_pods = MagicMock(return_value=[test_pod])
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
-        result = client.get('items')
+        result = client.get('/api/items')
         server_state_mock.get_nodes.assert_called_once()
         server_state_mock.get_pods.assert_called_once()
 
@@ -218,7 +218,7 @@ def test_update_nodes(client):
     server_state_mock.get_nodes = MagicMock(return_value=[test_node])
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
-        result = client.post('nodes', data=json.dumps({
+        result = client.post('/api/nodes', data=json.dumps({
             'action': 'start',
             'ip': '0.0.0.0'
         }), content_type='application/json')
@@ -226,7 +226,7 @@ def test_update_nodes(client):
         assert server_state_mock.start_node.call_count == 1
         assert server_state_mock.stop_node.call_count == 0
 
-        result = client.post('nodes', data=json.dumps({
+        result = client.post('/api/nodes', data=json.dumps({
             'action': 'stop',
             'ip': '0.0.0.0'
         }), content_type='application/json')
@@ -243,21 +243,21 @@ def test_update_pods(client):
     server_state_mock.kill_pod = MagicMock(return_value=True)
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
-        result = client.post('pods', data=json.dumps({
-            'is_forced': True,
+        result = client.post('/api/pods', data=json.dumps({
+            'isForced': True,
             'uid': '1-1-1-1'
         }), content_type='application/json')
         assert result.status_code == 200
         server_state_mock.kill_pod.assert_called_once_with(test_pod, True)
 
-        result = client.post('pods', data=json.dumps({
+        result = client.post('/api/pods', data=json.dumps({
             'uid': '1-1-1-1'
         }), content_type='application/json')
         assert result.status_code == 200
         server_state_mock.kill_pod.assert_called_with(test_pod, False)
 
-        result = client.post('pods', data=json.dumps({
-            'is_forced': False,
+        result = client.post('/api/pods', data=json.dumps({
+            'isForced': False,
             'uid': '1-1-1-1'
         }), content_type='application/json')
         assert result.status_code == 200

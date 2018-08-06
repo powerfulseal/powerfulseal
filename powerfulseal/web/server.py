@@ -21,6 +21,7 @@ from threading import Lock
 import jsonschema
 import yaml
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.node_scenario import NodeScenario
@@ -28,12 +29,13 @@ from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
 
 # Flask instance and routes
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Singleton instance of the server
 server_state = None
 
 
-@app.route('/policy', methods=['GET', 'PUT'])
+@app.route('/api/policy', methods=['GET', 'PUT'])
 def policy_actions():
     if request.method == 'GET':
         # GET request: returns a JSON representation of the policy file
@@ -62,7 +64,7 @@ def policy_actions():
     return jsonify({}), 501
 
 
-@app.route('/autonomous-mode', methods=['GET', 'POST'])
+@app.route('/api/autonomous-mode', methods=['GET', 'POST'])
 def autonomousMode():
     """
     GET: Gets the state of autonomous mode
@@ -96,7 +98,7 @@ def autonomousMode():
     return jsonify({}), 501
 
 
-@app.route('/logs')
+@app.route('/api/logs')
 def logs():
     """
     Retrieves the application logs
@@ -114,7 +116,7 @@ def logs():
         return jsonify({'logs': server_state.logs[offset:]})
 
 
-@app.route('/items')
+@app.route('/api/items')
 def items():
     """
     Gets a list of nodes and pods
@@ -144,7 +146,7 @@ def items():
     return jsonify({'nodes': nodes, 'pods': pods})
 
 
-@app.route('/nodes', methods=['POST'])
+@app.route('/api/nodes', methods=['POST'])
 def update_nodes():
     """
     Starts or stops a node identified by its IP address
@@ -174,7 +176,7 @@ def update_nodes():
     return jsonify({'error': 'Node IP address not found'}), 404
 
 
-@app.route('/pods', methods=['POST'])
+@app.route('/api/pods', methods=['POST'])
 def update_pods():
     """
     Kills or force kills a pod by its UID field. Force kills if `is_forced` parameter

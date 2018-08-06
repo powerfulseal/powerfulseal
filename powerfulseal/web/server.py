@@ -171,7 +171,7 @@ def update_nodes():
             else:
                 return jsonify({'error': 'Action on node failed'}, 500)
 
-    return jsonify({'error': 'Node IP address not found'}), 400
+    return jsonify({'error': 'Node IP address not found'}), 404
 
 
 @app.route('/pods', methods=['POST'])
@@ -182,7 +182,7 @@ def update_pods():
     :return:
     """
     params = request.get_json()
-    is_forced = params.get('is_forced', False) in [True, 'true', '1', 1]
+    is_forced = params.get('isForced', False) in [True, 'true', '1', 1]
     uid = params.get('uid', None)
     if uid is None:
         return jsonify({'error': 'uid field missing'}), 400
@@ -195,7 +195,7 @@ def update_pods():
             else:
                 return jsonify({'error': 'Action on pod failed'}, 500)
 
-    return jsonify({'error': 'Pod UID not found'}), 400
+    return jsonify({'error': 'Pod UID not found'}), 404
 
 
 def start_server(host, port):

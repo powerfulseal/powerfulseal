@@ -62,32 +62,38 @@ def policy_actions():
     return jsonify({}), 501
 
 
-@app.route('/autonomous-mode', methods=['POST'])
+@app.route('/autonomous-mode', methods=['GET', 'POST'])
 def autonomousMode():
     """
-    Sets the state of autonomous mode (state is either start or stop)
+    GET: Gets the state of autonomous mode
+    POST: Sets the state of autonomous mode (state is either start or stop)
     """
-    params = request.get_json()
-    action = params.get('action', None)
-    if action is None:
-        return jsonify({'error': 'Action field missing'}), 400
+    if request.method == 'GET':
+        return jsonify({'isStarted': server_state.is_policy_runner_running()})
+    elif request.method == 'POST':
+        params = request.get_json()
+        action = params.get('action', None)
+        if action is None:
+            return jsonify({'error': 'Action field missing'}), 400
 
-    if action not in ['start', 'stop']:
-        return jsonify({'error': 'Action field must either be \'start\' or \'stop\''}), 400
+        if action not in ['start', 'stop']:
+            return jsonify({'error': 'Action field must either be \'start\' or \'stop\''}), 400
 
-    try:
-        if action == 'start':
-            if server_state.is_policy_runner_running():
-                return jsonify({'error': 'Policy runner already running'}), 412
-            server_state.start_policy_runner()
-        else:
-            if not server_state.is_policy_runner_running():
-                return jsonify({'error': 'Policy runner already running'}), 412
-            server_state.stop_policy_runner()
-    except RuntimeError:
-        return jsonify({'error': 'Policy runner is in an inconsistent state'}), 400
+        try:
+            if action == 'start':
+                if server_state.is_policy_runner_running():
+                    return jsonify({'error': 'Policy runner already running'}), 412
+                server_state.start_policy_runner()
+            else:
+                if not server_state.is_policy_runner_running():
+                    return jsonify({'error': 'Policy runner already stopped'}), 412
+                server_state.stop_policy_runner()
+        except RuntimeError:
+            return jsonify({'error': 'Policy runner is in an inconsistent state'}), 500
 
-    return jsonify({})
+        return jsonify({})
+
+    return jsonify({}), 501
 
 
 @app.route('/logs')

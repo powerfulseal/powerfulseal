@@ -18,16 +18,77 @@ import pkg_resources
 import pytest
 from mock import mock, MagicMock
 
+from powerfulseal.execute import RemoteExecutor
 from powerfulseal.k8s import Pod
 from powerfulseal.node import Node, NodeState
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.web import server
+from powerfulseal.web.server import ServerState
 
 
 @pytest.fixture
 def client():
     client = server.app.test_client()
     yield client
+
+
+def test_autonomous_mode_integration(client):
+    policy = {
+        'config': {
+            'minSecondsBetweenRuns': 0,
+            'maxSecondsBetweenRuns': 2
+        },
+        'nodeScenarios': [
+            {
+                'name': 'Node Test'
+            }
+        ],
+        'podScenarios': [
+            {
+                'name': 'Pod Test'
+            }
+        ]
+    }
+    test_inventory = MagicMock()
+    test_inventory.sync = MagicMock(return_value=None)
+
+    server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None)
+
+    # Autonomous mode has not yet started
+    result = client.get('autonomous-mode')
+    assert json.loads(result.data)['isStarted'] is False
+
+    # Autonomous mode has not yet started so it cannot be stopped
+    result = client.post('autonomous-mode', data=json.dumps({
+        'action': 'stop'
+    }), content_type='application/json')
+    assert result.status_code == 412
+
+    # Start autonomous mode
+    result = client.post('autonomous-mode', data=json.dumps({
+        'action': 'start'
+    }), content_type='application/json')
+    assert result.status_code == 200
+
+    # Autonomous mode has started
+    result = client.get('autonomous-mode')
+    assert json.loads(result.data)['isStarted'] is True
+
+    # Autonomous mode has started so it cannot be started
+    result = client.post('autonomous-mode', data=json.dumps({
+        'action': 'start'
+    }), content_type='application/json')
+    assert result.status_code == 412
+
+    # Stop autonomous mode
+    result = client.post('autonomous-mode', data=json.dumps({
+        'action': 'stop'
+    }), content_type='application/json')
+    assert result.status_code == 200
+
+    # Autonomous mode has stopped
+    result = client.get('autonomous-mode')
+    assert json.loads(result.data)['isStarted'] is False
 
 
 def test_get_policy_actions(client):

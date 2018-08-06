@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import time
+
 import pkg_resources
 from mock import mock, mock_open, MagicMock
 
@@ -66,3 +68,38 @@ def test_kill_pod():
 
     server_state.kill_pod(mock_pod, True)
     execute_mock.assert_called_once_with("sudo docker kill -s SIGKILL container1", nodes=[test_node])
+
+
+def test_policy_runner_lifecycle():
+    """
+    Integration test which starts, checks status, and stops the policy runner
+    """
+    policy = {
+        'config': {
+            'minSecondsBetweenRuns': 0,
+            'maxSecondsBetweenRuns': 2
+        },
+        'nodeScenarios': [
+            {
+                'name': 'Node Test'
+            }
+        ],
+        'podScenarios': [
+            {
+                'name': 'Pod Test'
+            }
+        ]
+    }
+    test_inventory = MagicMock()
+    test_inventory.sync = MagicMock(return_value=None)
+
+    server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None)
+    assert server_state.is_policy_runner_running() is False
+
+    server_state.start_policy_runner()
+    time.sleep(1)
+    assert server_state.is_policy_runner_running() is True
+
+    server_state.stop_policy_runner()
+    time.sleep(1)
+    assert server_state.is_policy_runner_running() is False

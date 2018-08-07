@@ -243,10 +243,13 @@ class ThreadedPolicyRunner(threading.Thread):
 
     def run(self):
         while not self.is_stopped.is_set():
-            for scenario in self.node_scenarios:
-                scenario.execute()
-            for scenario in self.pod_scenarios:
-                scenario.execute()
+            try:
+                for scenario in self.node_scenarios:
+                    scenario.execute()
+                for scenario in self.pod_scenarios:
+                    scenario.execute()
+            except Exception as e:
+                logging.error(e)
 
             sleep_time = int(random.uniform(self.wait_min, self.wait_max))
             self.logger.debug("Sleeping for %s seconds", sleep_time)
@@ -395,5 +398,5 @@ class ServerStateLogHandler(logging.Handler):
             server_state.logs.append({
                 'timestamp': record.created,
                 'level': record.levelname,
-                'message': record.msg
+                'message': str(record.msg)
             })

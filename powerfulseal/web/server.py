@@ -43,65 +43,65 @@ def policy_actions():
         policy = server_state.get_policy()
 
         # Format node scenario output for JSON output
-        nodeScenarios = []
-        for policyScenario in policy.get('nodeScenarios', []):
-            outputScenario = DEFAULT_OUTPUT_NODE_SCENARIO
-            outputScenario['name'] = policyScenario['name']
+        output_node_scenarios = []
+        for policy_scenario in policy.get('nodeScenarios', []):
+            output_node_scenario = DEFAULT_OUTPUT_NODE_SCENARIO
+            output_node_scenario['name'] = policy_scenario['name']
 
             # Process matchers
-            for matcherItem in policyScenario.get('match', []):
-                outputScenario['matchers'].append(matcherItem['property'])
+            for matcherItem in policy_scenario.get('match', []):
+                output_node_scenario['matchers'].append(matcherItem['property'])
 
             # Process filters
-            for filterItem in policyScenario.get('filters', []):
+            for filterItem in policy_scenario.get('filters', []):
                 # In the schema, filter items are represented by an object with a single item
 
                 # Process property filters
                 if 'property' in filterItem:
-                    outputScenario['filters'].append(filterItem['property'])
+                    output_node_scenario['filters'].append(filterItem['property'])
 
                 # Process time of execution filters
                 if 'dayTime' in filterItem:
                     for dayOfWeek in POLICY_DAYS_OF_WEEK:
-                        outputScenario['dayOfWeek'][dayOfWeek] = \
+                        output_node_scenario['dayOfWeek'][dayOfWeek] = \
                             dayOfWeek in filterItem['dayTime']['onlyDays']
-                    outputScenario['startTime'] = filterItem['dayTime']['startTime']
-                    outputScenario['endTime'] = filterItem['dayTime']['endTime']
+                    output_node_scenario['startTime'] = filterItem['dayTime']['startTime']
+                    output_node_scenario['endTime'] = filterItem['dayTime']['endTime']
 
                 # Process random sample filters
                 if 'randomSample' in filterItem:
                     if 'size' in filterItem['randomSample']:
                         # The default scenario's other keys must not be modified or else the front-end
                         # will missed keys which are being watched
-                        outputScenario['randomSample']['type'] = RandomSampleType.SIZE,
-                        outputScenario['randomSample']['size'] = filterItem['randomSample']['size']
+                        output_node_scenario['randomSample']['type'] = RandomSampleType.SIZE,
+                        output_node_scenario['randomSample']['size'] = filterItem['randomSample']['size']
                     elif 'ratio' in filterItem['randomSample']:
-                        outputScenario['randomSample']['type'] = RandomSampleType.RATIO
-                        outputScenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
+                        output_node_scenario['randomSample']['type'] = RandomSampleType.RATIO
+                        output_node_scenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
 
                 # Process probability pass all filters
                 if 'probability' in filterItem:
-                    outputScenario['probabilityPassAll']['isEnabled'] = True
-                    outputScenario['probabilityPassAll']['probability'] = \
+                    output_node_scenario['probabilityPassAll']['isEnabled'] = True
+                    output_node_scenario['probabilityPassAll']['probability'] = \
                         filterItem['probability']['probabilityPassAll']
 
             # Process actions
-            for actionItem in policyScenario.get('actions', []):
+            for actionItem in policy_scenario.get('actions', []):
                 if 'stop' in actionItem:
-                    outputScenario['actions'].append({
+                    output_node_scenario['actions'].append({
                         'type': ActionType.STOP,
                         'params': [{
                             'name': k,
                             'value': v,
-                        } for (k, v) in actionItem['stop']]
+                        } for (k, v) in actionItem['stop'].items()]
                     })
                 elif 'start' in actionItem:
-                    outputScenario['actions'].append({
+                    output_node_scenario['actions'].append({
                         'type': ActionType.START,
                         'params': []
                     })
                 elif 'wait' in actionItem:
-                    outputScenario['actions'].append({
+                    output_node_scenario['actions'].append({
                         'type': ActionType.WAIT,
                         'params': [
                             {
@@ -111,7 +111,7 @@ def policy_actions():
                         ]
                     })
                 elif 'execute' in actionItem:
-                    outputScenario['actions'].append({
+                    output_node_scenario['actions'].append({
                         'type': ActionType.EXECUTE,
                         'params': [
                             {
@@ -121,84 +121,84 @@ def policy_actions():
                         ]
                     })
 
-            nodeScenarios.append(outputScenario)
+            output_node_scenarios.append(output_node_scenario)
 
         # Format pod scenario output for JSON output
-        podScenarios = []
-        for policyScenario in policy.get('podScenarios', []):
-            outputScenario = DEFAULT_OUTPUT_POD_SCENARIO
-            outputScenario['name'] = policyScenario['name']
+        output_pod_scenarios = []
+        for policy_scenario in policy.get('podScenarios', []):
+            output_pod_scenario = DEFAULT_OUTPUT_POD_SCENARIO
+            output_pod_scenario['name'] = policy_scenario['name']
 
             # Process matchers
-            for matcherItem in policyScenario.get('match', []):
+            for matcherItem in policy_scenario.get('match', []):
                 if 'namespace' in matcherItem:
-                    outputScenario['matchers'].append({
+                    output_pod_scenario['matchers'].append({
                         'type': PodMatcherTypes.NAMESPACE,
                         'params': [{
                             'name': k,
                             'value': v
-                        } for (k, v) in matcherItem['namespace']]
+                        } for (k, v) in matcherItem['namespace'].items()]
                     })
                 elif 'deployment' in matcherItem:
-                    outputScenario['matchers'].append({
+                    output_pod_scenario['matchers'].append({
                         'type': PodMatcherTypes.DEPLOYMENT,
                         'params': [{
                             'name': k,
                             'value': v
-                        } for (k, v) in matcherItem['deployment']]
+                        } for (k, v) in matcherItem['deployment'].items()]
                     })
                 elif 'labels' in matcherItem:
-                    outputScenario['matchers'].append({
+                    output_pod_scenario['matchers'].append({
                         'type': PodMatcherTypes.LABELS,
                         'params': [{
                             'name': k,
                             'value': v,
-                        } for (k, v) in matcherItem['labels']]
+                        } for (k, v) in matcherItem['labels'].items()]
                     })
 
             # Process filters
-            for filterItem in policyScenario.get('filters', []):
+            for filterItem in policy_scenario.get('filters', []):
                 # Process property filters
                 if 'property' in filterItem:
-                    outputScenario['filters'].append(filterItem['property'])
+                    output_pod_scenario['filters'].append(filterItem['property'])
 
                 # Process time of execution filters
                 if 'dayTime' in filterItem:
                     for dayOfWeek in POLICY_DAYS_OF_WEEK:
-                        outputScenario['dayOfWeek'][dayOfWeek] = \
+                        output_pod_scenario['dayOfWeek'][dayOfWeek] = \
                             dayOfWeek in filterItem['dayTime']['onlyDays']
-                    outputScenario['startTime'] = filterItem['dayTime']['startTime']
-                    outputScenario['endTime'] = filterItem['dayTime']['endTime']
+                    output_pod_scenario['startTime'] = filterItem['dayTime']['startTime']
+                    output_pod_scenario['endTime'] = filterItem['dayTime']['endTime']
 
                 # Process random sample filters
                 if 'randomSample' in filterItem:
                     if 'size' in filterItem['randomSample']:
                         # The default scenario's other keys must not be modified or else the front-end
                         # will missed keys which are being watched
-                        outputScenario['randomSample']['type'] = RandomSampleType.SIZE,
-                        outputScenario['randomSample']['size'] = filterItem['randomSample']['size']
+                        output_pod_scenario['randomSample']['type'] = RandomSampleType.SIZE,
+                        output_pod_scenario['randomSample']['size'] = filterItem['randomSample']['size']
                     elif 'ratio' in filterItem['randomSample']:
-                        outputScenario['randomSample']['type'] = RandomSampleType.RATIO
-                        outputScenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
+                        output_pod_scenario['randomSample']['type'] = RandomSampleType.RATIO
+                        output_pod_scenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
 
                 # Process probability pass all filters
                 if 'probability' in filterItem:
-                    outputScenario['probabilityPassAll']['isEnabled'] = True
-                    outputScenario['probabilityPassAll']['probability'] = \
+                    output_pod_scenario['probabilityPassAll']['isEnabled'] = True
+                    output_pod_scenario['probabilityPassAll']['probability'] = \
                         filterItem['probability']['probabilityPassAll']
 
             # Process actions
-            for actionItem in policyScenario.get('actions', []):
+            for actionItem in policy_scenario.get('actions', []):
                 if 'kill' in actionItem:
-                    outputScenario['actions'].append({
+                    output_pod_scenario['actions'].append({
                         'type': ActionType.STOP,
                         'params': [{
                             'name': k,
                             'value': v,
-                        } for (k, v) in actionItem['kill']]
+                        } for (k, v) in actionItem['kill'].items()]
                     })
                 elif 'wait' in actionItem:
-                    outputScenario['actions'].append({
+                    output_pod_scenario['actions'].append({
                         'type': ActionType.WAIT,
                         'params': [
                             {
@@ -208,15 +208,15 @@ def policy_actions():
                         ]
                     })
 
-            podScenarios.append(outputScenario)
+            output_pod_scenarios.append(output_pod_scenario)
 
         return jsonify({
             'config': policy.get('config', {
                 'minSecondsBetweenRuns': 0,
                 'maxSecondsBetweenRuns': 300,
             }),
-            'nodeScenarios': nodeScenarios,
-            'podScenarios': podScenarios
+            'nodeScenarios': output_node_scenarios,
+            'podScenarios': output_pod_scenarios
         })
     elif request.method == 'PUT':
         # PUT request: modify a policy

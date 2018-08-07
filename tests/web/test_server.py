@@ -108,7 +108,10 @@ def test_get_policy_actions(client):
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
         result = client.get("/api/policy")
         assert json.loads(result.data) == {
-            'config': [],
+            'config': {
+                'minSecondsBetweenRuns': 0,
+                'maxSecondsBetweenRuns': 300,
+            },
             'nodeScenarios': [],
             'podScenarios': []
         }

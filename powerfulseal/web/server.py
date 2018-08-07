@@ -26,8 +26,9 @@ from flask_cors import CORS
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.node_scenario import NodeScenario
 from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
-
 # Flask instance and routes
+from powerfulseal.web.constants import *
+
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -40,13 +41,182 @@ def policy_actions():
     if request.method == 'GET':
         # GET request: returns a JSON representation of the policy file
         policy = server_state.get_policy()
+
+        # Format node scenario output for JSON output
+        nodeScenarios = []
+        for policyScenario in policy.get('nodeScenarios', []):
+            outputScenario = DEFAULT_OUTPUT_NODE_SCENARIO
+            outputScenario['name'] = policyScenario['name']
+
+            # Process matchers
+            for matcherItem in policyScenario.get('match', []):
+                outputScenario['matchers'].append(matcherItem['property'])
+
+            # Process filters
+            for filterItem in policyScenario.get('filters', []):
+                # In the schema, filter items are represented by an object with a single item
+
+                # Process property filters
+                if 'property' in filterItem:
+                    outputScenario['filters'].append(filterItem['property'])
+
+                # Process time of execution filters
+                if 'dayTime' in filterItem:
+                    for dayOfWeek in POLICY_DAYS_OF_WEEK:
+                        outputScenario['dayOfWeek'][dayOfWeek] = \
+                            dayOfWeek in filterItem['dayTime']['onlyDays']
+                    outputScenario['startTime'] = filterItem['dayTime']['startTime']
+                    outputScenario['endTime'] = filterItem['dayTime']['endTime']
+
+                # Process random sample filters
+                if 'randomSample' in filterItem:
+                    if 'size' in filterItem['randomSample']:
+                        # The default scenario's other keys must not be modified or else the front-end
+                        # will missed keys which are being watched
+                        outputScenario['randomSample']['type'] = RandomSampleType.SIZE,
+                        outputScenario['randomSample']['size'] = filterItem['randomSample']['size']
+                    elif 'ratio' in filterItem['randomSample']:
+                        outputScenario['randomSample']['type'] = RandomSampleType.RATIO
+                        outputScenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
+
+                # Process probability pass all filters
+                if 'probability' in filterItem:
+                    outputScenario['probabilityPassAll']['isEnabled'] = True
+                    outputScenario['probabilityPassAll']['probability'] = \
+                        filterItem['probability']['probabilityPassAll']
+
+            # Process actions
+            for actionItem in policyScenario.get('actions', []):
+                if 'stop' in actionItem:
+                    outputScenario['actions'].append({
+                        'type': ActionType.STOP,
+                        'params': [{
+                            'name': k,
+                            'value': v,
+                        } for (k, v) in actionItem['stop']]
+                    })
+                elif 'start' in actionItem:
+                    outputScenario['actions'].append({
+                        'type': ActionType.START,
+                        'params': []
+                    })
+                elif 'wait' in actionItem:
+                    outputScenario['actions'].append({
+                        'type': ActionType.WAIT,
+                        'params': [
+                            {
+                                'name': 'seconds',
+                                'value': actionItem['wait']['seconds']
+                            }
+                        ]
+                    })
+                elif 'execute' in actionItem:
+                    outputScenario['actions'].append({
+                        'type': ActionType.EXECUTE,
+                        'params': [
+                            {
+                                'name': 'cmd',
+                                'value': actionItem['execute']['cmd']
+                            }
+                        ]
+                    })
+
+            nodeScenarios.append(outputScenario)
+
+        # Format pod scenario output for JSON output
+        podScenarios = []
+        for policyScenario in policy.get('podScenarios', []):
+            outputScenario = DEFAULT_OUTPUT_POD_SCENARIO
+            outputScenario['name'] = policyScenario['name']
+
+            # Process matchers
+            for matcherItem in policyScenario.get('match', []):
+                if 'namespace' in matcherItem:
+                    outputScenario['matchers'].append({
+                        'type': PodMatcherTypes.NAMESPACE,
+                        'params': [{
+                            'name': k,
+                            'value': v
+                        } for (k, v) in matcherItem['namespace']]
+                    })
+                elif 'deployment' in matcherItem:
+                    outputScenario['matchers'].append({
+                        'type': PodMatcherTypes.DEPLOYMENT,
+                        'params': [{
+                            'name': k,
+                            'value': v
+                        } for (k, v) in matcherItem['deployment']]
+                    })
+                elif 'labels' in matcherItem:
+                    outputScenario['matchers'].append({
+                        'type': PodMatcherTypes.LABELS,
+                        'params': [{
+                            'name': k,
+                            'value': v,
+                        } for (k, v) in matcherItem['labels']]
+                    })
+
+            # Process filters
+            for filterItem in policyScenario.get('filters', []):
+                # Process property filters
+                if 'property' in filterItem:
+                    outputScenario['filters'].append(filterItem['property'])
+
+                # Process time of execution filters
+                if 'dayTime' in filterItem:
+                    for dayOfWeek in POLICY_DAYS_OF_WEEK:
+                        outputScenario['dayOfWeek'][dayOfWeek] = \
+                            dayOfWeek in filterItem['dayTime']['onlyDays']
+                    outputScenario['startTime'] = filterItem['dayTime']['startTime']
+                    outputScenario['endTime'] = filterItem['dayTime']['endTime']
+
+                # Process random sample filters
+                if 'randomSample' in filterItem:
+                    if 'size' in filterItem['randomSample']:
+                        # The default scenario's other keys must not be modified or else the front-end
+                        # will missed keys which are being watched
+                        outputScenario['randomSample']['type'] = RandomSampleType.SIZE,
+                        outputScenario['randomSample']['size'] = filterItem['randomSample']['size']
+                    elif 'ratio' in filterItem['randomSample']:
+                        outputScenario['randomSample']['type'] = RandomSampleType.RATIO
+                        outputScenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
+
+                # Process probability pass all filters
+                if 'probability' in filterItem:
+                    outputScenario['probabilityPassAll']['isEnabled'] = True
+                    outputScenario['probabilityPassAll']['probability'] = \
+                        filterItem['probability']['probabilityPassAll']
+
+            # Process actions
+            for actionItem in policyScenario.get('actions', []):
+                if 'kill' in actionItem:
+                    outputScenario['actions'].append({
+                        'type': ActionType.STOP,
+                        'params': [{
+                            'name': k,
+                            'value': v,
+                        } for (k, v) in actionItem['kill']]
+                    })
+                elif 'wait' in actionItem:
+                    outputScenario['actions'].append({
+                        'type': ActionType.WAIT,
+                        'params': [
+                            {
+                                'name': 'seconds',
+                                'value': actionItem['wait']['seconds']
+                            }
+                        ]
+                    })
+
+            podScenarios.append(outputScenario)
+
         return jsonify({
             'config': policy.get('config', {
                 'minSecondsBetweenRuns': 0,
                 'maxSecondsBetweenRuns': 300,
             }),
-            'nodeScenarios': policy.get('nodeScenarios', []),
-            'podScenarios': policy.get('podScenarios', [])
+            'nodeScenarios': nodeScenarios,
+            'podScenarios': podScenarios
         })
     elif request.method == 'PUT':
         # PUT request: modify a policy

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import copy
 import logging
 import random
 import threading
@@ -45,7 +45,7 @@ def policy_actions():
         # Format node scenario output for JSON output
         output_node_scenarios = []
         for policy_scenario in policy.get('nodeScenarios', []):
-            output_node_scenario = DEFAULT_OUTPUT_NODE_SCENARIO
+            output_node_scenario = copy.deepcopy(DEFAULT_OUTPUT_NODE_SCENARIO)
             output_node_scenario['name'] = policy_scenario['name']
 
             # Process matchers
@@ -126,7 +126,7 @@ def policy_actions():
         # Format pod scenario output for JSON output
         output_pod_scenarios = []
         for policy_scenario in policy.get('podScenarios', []):
-            output_pod_scenario = DEFAULT_OUTPUT_POD_SCENARIO
+            output_pod_scenario = copy.deepcopy(DEFAULT_OUTPUT_POD_SCENARIO)
             output_pod_scenario['name'] = policy_scenario['name']
 
             # Process matchers

@@ -205,7 +205,7 @@ def start_server(host, port):
 
 
 class ThreadedPolicyRunner(threading.Thread):
-    def __init__(self, policy, inventory, k8s_inventory, driver, executor, logger=None):
+    def __init__(self, policy, inventory, k8s_inventory, driver, executor, stop_event, logger=None):
         super().__init__()
         config = policy.get("config", {})
         self.wait_min = config.get("minSecondsBetweenRuns", 0)
@@ -239,10 +239,11 @@ class ThreadedPolicyRunner(threading.Thread):
         self.executor = executor
         self.logger = logger or logging.getLogger(__name__)
 
-        self.is_stopped = threading.Event()
+        self.stop_event = stop_event
+        self.stop_event.clear()
 
     def run(self):
-        while not self.is_stopped.is_set():
+        while not self.stop_event.is_set():
             try:
                 for scenario in self.node_scenarios:
                     scenario.execute()
@@ -250,15 +251,21 @@ class ThreadedPolicyRunner(threading.Thread):
                     scenario.execute()
             except Exception as e:
                 logging.error(e)
+                self.stop()
 
+            # Repeatedly check whether the stop event has been set in order to
+            # prevent blocking the main thread while it waits for the thread to
+            # join after stopping
             sleep_time = int(random.uniform(self.wait_min, self.wait_max))
             self.logger.debug("Sleeping for %s seconds", sleep_time)
-            time.sleep(sleep_time)
+            while sleep_time > 0 and not self.stop_event.is_set():
+                time.sleep(1)
+                sleep_time -= 1
 
             self.inventory.sync()
 
     def stop(self):
-        self.is_stopped.set()
+        self.stop_event.set()
 
 
 class ServerState:
@@ -285,8 +292,11 @@ class ServerState:
         self.lock = Lock()
 
         # Contains an instance of ThreadedPolicyRunner which is only set once
-        # autonomous mode is started and cleared once it is stopped
-        self.policyRunner = None
+        # autonomous mode is started and cleared once it is stopped.
+        # The threading.Event has to be in the main thread so the state of it can
+        # be read while the policy runner thread blocks (e.g., sleeps).
+        self.policy_runner = None
+        self.policy_runner_stop_event = threading.Event()
 
     def is_policy_valid(self):
         """
@@ -367,26 +377,26 @@ class ServerState:
 
     def is_policy_runner_running(self):
         with self.lock:
-            return self.policyRunner is not None
+            return self.policy_runner is not None and not self.policy_runner_stop_event.is_set()
 
     def start_policy_runner(self):
         with self.lock:
-            if self.policyRunner is not None:
+            if self.policy_runner is not None and not self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already running')
 
-            self.policyRunner = ThreadedPolicyRunner(self.policy, self.inventory,
-                                                     self.k8s_inventory, self.driver,
-                                                     self.executor)
-            self.policyRunner.start()
+            self.policy_runner = ThreadedPolicyRunner(self.policy, self.inventory,
+                                                      self.k8s_inventory, self.driver,
+                                                      self.executor, self.policy_runner_stop_event)
+            self.policy_runner.start()
 
     def stop_policy_runner(self):
         with self.lock:
-            if self.policyRunner is None:
+            if self.policy_runner is None or self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already stopped')
 
-            self.policyRunner.stop()
-            self.policyRunner.join()
-            self.policyRunner = None
+            self.policy_runner.stop()
+            self.policy_runner.join()
+            self.policy_runner = None
 
 
 class ServerStateLogHandler(logging.Handler):

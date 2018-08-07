@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import threading
 import time
 
 from mock import MagicMock
@@ -43,7 +44,7 @@ def test_threaded_policy_runner():
     # As the threaded policy runner runs on a separate thread, this can be tested
     # by waiting a reasonably short amount of time for the runner loop to run
     # and checking whether the expected functions have been called by the runner
-    policy_runner = ThreadedPolicyRunner(policy, test_inventory, None, None, None)
+    policy_runner = ThreadedPolicyRunner(policy, test_inventory, None, None, None, threading.Event())
     policy_runner.node_scenarios = [test_node_scenario]
     policy_runner.pod_scenarios = [test_pod_scenario]
 
@@ -52,7 +53,7 @@ def test_threaded_policy_runner():
     policy_runner.stop()
     policy_runner.join()
 
-    assert policy_runner.is_stopped
+    assert policy_runner.stop_event
     test_node_scenario.execute.assert_called()
     test_pod_scenario.execute.assert_called()
     test_inventory.sync.assert_called()

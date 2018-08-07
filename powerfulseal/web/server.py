@@ -41,7 +41,7 @@ def policy_actions():
         # GET request: returns a JSON representation of the policy file
         policy = server_state.get_policy()
         return jsonify({
-            'config': policy.get('config', []),
+            'config': policy.get('config', {}),
             'nodeScenarios': policy.get('nodeScenarios', []),
             'podScenarios': policy.get('podScenarios', [])
         })

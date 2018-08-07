@@ -67,6 +67,77 @@ paths:
           description: "Autonomous mode is in an inconsistent state and cannot be recovered"
         501:
           description: "Unhandled HTTP method"
+  /api/policy:
+    get:
+      tags:
+      - "autonomous-mode"
+      summary: "Gets the policy for autonomous mode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Policy file in JSON format"
+          schema:
+            type: "object"
+            properties:
+              config:
+                type: "object"
+                properties:
+                  minSecondsBetweenRuns:
+                    type: "integer"
+                  maxSecondsBetweenRuns:
+                    type: "integer"
+              nodeScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Node scenario object"
+              podScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Pod scenario object"
+    put:
+      tags:
+      - "autonomous-mode"
+      summary: "Overwrites the policy file for autonomous mode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "policy"
+        required: true
+        schema:
+            type: "object"
+            properties:
+              config:
+                type: "object"
+                properties:
+                  minSecondsBetweenRuns:
+                    type: "integer"
+                  maxSecondsBetweenRuns:
+                    type: "integer"
+              nodeScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Node scenario object"
+              podScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Pod scenario object"
+      responses:
+        200:
+          description: "Policy successfully modified"
+        400:
+          description: "Policy field missing or invalid"
+        500:
+          description: "Unable to overwrite policy file"
   /api/logs:
     get:
       tags:

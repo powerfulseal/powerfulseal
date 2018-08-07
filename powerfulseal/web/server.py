@@ -408,5 +408,5 @@ class ServerStateLogHandler(logging.Handler):
             server_state.logs.append({
                 'timestamp': record.created,
                 'level': record.levelname,
-                'message': str(record.msg)
+                'message': record.getMessage()
             })

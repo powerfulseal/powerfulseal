@@ -22,11 +22,30 @@ class RandomSampleType(IntEnum):
     RATIO = 2
 
 
-class ActionType(IntEnum):
+class NodeActionType(IntEnum):
     STOP = 0
     START = 1
     WAIT = 2
     EXECUTE = 3
+
+
+NODE_ACTION_TYPE_NAMES = {
+    NodeActionType.STOP: 'stop',
+    NodeActionType.START: 'start',
+    NodeActionType.WAIT: 'wait',
+    NodeActionType.EXECUTE: 'execute'
+}
+
+
+class PodActionType(IntEnum):
+    KILL = 0
+    WAIT = 1
+
+
+POD_ACTION_TYPE_NAMES = {
+    PodActionType.KILL: 'kill',
+    PodActionType.WAIT: 'wait'
+}
 
 
 class PodMatcherTypes(IntEnum):

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import copy
 import logging
 import random
 import threading
@@ -26,9 +25,9 @@ from flask_cors import CORS
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.node_scenario import NodeScenario
 from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
-# Flask instance and routes
-from powerfulseal.web.constants import *
+from powerfulseal.web.formatter import PolicyFormatter
 
+# Flask instance and routes
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -41,189 +40,17 @@ def policy_actions():
     if request.method == 'GET':
         # GET request: returns a JSON representation of the policy file
         policy = server_state.get_policy()
-
-        # Format node scenario output for JSON output
-        output_node_scenarios = []
-        for policy_scenario in policy.get('nodeScenarios', []):
-            output_node_scenario = copy.deepcopy(DEFAULT_OUTPUT_NODE_SCENARIO)
-            output_node_scenario['name'] = policy_scenario['name']
-
-            # Process matchers
-            for matcherItem in policy_scenario.get('match', []):
-                output_node_scenario['matchers'].append(matcherItem['property'])
-
-            # Process filters
-            for filterItem in policy_scenario.get('filters', []):
-                # In the schema, filter items are represented by an object with a single item
-
-                # Process property filters
-                if 'property' in filterItem:
-                    output_node_scenario['filters'].append(filterItem['property'])
-
-                # Process time of execution filters
-                if 'dayTime' in filterItem:
-                    for dayOfWeek in POLICY_DAYS_OF_WEEK:
-                        output_node_scenario['dayOfWeek'][dayOfWeek] = \
-                            dayOfWeek in filterItem['dayTime']['onlyDays']
-                    output_node_scenario['startTime'] = filterItem['dayTime']['startTime']
-                    output_node_scenario['endTime'] = filterItem['dayTime']['endTime']
-
-                # Process random sample filters
-                if 'randomSample' in filterItem:
-                    if 'size' in filterItem['randomSample']:
-                        # The default scenario's other keys must not be modified or else the front-end
-                        # will missed keys which are being watched
-                        output_node_scenario['randomSample']['type'] = RandomSampleType.SIZE,
-                        output_node_scenario['randomSample']['size'] = filterItem['randomSample']['size']
-                    elif 'ratio' in filterItem['randomSample']:
-                        output_node_scenario['randomSample']['type'] = RandomSampleType.RATIO
-                        output_node_scenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
-
-                # Process probability pass all filters
-                if 'probability' in filterItem:
-                    output_node_scenario['probabilityPassAll']['isEnabled'] = True
-                    output_node_scenario['probabilityPassAll']['probability'] = \
-                        filterItem['probability']['probabilityPassAll']
-
-            # Process actions
-            for actionItem in policy_scenario.get('actions', []):
-                if 'stop' in actionItem:
-                    output_node_scenario['actions'].append({
-                        'type': ActionType.STOP,
-                        'params': [{
-                            'name': k,
-                            'value': v,
-                        } for (k, v) in actionItem['stop'].items()]
-                    })
-                elif 'start' in actionItem:
-                    output_node_scenario['actions'].append({
-                        'type': ActionType.START,
-                        'params': []
-                    })
-                elif 'wait' in actionItem:
-                    output_node_scenario['actions'].append({
-                        'type': ActionType.WAIT,
-                        'params': [
-                            {
-                                'name': 'seconds',
-                                'value': actionItem['wait']['seconds']
-                            }
-                        ]
-                    })
-                elif 'execute' in actionItem:
-                    output_node_scenario['actions'].append({
-                        'type': ActionType.EXECUTE,
-                        'params': [
-                            {
-                                'name': 'cmd',
-                                'value': actionItem['execute']['cmd']
-                            }
-                        ]
-                    })
-
-            output_node_scenarios.append(output_node_scenario)
-
-        # Format pod scenario output for JSON output
-        output_pod_scenarios = []
-        for policy_scenario in policy.get('podScenarios', []):
-            output_pod_scenario = copy.deepcopy(DEFAULT_OUTPUT_POD_SCENARIO)
-            output_pod_scenario['name'] = policy_scenario['name']
-
-            # Process matchers
-            for matcherItem in policy_scenario.get('match', []):
-                if 'namespace' in matcherItem:
-                    output_pod_scenario['matchers'].append({
-                        'type': PodMatcherTypes.NAMESPACE,
-                        'params': [{
-                            'name': k,
-                            'value': v
-                        } for (k, v) in matcherItem['namespace'].items()]
-                    })
-                elif 'deployment' in matcherItem:
-                    output_pod_scenario['matchers'].append({
-                        'type': PodMatcherTypes.DEPLOYMENT,
-                        'params': [{
-                            'name': k,
-                            'value': v
-                        } for (k, v) in matcherItem['deployment'].items()]
-                    })
-                elif 'labels' in matcherItem:
-                    output_pod_scenario['matchers'].append({
-                        'type': PodMatcherTypes.LABELS,
-                        'params': [{
-                            'name': k,
-                            'value': v,
-                        } for (k, v) in matcherItem['labels'].items()]
-                    })
-
-            # Process filters
-            for filterItem in policy_scenario.get('filters', []):
-                # Process property filters
-                if 'property' in filterItem:
-                    output_pod_scenario['filters'].append(filterItem['property'])
-
-                # Process time of execution filters
-                if 'dayTime' in filterItem:
-                    for dayOfWeek in POLICY_DAYS_OF_WEEK:
-                        output_pod_scenario['dayOfWeek'][dayOfWeek] = \
-                            dayOfWeek in filterItem['dayTime']['onlyDays']
-                    output_pod_scenario['startTime'] = filterItem['dayTime']['startTime']
-                    output_pod_scenario['endTime'] = filterItem['dayTime']['endTime']
-
-                # Process random sample filters
-                if 'randomSample' in filterItem:
-                    if 'size' in filterItem['randomSample']:
-                        # The default scenario's other keys must not be modified or else the front-end
-                        # will missed keys which are being watched
-                        output_pod_scenario['randomSample']['type'] = RandomSampleType.SIZE,
-                        output_pod_scenario['randomSample']['size'] = filterItem['randomSample']['size']
-                    elif 'ratio' in filterItem['randomSample']:
-                        output_pod_scenario['randomSample']['type'] = RandomSampleType.RATIO
-                        output_pod_scenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
-
-                # Process probability pass all filters
-                if 'probability' in filterItem:
-                    output_pod_scenario['probabilityPassAll']['isEnabled'] = True
-                    output_pod_scenario['probabilityPassAll']['probability'] = \
-                        filterItem['probability']['probabilityPassAll']
-
-            # Process actions
-            for actionItem in policy_scenario.get('actions', []):
-                if 'kill' in actionItem:
-                    output_pod_scenario['actions'].append({
-                        'type': ActionType.STOP,
-                        'params': [{
-                            'name': k,
-                            'value': v,
-                        } for (k, v) in actionItem['kill'].items()]
-                    })
-                elif 'wait' in actionItem:
-                    output_pod_scenario['actions'].append({
-                        'type': ActionType.WAIT,
-                        'params': [
-                            {
-                                'name': 'seconds',
-                                'value': actionItem['wait']['seconds']
-                            }
-                        ]
-                    })
-
-            output_pod_scenarios.append(output_pod_scenario)
-
-        return jsonify({
-            'config': policy.get('config', {
-                'minSecondsBetweenRuns': 0,
-                'maxSecondsBetweenRuns': 300,
-            }),
-            'nodeScenarios': output_node_scenarios,
-            'podScenarios': output_pod_scenarios
-        })
+        return jsonify(PolicyFormatter.output_policy(policy))
     elif request.method == 'PUT':
         # PUT request: modify a policy
-        modified_policy = request.get_json().get('policy', None)
-        if modified_policy is None:
+        input_policy = request.get_json().get('policy', None)
+        if input_policy is None:
             return jsonify({'error': 'Policy field missing'}), 400
 
+        try:
+            modified_policy = PolicyFormatter.parse_policy(input_policy)
+        except KeyError:
+            return jsonify({'error': 'Policy not valid'}), 400
         if not PolicyRunner.is_policy_valid(modified_policy):
             return jsonify({'error': 'Policy not valid'}), 400
 

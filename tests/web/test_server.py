@@ -23,6 +23,7 @@ from powerfulseal.k8s import Pod
 from powerfulseal.node import Node, NodeState
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.web import server
+from powerfulseal.web.formatter import PolicyFormatter
 from powerfulseal.web.server import ServerState
 
 
@@ -132,7 +133,7 @@ def test_put_policy_actions(client):
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
         result = client.put("/api/policy", data=json.dumps({
-            'policy': valid_policy
+            'policy': PolicyFormatter.output_policy(valid_policy)
         }), content_type='application/json')
         assert result.status_code == 200
 

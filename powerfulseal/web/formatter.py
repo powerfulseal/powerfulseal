@@ -70,10 +70,10 @@ class PolicyFormatter:
                 if 'size' in filterItem['randomSample']:
                     # The default scenario's other keys must not be modified or else the front-end
                     # will missed keys which are being watched
-                    output_node_scenario['randomSample']['type'] = RandomSampleType.SIZE,
+                    output_node_scenario['randomSample']['type'] = int(RandomSampleType.SIZE)
                     output_node_scenario['randomSample']['size'] = filterItem['randomSample']['size']
                 elif 'ratio' in filterItem['randomSample']:
-                    output_node_scenario['randomSample']['type'] = RandomSampleType.RATIO
+                    output_node_scenario['randomSample']['type'] = int(RandomSampleType.RATIO)
                     output_node_scenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
 
             # Process probability pass all filters
@@ -130,7 +130,7 @@ class PolicyFormatter:
         for matcherItem in policy_scenario.get('match', []):
             if 'namespace' in matcherItem:
                 output_pod_scenario['matchers'].append({
-                    'type': PodMatcherTypes.NAMESPACE,
+                    'type': int(PodMatcherTypes.NAMESPACE),
                     'params': [{
                         'name': k,
                         'value': v
@@ -138,7 +138,7 @@ class PolicyFormatter:
                 })
             elif 'deployment' in matcherItem:
                 output_pod_scenario['matchers'].append({
-                    'type': PodMatcherTypes.DEPLOYMENT,
+                    'type': int(PodMatcherTypes.DEPLOYMENT),
                     'params': [{
                         'name': k,
                         'value': v
@@ -146,7 +146,7 @@ class PolicyFormatter:
                 })
             elif 'labels' in matcherItem:
                 output_pod_scenario['matchers'].append({
-                    'type': PodMatcherTypes.LABELS,
+                    'type': int(PodMatcherTypes.LABELS),
                     'params': [{
                         'name': k,
                         'value': v,
@@ -174,10 +174,10 @@ class PolicyFormatter:
                 if 'size' in filterItem['randomSample']:
                     # The default scenario's other keys must not be modified or else the front-end
                     # will missed keys which are being watched
-                    output_pod_scenario['randomSample']['type'] = RandomSampleType.SIZE,
+                    output_pod_scenario['randomSample']['type'] = int(RandomSampleType.SIZE)
                     output_pod_scenario['randomSample']['size'] = filterItem['randomSample']['size']
                 elif 'ratio' in filterItem['randomSample']:
-                    output_pod_scenario['randomSample']['type'] = RandomSampleType.RATIO
+                    output_pod_scenario['randomSample']['type'] = int(RandomSampleType.RATIO)
                     output_pod_scenario['randomSample']['ratio'] = filterItem['randomSample']['ratio']
 
             # Process probability pass all filters
@@ -265,13 +265,13 @@ class PolicyFormatter:
             })
 
         # Process random sample
-        if input_scenario['randomSample']['type'] == RandomSampleType.SIZE:
+        if input_scenario['randomSample']['type'] == int(RandomSampleType.SIZE):
             policy_scenario['filters'].append({
                 'randomSample': {
                     'size': input_scenario['randomSample']['size']
                 }
             })
-        elif input_scenario['randomSample']['type'] == RandomSampleType.RATIO:
+        elif input_scenario['randomSample']['type'] == int(RandomSampleType.RATIO):
             policy_scenario['filters'].append({
                 'randomSample': {
                     'ratio': input_scenario['randomSample']['ratio']
@@ -304,15 +304,15 @@ class PolicyFormatter:
         # Process matchers
         policy_scenario['match'] = []
         for matcher in input_scenario.get('matchers', []):
-            if matcher['type'] == PodMatcherTypes.NAMESPACE:
+            if matcher['type'] == int(PodMatcherTypes.NAMESPACE):
                 policy_scenario['match'].append({
                     'namespace': {param['name']: param['value'] for param in matcher['params']}
                 })
-            elif matcher['type'] == PodMatcherTypes.DEPLOYMENT:
+            elif matcher['type'] == int(PodMatcherTypes.DEPLOYMENT):
                 policy_scenario['match'].append({
                     'deployment': {param['name']: param['value'] for param in matcher['params']}
                 })
-            elif matcher['type'] == PodMatcherTypes.LABELS:
+            elif matcher['type'] == int(PodMatcherTypes.LABELS):
                 policy_scenario['match'].append({
                     'labels': {param['name']: param['value'] for param in matcher['params']}
                 })
@@ -336,13 +336,13 @@ class PolicyFormatter:
             })
 
         # Process random sample
-        if input_scenario['randomSample']['type'] == RandomSampleType.SIZE:
+        if input_scenario['randomSample']['type'] == int(RandomSampleType.SIZE):
             policy_scenario['filters'].append({
                 'randomSample': {
                     'size': input_scenario['randomSample']['size']
                 }
             })
-        elif input_scenario['randomSample']['type'] == RandomSampleType.RATIO:
+        elif input_scenario['randomSample']['type'] == int(RandomSampleType.RATIO):
             policy_scenario['filters'].append({
                 'randomSample': {
                     'ratio': input_scenario['randomSample']['ratio']

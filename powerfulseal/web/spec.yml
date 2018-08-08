@@ -82,13 +82,10 @@ paths:
           schema:
             type: "object"
             properties:
-              config:
-                type: "object"
-                properties:
-                  minSecondsBetweenRuns:
-                    type: "integer"
-                  maxSecondsBetweenRuns:
-                    type: "integer"
+              minSecondsBetweenRuns:
+                type: "integer"
+              maxSecondsBetweenRuns:
+                type: "integer"
               nodeScenarios:
                 type: "array"
                 items:
@@ -114,13 +111,10 @@ paths:
         schema:
             type: "object"
             properties:
-              config:
-                type: "object"
-                properties:
-                  minSecondsBetweenRuns:
-                    type: "integer"
-                  maxSecondsBetweenRuns:
-                    type: "integer"
+              minSecondsBetweenRuns:
+                type: "integer"
+              maxSecondsBetweenRuns:
+                type: "integer"
               nodeScenarios:
                 type: "array"
                 items:

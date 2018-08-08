@@ -105,48 +105,7 @@ def test_autonomous_mode_integration(client):
 
 def test_get_policy_actions(client):
     server_state_mock = MagicMock()
-    server_state_mock.get_policy = MagicMock(return_value={
-        "config": {
-            "maxSecondsBetweenRuns": 30,
-            "minSecondsBetweenRuns": 0
-        },
-        "nodeScenarios": [
-
-        ],
-        "podScenarios": [
-            {
-                "actions": [
-                    {
-                        "kill": {
-                            "probability": 1
-                        }
-                    }
-                ],
-                "filters": [
-                    {
-                        "property": {
-                            "name": "name",
-                            "value": "goldpinger-*"
-                        }
-                    },
-                    {
-                        "randomSample": {
-                            "size": 1
-                        }
-                    },
-                    {
-                        "probability": {
-                            "probabilityPassAll": 0.5
-                        }
-                    }
-                ],
-                "match": [
-
-                ],
-                "name": "Delete a Goldpinger pod"
-            }
-        ]
-    })
+    server_state_mock.get_policy = MagicMock(return_value={})
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
         result = client.get("/api/policy")
         assert json.loads(result.data) == {

@@ -394,8 +394,7 @@ class ServerState:
             if self.policy_runner is None or self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already stopped')
 
-            self.policy_runner.stop()
-            self.policy_runner.join()
+            self.policy_runner_stop_event.set()
             self.policy_runner = None
 
 

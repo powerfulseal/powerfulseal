@@ -28,6 +28,7 @@ setup(
         'requests>=2.19.1,<3',
         'prometheus_client>=0.3.0,<1'
         'flask-cors>=3.0.6,<4'
+        'flask-swagger-ui>=3.18.0<4'
     ],
     extras_require={
         'testing': [

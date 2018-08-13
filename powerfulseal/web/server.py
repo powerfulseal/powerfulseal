@@ -21,6 +21,7 @@ import jsonschema
 import yaml
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_swagger_ui import get_swaggerui_blueprint
 
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.node_scenario import NodeScenario
@@ -28,8 +29,22 @@ from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
 from powerfulseal.web.formatter import PolicyFormatter
 
 # Flask instance and routes
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/static")
+
+# Set up CORS to allow requests originating outside the server for the API
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# Serve Swagger
+SWAGGER_PATH = '/docs'
+API_URL = '/static/spec.yml'
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_PATH,
+    API_URL,
+    config={
+        'app_name': 'PowerfulSeal Docs'
+    }
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_PATH)
 
 # Singleton instance of the server
 server_state = None

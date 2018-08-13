@@ -96,6 +96,45 @@ paths:
                 items:
                   type: "object"
                   description: "Pod scenario object"
+    post:
+      tags:
+      - "autonomous-mode"
+      summary: "Gets the processed YAML equivalent of the policy"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "policy"
+        required: true
+        schema:
+            type: "object"
+            properties:
+              minSecondsBetweenRuns:
+                type: "integer"
+              maxSecondsBetweenRuns:
+                type: "integer"
+              nodeScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Node scenario object"
+              podScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Pod scenario object"
+      responses:
+        200:
+          description: "Policy YAML serialized to JSON"
+          schema:
+            type: "object"
+            properties:
+              policy:
+                type: "string"
+        400:
+          description: "Policy field missing or invalid"
     put:
       tags:
       - "autonomous-mode"

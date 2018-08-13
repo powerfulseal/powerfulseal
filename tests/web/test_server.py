@@ -116,6 +116,34 @@ def test_get_policy_actions(client):
         }
 
 
+def test_post_policy_actions(client):
+    server_state_mock = MagicMock()
+
+    valid_policy = {
+        'minSecondsBetweenRuns': 0,
+        'maxSecondsBetweenRuns': 300,
+        'nodeScenarios': [],
+        'podScenarios': []
+    }
+
+    invalid_policy = {
+        'config': {
+            'minSecondsBetweenRuns': 'invalid'
+        }
+    }
+
+    with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
+        result = client.post("/api/policy", data=json.dumps({
+            'policy': PolicyFormatter.output_policy(valid_policy)
+        }), content_type='application/json')
+        assert result.status_code == 200
+
+        result = client.post("/api/policy", data=json.dumps({
+            'policy': PolicyFormatter.output_policy(invalid_policy)
+        }), content_type='application/json')
+        assert result.status_code == 400
+
+
 def test_put_policy_actions(client):
     server_state_mock = MagicMock()
     server_state_mock.update_policy = MagicMock()
@@ -232,7 +260,6 @@ def test_get_pods(client):
         # Case where namespace is not the same as the pod's namespace
         result = client.get('/api/pods?namespace=b')
         assert len(json.loads(result.data)['pods']) == 0
-
 
 
 def test_update_nodes(client):

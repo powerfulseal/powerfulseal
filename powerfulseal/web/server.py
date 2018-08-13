@@ -50,12 +50,28 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_PATH)
 server_state = None
 
 
-@app.route('/api/policy', methods=['GET', 'PUT'])
+@app.route('/api/policy', methods=['GET', 'POST', 'PUT'])
 def policy_actions():
     if request.method == 'GET':
         # GET request: returns a JSON representation of the policy file
         policy = server_state.get_policy()
         return jsonify(PolicyFormatter.output_policy(policy))
+    elif request.method == 'POST':
+        # POST request: returns a YAML representation of the given policy
+        input_policy = request.get_json().get('policy', None)
+        if input_policy is None:
+            return jsonify({'error': 'Policy field missing'}), 400
+
+        try:
+            modified_policy = PolicyFormatter.parse_policy(input_policy)
+        except KeyError:
+            return jsonify({'error': 'Policy not valid'}), 400
+        if not PolicyRunner.is_policy_valid(modified_policy):
+            return jsonify({'error': 'Policy not valid'}), 400
+
+        return jsonify({
+            'policy': yaml.dump(modified_policy, default_flow_style=False)
+        })
     elif request.method == 'PUT':
         # PUT request: modify a policy
         input_policy = request.get_json().get('policy', None)

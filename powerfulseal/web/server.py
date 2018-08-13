@@ -184,6 +184,10 @@ def update_pods():
     parameter is the string `true`.
     """
     if request.method == 'GET':
+        # Pods can be filtered based on their namespace
+        # An empty namespace retrieves all pods
+        namespace = request.args.get('namespace', default="", type=str)
+
         pods = [{
             'name': pod.name,
             'namespace': pod.namespace,
@@ -194,7 +198,7 @@ def update_pods():
             'container_ids': pod.container_ids,
             'state': pod.state,
             'labels': pod.labels
-        } for pod in server_state.get_pods()]
+        } for pod in server_state.get_pods() if len(namespace) == 0 or pod.namespace == namespace]
 
         return jsonify({'pods': pods})
     elif request.method == 'POST':

@@ -142,9 +142,9 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: query
-        name: offset
-        type: integer
+      - in: "query"
+        name: "offset"
+        type: "integer"
         description: "Returns logs from offset inclusive (e.g., if the offset is 3, then return from fourth item in list of logs inclusive [3:]). If offset is greater than bounds, an empty list is returned. If offset is negative, error is returned."
       responses:
         200:
@@ -241,6 +241,11 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      parameters:
+      - in: "query"
+        name: "namespace"
+        type: "string"
+        description: "Filters the list of pods based on namespace"
       responses:
         200:
           description: ""

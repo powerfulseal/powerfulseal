@@ -213,12 +213,26 @@ def test_get_pods(client):
     server_state_mock.get_pods = MagicMock(return_value=[test_pod])
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
+        # General case
         result = client.get('/api/pods')
         server_state_mock.get_pods.assert_called_once()
 
         data = json.loads(result.data)
         assert len(data['pods']) == 1
         assert data['pods'][0]['num'] == 1
+
+        # Case where namespace is empty
+        result = client.get('/api/pods?namespace=')
+        assert len(json.loads(result.data)['pods']) == 1
+
+        # Case where namespace matches the pod's namespace
+        result = client.get('/api/pods?namespace=a')
+        assert len(json.loads(result.data)['pods']) == 1
+
+        # Case where namespace is not the same as the pod's namespace
+        result = client.get('/api/pods?namespace=b')
+        assert len(json.loads(result.data)['pods']) == 0
+
 
 
 def test_update_nodes(client):

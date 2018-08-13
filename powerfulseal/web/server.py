@@ -116,88 +116,90 @@ def logs():
         return jsonify({'logs': server_state.logs[offset:]})
 
 
-@app.route('/api/items')
-def items():
-    """
-    Gets a list of nodes and pods
-    """
-    nodes = [{
-        'id': node.id,
-        'name': node.name,
-        'ip': node.ip,
-        'az': node.az,
-        'groups': node.groups,
-        'no': node.no,
-        'state': node.state
-    } for node in server_state.get_nodes()]
-
-    pods = [{
-        'name': pod.name,
-        'namespace': pod.namespace,
-        'num': pod.num,
-        'uid': pod.uid,
-        'host_ip': pod.host_ip,
-        'ip': pod.ip,
-        'container_ids': pod.container_ids,
-        'state': pod.state,
-        'labels': pod.labels
-    } for pod in server_state.get_pods()]
-
-    return jsonify({'nodes': nodes, 'pods': pods})
-
-
-@app.route('/api/nodes', methods=['POST'])
+@app.route('/api/nodes', methods=['GET', 'POST'])
 def update_nodes():
     """
-    Starts or stops a node identified by its IP address
-    :return:
+    GET: Gets a list of all nodes
+    POST: Starts or stops a node identified by its IP address
     """
-    params = request.get_json()
-    action = params.get('action', None)
-    ip = params.get('ip', None)
-    if action is None or ip is None:
-        return jsonify({'error': 'Action/IP address fields missing'}), 400
+    if request.method == 'GET':
+        nodes = [{
+            'id': node.id,
+            'name': node.name,
+            'ip': node.ip,
+            'az': node.az,
+            'groups': node.groups,
+            'no': node.no,
+            'state': node.state
+        } for node in server_state.get_nodes()]
 
-    if action not in ['start', 'stop']:
-        return jsonify({'error': 'Invalid action'}), 400
+        return jsonify({'nodes': nodes})
+    elif request.method == 'POST':
+        params = request.get_json()
+        action = params.get('action', None)
+        ip = params.get('ip', None)
+        if action is None or ip is None:
+            return jsonify({'error': 'Action/IP address fields missing'}), 400
 
-    for node in server_state.get_nodes():
-        if node.ip == ip:
-            if action == 'start':
-                is_action_successful = server_state.start_node(node)
-            else:
-                is_action_successful = server_state.stop_node(node)
+        if action not in ['start', 'stop']:
+            return jsonify({'error': 'Invalid action'}), 400
 
-            if is_action_successful:
-                return jsonify({}), 200
-            else:
-                return jsonify({'error': 'Action on node failed'}, 500)
+        for node in server_state.get_nodes():
+            if node.ip == ip:
+                if action == 'start':
+                    is_action_successful = server_state.start_node(node)
+                else:
+                    is_action_successful = server_state.stop_node(node)
 
-    return jsonify({'error': 'Node IP address not found'}), 404
+                if is_action_successful:
+                    return jsonify({}), 200
+                else:
+                    return jsonify({'error': 'Action on node failed'}, 500)
+
+        return jsonify({'error': 'Node IP address not found'}), 404
+
+    return jsonify({}), 501
 
 
-@app.route('/api/pods', methods=['POST'])
+@app.route('/api/pods', methods=['GET', 'POST'])
 def update_pods():
     """
-    Kills or force kills a pod by its UID field. Force kills if `is_forced` parameter
-    is the string `true`.
-    :return:
+    GET: Gets a list of all pods
+    POST: Kills or force kills a pod by its UID field. Force kills if `is_forced`
+    parameter is the string `true`.
     """
-    params = request.get_json()
-    is_forced = params.get('isForced', False) in [True, 'true', '1', 1]
-    uid = params.get('uid', None)
-    if uid is None:
-        return jsonify({'error': 'uid field missing'}), 400
+    if request.method == 'GET':
+        pods = [{
+            'name': pod.name,
+            'namespace': pod.namespace,
+            'num': pod.num,
+            'uid': pod.uid,
+            'host_ip': pod.host_ip,
+            'ip': pod.ip,
+            'container_ids': pod.container_ids,
+            'state': pod.state,
+            'labels': pod.labels
+        } for pod in server_state.get_pods()]
 
-    for pod in server_state.get_pods():
-        if pod.uid == uid:
-            is_action_successful = server_state.kill_pod(pod, is_forced)
-            if is_action_successful:
-                return jsonify({}), 200
-            else:
-                return jsonify({'error': 'Action on pod failed'}, 500)
+        return jsonify({'pods': pods})
+    elif request.method == 'POST':
+        params = request.get_json()
+        is_forced = params.get('isForced', False) in [True, 'true', '1', 1]
+        uid = params.get('uid', None)
+        if uid is None:
+            return jsonify({'error': 'uid field missing'}), 400
 
-    return jsonify({'error': 'Pod UID not found'}), 404
+        for pod in server_state.get_pods():
+            if pod.uid == uid:
+                is_action_successful = server_state.kill_pod(pod, is_forced)
+                if is_action_successful:
+                    return jsonify({}), 200
+                else:
+                    return jsonify({'error': 'Action on pod failed'}, 500)
+
+        return jsonify({'error': 'Pod UID not found'}), 404
+
+    return jsonify({}), 501
 
 
 def start_server(host, port):

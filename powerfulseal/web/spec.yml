@@ -166,11 +166,11 @@ paths:
                       type: "string"
         400:
           description: "Negative offset not allowed"
-  /api/items:
+  /api/nodes:
     get:
       tags:
       - "items"
-      summary: "Retrieves all nodes and pods"
+      summary: "Retrieves all nodes"
       consumes:
       - "application/json"
       produces:
@@ -201,30 +201,6 @@ paths:
                     state:
                       type: "integer"
                       description: "Enum: 1 - Unknown; 2 - Up; 3 - Down"
-              pods:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    name:
-                      type: "string"
-                    namespace:
-                      type: "string"
-                    num:
-                      type: "integer"
-                    uid:
-                      type: "string"
-                    host_ip:
-                      type: "string"
-                    ip:
-                      type: "string"
-                    container_ids:
-                      type: "string"
-                    state:
-                      type: "string"
-                    labels:
-                      type: "string"
-  /api/nodes:
     post:
       tags:
       - "items"
@@ -257,6 +233,43 @@ paths:
         500:
           description: "Action on node failed"
   /api/pods:
+    get:
+      tags:
+      - "items"
+      summary: "Retrieves all pods"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: ""
+          schema:
+            type: "object"
+            properties:
+              pods:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    namespace:
+                      type: "string"
+                    num:
+                      type: "integer"
+                    uid:
+                      type: "string"
+                    host_ip:
+                      type: "string"
+                    ip:
+                      type: "string"
+                    container_ids:
+                      type: "string"
+                    state:
+                      type: "string"
+                    labels:
+                      type: "string"
     post:
       tags:
       - "items"

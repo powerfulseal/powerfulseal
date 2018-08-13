@@ -175,7 +175,7 @@ def test_get_logs(client):
         assert result.status_code == 400
 
 
-def test_items(client):
+def test_get_nodes(client):
     server_state_mock = MagicMock()
 
     test_node = Node(1, name='a',
@@ -185,6 +185,21 @@ def test_items(client):
                      no=1,
                      state=NodeState.UP)
     server_state_mock.get_nodes = MagicMock(return_value=[test_node])
+
+    with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
+        result = client.get('/api/nodes')
+        server_state_mock.get_nodes.assert_called_once()
+
+        data = json.loads(result.data)
+        assert len(data['nodes']) == 1
+
+        # Ensure that the state is converted to an integer
+        assert isinstance(data['nodes'][0]['state'], int)
+        assert data['nodes'][0]['state'] == NodeState.UP
+
+
+def test_get_pods(client):
+    server_state_mock = MagicMock()
 
     test_pod = Pod('a',
                    namespace='a',
@@ -198,17 +213,12 @@ def test_items(client):
     server_state_mock.get_pods = MagicMock(return_value=[test_pod])
 
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
-        result = client.get('/api/items')
-        server_state_mock.get_nodes.assert_called_once()
+        result = client.get('/api/pods')
         server_state_mock.get_pods.assert_called_once()
 
         data = json.loads(result.data)
-        assert len(data['nodes']) == 1
         assert len(data['pods']) == 1
-
-        # Ensure that the state is converted to an integer
-        assert isinstance(data['nodes'][0]['state'], int)
-        assert data['nodes'][0]['state'] == NodeState.UP
+        assert data['pods'][0]['num'] == 1
 
 
 def test_update_nodes(client):

@@ -232,6 +232,16 @@ def main(argv):
     args = parse_args(args=argv)
 
     # Configure logging
+
+    # Ensure the logger config propagates from the root module of this package
+    logger = logging.getLogger(__name__.split('.')[0])
+
+    # The default level should be set to logging.DEBUG to ensure that the stdout
+    # stream handler can filter to the user-specified verbosity level while the
+    # server logging handler can receive all logs
+    logger.setLevel(logging.DEBUG)
+
+    # Configure logging for stdout
     if not args.verbose:
         log_level = logging.ERROR
     elif args.verbose == 1:
@@ -240,14 +250,10 @@ def main(argv):
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
-    logging.basicConfig(
-        stream=sys.stdout,
-        level=log_level
-    )
 
-    # Ensure the logger config propagates from the root module of this package
-    logger = logging.getLogger(__name__.split('.')[0])
-    logger.setLevel(log_level)
+    stdout_handler = logging.StreamHandler()
+    stdout_handler.setLevel(log_level)
+    logger.addHandler(stdout_handler)
 
     # build cloud provider driver
     logger.debug("Building the driver")

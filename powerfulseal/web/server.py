@@ -19,7 +19,7 @@ from threading import Lock
 
 import jsonschema
 import yaml
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file, render_template
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -29,14 +29,14 @@ from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
 from powerfulseal.web.formatter import PolicyFormatter
 
 # Flask instance and routes
-app = Flask(__name__, static_url_path="/static")
+app = Flask(__name__, static_url_path="/static", static_folder="dist/static", template_folder="dist")
 
 # Set up CORS to allow requests originating outside the server for the API
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Serve Swagger
 SWAGGER_PATH = '/docs'
-API_URL = '/static/spec.yml'
+API_URL = '/spec.yml'
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_PATH,
     API_URL,
@@ -48,6 +48,11 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_PATH)
 
 # Singleton instance of the server
 server_state = None
+
+
+@app.route('/spec.yml')
+def get_spec():
+    return send_file('spec.yml')
 
 
 @app.route('/api/policy', methods=['GET', 'POST', 'PUT'])
@@ -238,6 +243,12 @@ def update_pods():
     return jsonify({}), 501
 
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template('index.html', baseUrl='%sapi' % request.base_url)
+
+
 def start_server(host, port):
     app.run(host=host, port=port)
 
@@ -307,7 +318,8 @@ class ThreadedPolicyRunner(threading.Thread):
 
 
 class ServerState:
-    def __init__(self, policy, inventory, k8s_inventory, driver, executor, policy_path, logger=None):
+    def __init__(self, policy, inventory, k8s_inventory, driver, executor,
+                 server_host, server_port, policy_path, logger=None):
         # server_state must be accessed in a global context as Flask works within
         # a module level scope. As a result, there is no intuitive way for Flask
         # API endpoints to access the server state without first making the server
@@ -320,6 +332,8 @@ class ServerState:
         self.k8s_inventory = k8s_inventory
         self.driver = driver
         self.executor = executor
+        self.server_host = server_host
+        self.server_port = server_port
         self.policy_path = policy_path
 
         self.logger = logger or logging.getLogger(__name__)

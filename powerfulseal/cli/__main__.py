@@ -331,7 +331,7 @@ def main(argv):
         # Create an instance of the singleton server state, ensuring all logs
         # for retrieval from the web interface
         ServerState(policy, inventory, k8s_inventory, driver, executor,
-                    policy_path=args.run_policy_file)
+                    args.server_host, args.server_port, args.run_policy_file)
         server_log_handler = ServerStateLogHandler()
         server_log_handler.setLevel(logging.DEBUG)
         logger.addHandler(server_log_handler)

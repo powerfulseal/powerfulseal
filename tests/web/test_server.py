@@ -64,7 +64,7 @@ def test_autonomous_mode_integration(client):
     test_inventory = MagicMock()
     test_inventory.sync = MagicMock(return_value=None)
 
-    server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None)
+    server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None, None, None)
 
     # Autonomous mode has not yet started
     result = client.get('/api/autonomous-mode')

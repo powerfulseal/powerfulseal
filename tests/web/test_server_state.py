@@ -31,17 +31,17 @@ def test_is_policy_valid_validates():
         }
     }
 
-    server_state = ServerState(valid_policy, None, None, None, None, None)
+    server_state = ServerState(valid_policy, None, None, None, None, None, None, None)
     assert server_state.is_policy_valid()
 
-    server_state = ServerState(invalid_policy, None, None, None, None, None)
+    server_state = ServerState(invalid_policy, None, None, None, None, None, None, None)
     assert not server_state.is_policy_valid()
 
 
 def test_update_policy():
     test_path = 'test.yml'
     new_policy = {'test': 'test'}
-    server_state = ServerState({}, None, None, None, None, test_path)
+    server_state = ServerState({}, None, None, None, None, None, None, test_path)
 
     m = mock_open()
     with mock.patch('powerfulseal.web.server.open', m, create=True):
@@ -52,7 +52,7 @@ def test_update_policy():
 
 
 def test_kill_pod():
-    server_state = ServerState(None, NodeInventory(None), None, None, RemoteExecutor(), None)
+    server_state = ServerState(None, NodeInventory(None), None, None, RemoteExecutor(), None, None, None)
 
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
@@ -93,7 +93,7 @@ def test_policy_runner_lifecycle():
     test_inventory = MagicMock()
     test_inventory.sync = MagicMock(return_value=None)
 
-    server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None)
+    server_state = ServerState(policy, test_inventory, None, None, RemoteExecutor(), None, None, None)
     assert server_state.is_policy_runner_running() is False
 
     server_state.start_policy_runner()

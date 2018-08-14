@@ -22,7 +22,7 @@ class Pod():
     """
 
     def __init__(self, name, namespace, num=None, uid=None, host_ip=None, ip=None,
-                container_ids=None, state=None, labels=None, meta=None):
+                container_ids=None, restart_count=None, state=None, labels=None, meta=None):
         self.name = name
         self.namespace = namespace
         self.num = num
@@ -30,6 +30,7 @@ class Pod():
         self.host_ip = host_ip
         self.ip = ip
         self.container_ids = container_ids or []
+        self.restart_count = restart_count or 0
         self.state = state
         self.labels = labels or dict()
         self.meta = meta

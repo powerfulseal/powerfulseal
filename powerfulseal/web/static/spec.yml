@@ -310,6 +310,8 @@ paths:
                       type: "string"
                     container_ids:
                       type: "string"
+                    restart_count:
+                      type: "integer"
                     state:
                       type: "string"
                     labels:

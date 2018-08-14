@@ -92,6 +92,10 @@ class K8sInventory():
                     status.container_id
                     for status in item.status.container_statuses
                 ] if item.status.container_statuses else [],
+                restart_count=sum([
+                    status.restart_count
+                    for status in item.status.container_statuses
+                ]),
                 state=item.status.phase,
                 labels=item.metadata.labels,
                 meta=item,

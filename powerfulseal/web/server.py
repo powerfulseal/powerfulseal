@@ -212,6 +212,7 @@ def update_pods():
             'host_ip': pod.host_ip,
             'ip': pod.ip,
             'container_ids': pod.container_ids,
+            'restart_count': pod.restart_count,
             'state': pod.state,
             'labels': pod.labels
         } for pod in server_state.get_pods() if len(namespace) == 0 or pod.namespace == namespace]

@@ -47,6 +47,9 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 
 ![pipeline](./media/pipeline.png)
 
+### Metric Collection
+
+Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
 
 ## Writing policies
 

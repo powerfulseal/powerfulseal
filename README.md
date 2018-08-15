@@ -16,6 +16,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 - works with `OpenStack`, `AWS` and local machines
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
+- web interface to interact with PowerfulSeal
 - metric collection and exposition to `Prometheus`
 - minimal setup, easy yaml-based policies
 - easy to extend
@@ -53,6 +54,19 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 ### Metric Collection
 
 Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
+
+### Web Interface
+
+PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
+
+- starting/stopping autonomous mode
+- viewing and filtering logs
+- changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
+- stopping/killing individual nodes and pods
+
+To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
+
+![web interface](./media/web.png)
 
 ### Writing policies
 

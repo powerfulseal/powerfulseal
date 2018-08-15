@@ -14,6 +14,7 @@
 
 
 import abc
+import six
 
 # Used to identify the source of metrics for actions which can be performed on
 # both pods and nodes
@@ -21,7 +22,8 @@ POD_SOURCE = 'pods'
 NODE_SOURCE = 'nodes'
 
 
-class AbstractCollector(metaclass=abc.ABCMeta):
+@six.add_metaclass(abc.ABCMeta)
+class AbstractCollector():
     """
         Metric collectors record events which are useful to users. The storage
         of these metrics is handled by the the collectors which extend this

@@ -16,7 +16,6 @@
 
 import random
 import datetime
-import pytest
 from mock import MagicMock
 
 import pytest

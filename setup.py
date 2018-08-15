@@ -26,8 +26,8 @@ setup(
         'boto3>=1.5.15,<2.0.0',
         'future>=0.16.0,<1',
         'requests>=2.19.1,<3',
-        'prometheus_client>=0.3.0,<1'
-        'flask-cors>=3.0.6,<4'
+        'prometheus_client>=0.3.0,<1',
+        'flask-cors>=3.0.6,<4',
         'flask-swagger-ui>=3.18.0<4'
     ],
     extras_require={

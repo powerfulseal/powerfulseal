@@ -68,7 +68,7 @@ def test_autonomous_mode_integration(client):
 
     # Autonomous mode has not yet started
     result = client.get('/api/autonomous-mode')
-    assert json.loads(result.data)['isStarted'] is False
+    assert json.loads(result.data.decode("utf-8"))['isStarted'] is False
 
     # Autonomous mode has not yet started so it cannot be stopped
     result = client.post('/api/autonomous-mode', data=json.dumps({
@@ -84,7 +84,7 @@ def test_autonomous_mode_integration(client):
 
     # Autonomous mode has started
     result = client.get('/api/autonomous-mode')
-    assert json.loads(result.data)['isStarted'] is True
+    assert json.loads(result.data.decode("utf-8"))['isStarted'] is True
 
     # Autonomous mode has started so it cannot be started
     result = client.post('/api/autonomous-mode', data=json.dumps({
@@ -100,7 +100,7 @@ def test_autonomous_mode_integration(client):
 
     # Autonomous mode has stopped
     result = client.get('/api/autonomous-mode')
-    assert json.loads(result.data)['isStarted'] is False
+    assert json.loads(result.data.decode("utf-8"))['isStarted'] is False
 
 
 def test_get_policy_actions(client):
@@ -108,7 +108,7 @@ def test_get_policy_actions(client):
     server_state_mock.get_policy = MagicMock(return_value={})
     with mock.patch("powerfulseal.web.server.server_state", server_state_mock):
         result = client.get("/api/policy")
-        assert json.loads(result.data) == {
+        assert json.loads(result.data.decode("utf-8")) == {
             'minSecondsBetweenRuns': 0,
             'maxSecondsBetweenRuns': 300,
             'nodeScenarios': [],
@@ -179,22 +179,22 @@ def test_get_logs(client):
         # Test case where an offset is not specified
         server_state_mock.logs = [str(i) for i in range(3)]
         result = client.get("/api/logs")
-        assert json.loads(result.data)['logs'] == [str(i) for i in range(3)]
+        assert json.loads(result.data.decode("utf-8"))['logs'] == [str(i) for i in range(3)]
 
         # Test case where offset is specified and correct result is given
         server_state_mock.logs = [str(i) for i in range(9)]
         result = client.get("/api/logs?offset=5")
-        assert json.loads(result.data)['logs'] == ['5', '6', '7', '8']
+        assert json.loads(result.data.decode("utf-8"))['logs'] == ['5', '6', '7', '8']
 
         # Test edge case where just within range
         server_state_mock.logs = [str(i) for i in range(9)]
         result = client.get("/api/logs?offset=8")
-        assert json.loads(result.data)['logs'] == ['8']
+        assert json.loads(result.data.decode("utf-8"))['logs'] == ['8']
 
         # Test edge case where just outside range
         server_state_mock.logs = [str(i) for i in range(9)]
         result = client.get("/api/logs?offset=9")
-        assert json.loads(result.data)['logs'] == []
+        assert json.loads(result.data.decode("utf-8"))['logs'] == []
 
         # Test case where offset is negative
         # Test edge case where just within range
@@ -218,7 +218,7 @@ def test_get_nodes(client):
         result = client.get('/api/nodes')
         server_state_mock.get_nodes.assert_called_once()
 
-        data = json.loads(result.data)
+        data = json.loads(result.data.decode("utf-8"))
         assert len(data['nodes']) == 1
 
         # Ensure that the state is converted to an integer
@@ -245,21 +245,21 @@ def test_get_pods(client):
         result = client.get('/api/pods')
         server_state_mock.get_pods.assert_called_once()
 
-        data = json.loads(result.data)
+        data = json.loads(result.data.decode("utf-8"))
         assert len(data['pods']) == 1
         assert data['pods'][0]['num'] == 1
 
         # Case where namespace is empty
         result = client.get('/api/pods?namespace=')
-        assert len(json.loads(result.data)['pods']) == 1
+        assert len(json.loads(result.data.decode("utf-8"))['pods']) == 1
 
         # Case where namespace matches the pod's namespace
         result = client.get('/api/pods?namespace=a')
-        assert len(json.loads(result.data)['pods']) == 1
+        assert len(json.loads(result.data.decode("utf-8"))['pods']) == 1
 
         # Case where namespace is not the same as the pod's namespace
         result = client.get('/api/pods?namespace=b')
-        assert len(json.loads(result.data)['pods']) == 0
+        assert len(json.loads(result.data.decode("utf-8"))['pods']) == 0
 
 
 def test_update_nodes(client):

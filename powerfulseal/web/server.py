@@ -166,7 +166,7 @@ def update_nodes():
             'az': node.az,
             'groups': node.groups,
             'no': node.no,
-            'state': node.state
+            'state': node.state.value
         } for node in server_state.get_nodes()]
 
         return jsonify({'nodes': nodes})
@@ -255,7 +255,7 @@ def start_server(host, port):
 
 class ThreadedPolicyRunner(threading.Thread):
     def __init__(self, policy, inventory, k8s_inventory, driver, executor, stop_event, logger=None):
-        super().__init__()
+        threading.Thread.__init__(self)
         config = policy.get("config", {})
         self.wait_min = config.get("minSecondsBetweenRuns", 0)
         self.wait_max = config.get("maxSecondsBetweenRuns", 300)
@@ -452,7 +452,7 @@ class ServerState:
 
 class ServerStateLogHandler(logging.Handler):
     def __init__(self):
-        super().__init__()
+        logging.Handler.__init__(self)
 
     def emit(self, record):
         with server_state.lock:

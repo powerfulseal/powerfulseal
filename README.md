@@ -64,8 +64,6 @@ PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Fe
 - changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
 - stopping/killing individual nodes and pods
 
-To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
-
 ![web interface](./media/web.png)
 
 ### Writing policies
@@ -114,6 +112,15 @@ pip install powerfulseal
 powerfulseal --help # or seal --help
 ```
 
+If you are using the web interface, you will need to clone this repository and run:
+```sh
+pip install .   # Installs package locally
+make web        # Installs npm packages
+powerfulseal --help
+```
+
+To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
+
 Both Python 2.7 and Python 3 are supported.
 
 ### Demo mode
@@ -129,7 +136,7 @@ PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test with multiple ve
 
 Once the required Python versions are set up and can be discovered by tox (e.g., by having them discoverable in your PATH), you can run the tests by running `tox`.
 
-More details in [TESTING.md](TESTING.md) 
+For testing the web server and more details on testing, see [TESTING.md](TESTING.md). 
 
 ## Read about the PowerfulSeal
 

@@ -20,19 +20,19 @@ def test_validate_policy_file_does_not_require_other_arguments():
     assert parser.validate_policy_file == 'test/config.yml'
 
 
-def test_example_arguments():
-    # Interactive mode
-    parser = parse_args['--inventory-kubernetes', '--kube-config',
-                        '~/.kube/config', '--no-cloud', '--interactive']
+def test_interactive_mode_integration():
+    parser = parse_args(['--inventory-kubernetes', '--kube-config',
+                        '~/.kube/config', '--no-cloud', '--interactive'])
     assert parser.inventory_kubernetes
     assert parser.kube_config == '~/.kube/config'
     assert parser.no_cloud
     assert parser.interactive
 
-    # Autonomous mode
-    parser = parse_args['--inventory-kubernetes', '--kube-config',
+
+def test_autonomous_mode_integration():
+    parser = parse_args(['--inventory-kubernetes', '--kube-config',
                         '~/.kube/config', '--no-cloud', '--run-policy-file',
-                        '~/policy.yml', '--inventory-kubernetes']
+                        '~/policy.yml', '--inventory-kubernetes'])
     assert parser.inventory_kubernetes
     assert parser.kube_config == '~/.kube/config'
     assert parser.no_cloud

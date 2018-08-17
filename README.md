@@ -16,6 +16,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 - works with `OpenStack`, `AWS` and local machines
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
+- metric collection and exposition to `Prometheus`
 - minimal setup, easy yaml-based policies
 - easy to extend
 

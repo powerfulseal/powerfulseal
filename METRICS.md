@@ -36,7 +36,7 @@ To collect metrics, run PowerfulSeal with the `--prometheus-collector` flag, alo
 
 A common use case is to use a combination of Prometheus, Grafana and AlertManager in order to increase visibility of potential issues. 
 
-In order to configure this integration, follow the steps below. (The below instructions assume that Prometheus and Grafana are alread set up.)
+In order to configure this integration, follow the steps below. (The below instructions assume that Prometheus and Grafana are already set up.)
 
 1. Open your Prometheus configuration file (e.g., `/etc/prometheus/prometheus.yml`) and add a `scrape_configs` job with the host IP and a chosen port for the server PowerfulSeal will be run on:
     ```yaml

@@ -25,7 +25,6 @@ setup(
         'jsonschema>=2.6.0,<3',
         'boto3>=1.5.15,<2.0.0',
         'future>=0.16.0,<1',
-        'boto3>=1.5.15,<2.0.0',
         'prometheus_client>=0.3.0,<1'
     ],
     extras_require={

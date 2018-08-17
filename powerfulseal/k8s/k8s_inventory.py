@@ -93,3 +93,9 @@ class K8sInventory():
         ] if pods else []
         self.last_pods = pod_objects
         return pod_objects
+
+    def get_all_pods(self):
+        """
+        Retrieves all pods for all namespaces
+        """
+        return self.find_pods("")

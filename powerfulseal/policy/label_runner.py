@@ -28,12 +28,12 @@ class LabelRunner:
     `seal/force-kill`       either "true" or "false" (default: "false")
     `seal/kill-probability` a value between "0" and "1" inclusive (default: "1")
     `seal/days`             a comma-separated string consisting of "mon", "tue",
-                            "wed", "thu", "fri", "sat", "sun" of which days the
+                            "wed", "thu", "fri", "sat", "sun" describing the
                             pod can be killed (default: "mon,tue,wed,thu,fri")
-    `seal/start-time`       a value "HH:MM:SS" for the inclusive start boundary
+    `seal/start-time`       a value "HH-MM-SS" for the inclusive start boundary
                             of when a pod can be killed in the local timezone
                             (default: "10-00-00")
-    `seal/end-time`         a value "HH:MM:SS" for the exclusive end boundary of
+    `seal/end-time`         a value "HH-MM-SS" for the exclusive end boundary of
                             when a pod can be killed in the local timezone
                             (default: "17-30-00")
     """

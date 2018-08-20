@@ -54,7 +54,9 @@ class LabelRunner:
     def run(self):
         while True:
             # Filter
-            pods = self.filter_pods(self.k8s_inventory.get_all_pods())
+            all_pods = self.k8s_inventory.get_all_pods()
+            self.logger.info("Found %d pods" % len(all_pods))
+            pods = self.filter_pods(all_pods)
             self.logger.info("Filtered to %d pods" % len(pods))
 
             # Execute
@@ -108,7 +110,6 @@ class LabelRunner:
         remaining_pods = []
         for pod in pods:
             # Retrieve probability value, performing validation
-            probability = 0
             try:
                 probability = float(pod.labels.get("seal/kill-probability", "1"))
                 if probability < 0 or probability > 1:

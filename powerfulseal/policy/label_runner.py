@@ -55,6 +55,7 @@ class LabelRunner:
         while True:
             # Filter
             pods = self.filter_pods(self.k8s_inventory.get_all_pods())
+            self.logger.info("Filtered to %d pods" % len(pods))
 
             # Execute
             for pod in pods:

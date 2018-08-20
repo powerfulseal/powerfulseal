@@ -54,7 +54,7 @@ class LabelRunner:
     def run(self):
         while True:
             # Filter
-            pods = self.filter_pods(self.inventory.get_all_pods())
+            pods = self.filter_pods(self.k8s_inventory.get_all_pods())
 
             # Execute
             for pod in pods:

@@ -282,8 +282,8 @@ def main(argv):
                 sys.exit(0)
     elif args.label:
         label_runner = LabelRunner(inventory, k8s_inventory, driver, executor,
-                                   min_seconds_between_runs=args.min_seconds_between_runs,
-                                   max_seconds_between_runs=args.max_seconds_between_runs)
+                                   min_seconds_between_runs=int(args.min_seconds_between_runs),
+                                   max_seconds_between_runs=int(args.max_seconds_between_runs))
         label_runner.run()
     elif args.validate_policy_file:
         PolicyRunner.validate_file(args.validate_policy_file)

@@ -109,8 +109,8 @@ def test_filter_day_time():
 
     pod = MagicMock
     pod.labels = {
-        "seal/start-time": "10:00:00",
-        "seal/end-time": "17:30:00"
+        "seal/start-time": "10-00-00",
+        "seal/end-time": "17-30-00"
     }
 
     now = datetime.now()
@@ -138,12 +138,12 @@ def test_process_time_label():
     label_runner = LabelRunner(None, None, None, None)
 
     with pytest.raises(ValueError) as _:
-        label_runner.process_time_label("10:00:0")
+        label_runner.process_time_label("10-00-0")
 
     with pytest.raises(ValueError) as _:
-        label_runner.process_time_label("-1:00:00")
+        label_runner.process_time_label("-1-00-00")
 
     with pytest.raises(ValueError) as _:
-        label_runner.process_time_label("24:00:00")
+        label_runner.process_time_label("24-00-00")
 
-    assert (1, 22, 21) == label_runner.process_time_label("01:22:21")
+    assert (1, 22, 21) == label_runner.process_time_label("01-22-21")

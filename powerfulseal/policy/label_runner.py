@@ -32,10 +32,10 @@ class LabelRunner:
                             pod can be killed (default: "mon,tue,wed,thu,fri")
     `seal/start-time`       a value "HH:MM:SS" for the inclusive start boundary
                             of when a pod can be killed in the local timezone
-                            (default: "10:00:00")
+                            (default: "10-00-00")
     `seal/end-time`         a value "HH:MM:SS" for the exclusive end boundary of
                             when a pod can be killed in the local timezone
-                            (default: "17:30:00")
+                            (default: "17-30-00")
     """
     DEFAULT_DAYS_LABEL = "mon,tue,wed,thu,fri"
     DAY_STRING_TO_DATETIME = {'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4,
@@ -136,7 +136,7 @@ class LabelRunner:
                 continue
 
             # Filter on start time
-            start_time_label = pod.labels.get("seal/start-time", "10:00:00")
+            start_time_label = pod.labels.get("seal/start-time", "10-00-00")
             try:
                 hours, minutes, seconds = self.process_time_label(start_time_label)
                 start_time = now.replace(hour=hours, minute=minutes, second=seconds)
@@ -147,7 +147,7 @@ class LabelRunner:
                 continue
 
             # Filter on end time
-            end_time_label = pod.labels.get("seal/end-time", "17:30:00")
+            end_time_label = pod.labels.get("seal/end-time", "17-30-00")
             try:
                 hours, minutes, seconds = self.process_time_label(end_time_label)
                 end_time = now.replace(hour=hours, minute=minutes, second=seconds)
@@ -185,19 +185,19 @@ class LabelRunner:
 
         # "HH:MM:SS" has eight characters
         if len(label) != 8:
-            raise ValueError("Label has invalid length (must be in HH:MM:SS format")
+            raise ValueError("Label has invalid length (must be in HH-MM-SS format")
 
-        tokens = label.split(':')
+        tokens = label.split('-')
 
         # Ensure tokens is a list of three values ('HH', 'MM', 'SS')
         if len(tokens) != 3 or not all(map(lambda x: len(x) is 2, tokens)):
-            raise ValueError("Label be in HH:MM:SS format")
+            raise ValueError("Label be in HH-MM-SS format")
 
         hours = int(tokens[0])
         minutes = int(tokens[1])
         seconds = int(tokens[2])
 
         if hours < 0 or hours > 23 or minutes < 0 or minutes > 59 or seconds < 0 or seconds > 59:
-            raise ValueError("Label must be in HH:MM:SS format")
+            raise ValueError("Label must be in HH-MM-SS format")
 
         return hours, minutes, seconds

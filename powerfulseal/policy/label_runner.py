@@ -33,12 +33,12 @@ class LabelRunner:
     `seal/start-time`       a value "HH:MM:SS" for the inclusive start boundary
                             of when a pod can be killed in the local timezone
                             (default: "10:00:00")
-    `seal/end-time`         a value "HH:MM:SS" for the inclusive end boundary of
+    `seal/end-time`         a value "HH:MM:SS" for the exclusive end boundary of
                             when a pod can be killed in the local timezone
                             (default: "17:30:00")
     """
     DEFAULT_DAYS_LABEL = "mon,tue,wed,thu,fri"
-    DAY_STRING_TO_DATETIME = {'mon': 0, 'tue': 1, 'wed': 2, 'thur': 3, 'fri': 4,
+    DAY_STRING_TO_DATETIME = {'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4,
                               'sat': 5, 'sun': 6}
 
     def __init__(self, policy, inventory, k8s_inventory, driver, executor,
@@ -75,7 +75,7 @@ class LabelRunner:
             return
 
         # Format command
-        signal = "SIGKILL" if pod.labels.get("self/force-kill", "false") == "true" else "SIGTERM"
+        signal = "SIGKILL" if pod.labels.get("seal/force-kill", "false") == "true" else "SIGTERM"
         container_id = random.choice(pod.container_ids)
         cmd = POD_KILL_CMD_TEMPLATE.format(
             signal=signal,
@@ -91,8 +91,8 @@ class LabelRunner:
     def filter_pods(self, pods):
         filters = [
             self.filter_is_enabled,
-            self.filter_kill_probability,
-            self.filter_day_time
+            self.filter_day_time,
+            self.filter_kill_probability
         ]
 
         remaining_pods = pods
@@ -102,7 +102,7 @@ class LabelRunner:
         return remaining_pods
 
     def filter_is_enabled(self, pods):
-        return filter(lambda pod: pod.labels.get("seal/enabled", "false") == "true", pods)
+        return list(filter(lambda pod: pod.labels.get("seal/enabled", "false") == "true", pods))
 
     def filter_kill_probability(self, pods):
         remaining_pods = []
@@ -110,15 +110,16 @@ class LabelRunner:
             # Retrieve probability value, performing validation
             probability = 0
             try:
-                probability = float(pod.labels.get("seal/kill_probability", "1"))
+                probability = float(pod.labels.get("seal/kill-probability", "1"))
                 if probability < 0 or probability > 1:
                     raise ValueError
             except ValueError:
                 self.logger.warning("Invalid float value - skipping pod %s/%s" % (pod.namespace, pod.name))
-                pass
+                continue
 
-            if probability < random.random():
-                pass
+            p = random.random()
+            if probability < p:
+                continue
 
             remaining_pods.append(pod)
 
@@ -132,29 +133,29 @@ class LabelRunner:
             # Filter on days
             days_label = pod.labels.get("seal/days", self.DEFAULT_DAYS_LABEL)
             if now.weekday() not in self.get_integer_days_from_days_label(days_label):
-                pass
+                continue
 
             # Filter on start time
-            start_time_label = pods.labels.get("seal/start-time", "10:00:00")
+            start_time_label = pod.labels.get("seal/start-time", "10:00:00")
             try:
                 hours, minutes, seconds = self.process_time_label(start_time_label)
                 start_time = now.replace(hour=hours, minute=minutes, second=seconds)
                 if now < start_time:
-                    pass
+                    continue
             except ValueError:
                 self.logger("Invalid start time - skipping pod %s/%s" % (pod.namespace, pod.name))
-                pass
+                continue
 
             # Filter on end time
-            end_time_label = pods.labels.get("seal/end-time", "17:30:00")
+            end_time_label = pod.labels.get("seal/end-time", "17:30:00")
             try:
                 hours, minutes, seconds = self.process_time_label(end_time_label)
                 end_time = now.replace(hour=hours, minute=minutes, second=seconds)
-                if now > end_time:
-                    pass
+                if now >= end_time:
+                    continue
             except ValueError:
                 self.logger("Invalid end time - skipping pod %s/%s" % (pod.namespace, pod.name))
-                pass
+                continue
 
             remaining_pods.append(pod)
 

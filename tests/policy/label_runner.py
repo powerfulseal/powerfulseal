@@ -23,7 +23,7 @@ from powerfulseal.policy.label_runner import LabelRunner
 
 
 def test_kill_pod():
-    label_runner = LabelRunner(None, NodeInventory(None), None, None, RemoteExecutor())
+    label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
 
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
@@ -48,7 +48,7 @@ def test_kill_pod():
 
 
 def test_kill_pod_forced():
-    label_runner = LabelRunner(None, NodeInventory(None), None, None, RemoteExecutor())
+    label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
 
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
@@ -67,7 +67,7 @@ def test_kill_pod_forced():
 
 
 def test_filter_is_enabled():
-    label_runner = LabelRunner(None, None, None, None, None)
+    label_runner = LabelRunner(None, None, None, None)
 
     enabled_pod = MagicMock()
     enabled_pod.labels = {'seal/enabled': 'true'}
@@ -94,7 +94,7 @@ def test_filter_kill_probability(proba):
     random.seed(7)  # make the tests deterministic
     SAMPLES = 100000
 
-    label_runner = LabelRunner(None, None, None, None, None)
+    label_runner = LabelRunner(None, None, None, None)
     pod = MagicMock()
     pod.labels = {'seal/kill-probability': str(proba)}
 
@@ -105,7 +105,7 @@ def test_filter_kill_probability(proba):
 
 
 def test_filter_day_time():
-    label_runner = LabelRunner(None, None, None, None, None)
+    label_runner = LabelRunner(None, None, None, None)
 
     pod = MagicMock
     pod.labels = {
@@ -129,13 +129,13 @@ def test_filter_day_time():
 
 
 def test_get_integer_days_from_days_label():
-    label_runner = LabelRunner(None, None, None, None, None)
+    label_runner = LabelRunner(None, None, None, None)
     integer_days = label_runner.get_integer_days_from_days_label("mon,abc,tue,wed,thu,thur,fri,sat,sun,bla")
     assert integer_days == [0, 1, 2, 3, 4, 5, 6]
 
 
 def test_process_time_label():
-    label_runner = LabelRunner(None, None, None, None, None)
+    label_runner = LabelRunner(None, None, None, None)
 
     with pytest.raises(ValueError) as _:
         label_runner.process_time_label("10:00:0")

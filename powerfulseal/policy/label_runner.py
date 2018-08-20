@@ -41,9 +41,8 @@ class LabelRunner:
     DAY_STRING_TO_DATETIME = {'mon': 0, 'tue': 1, 'wed': 2, 'thu': 3, 'fri': 4,
                               'sat': 5, 'sun': 6}
 
-    def __init__(self, policy, inventory, k8s_inventory, driver, executor,
+    def __init__(self, inventory, k8s_inventory, driver, executor,
                  min_seconds_between_runs=0, max_seconds_between_runs=300, logger=None):
-        self.policy = policy
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.driver = driver

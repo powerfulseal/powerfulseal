@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +23,7 @@ import os
 from prometheus_client import start_http_server
 
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
+from powerfulseal.policy.label_runner import LabelRunner
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
@@ -69,7 +69,23 @@ def parse_args(args):
         help='will start the seal in interactive mode',
         action='store_true',
     )
+    policy_options.add_argument('--label',
+        help='starts the seal inn label mode',
+        action='store_true',
+    )
+
     is_validate_policy_file_set = '--validate-policy-file' in args
+
+    # Label mode arguments
+    label_options = prog.add_argument_group()
+    label_options.add_argument('--min-seconds-between-runs',
+        default=0,
+        help='minimum seconds between runs'
+    )
+    label_options.add_argument('--max-seconds-between-runs',
+       default=300,
+       help='maximum seconds between runs'
+    )
 
     # Inventory
     inventory_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
@@ -264,6 +280,11 @@ def main(argv):
                 input()
             except KeyboardInterrupt:
                 sys.exit(0)
+    elif args.label:
+        label_runner = LabelRunner(inventory, k8s_inventory, driver, executor,
+                                   min_seconds_between_runs=args.min_seconds_between_runs,
+                                   max_seconds_between_runs=args.max_seconds_between_runs)
+        label_runner.run()
     elif args.validate_policy_file:
         PolicyRunner.validate_file(args.validate_policy_file)
         print("All good, captain")

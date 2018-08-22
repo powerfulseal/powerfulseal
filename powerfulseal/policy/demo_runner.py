@@ -111,10 +111,6 @@ class DemoRunner:
         return filled_pods
 
     def filter_pods(self, pods):
-        # Fill metrics if metrics to filter on do not already exist
-        if not all(map(lambda p: 'metrics' in p, pods)):
-            raise RuntimeError("Metrics not filled before filtering")
-
         filters = [
             self.filter_top,
             self.filter_probability

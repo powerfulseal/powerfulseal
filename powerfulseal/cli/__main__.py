@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,12 +31,8 @@ from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
 
-def main(argv):
-    """
-        The main function to invoke the powerfulseal cli
-    """
 
-    # Describe our configuration.
+def parse_args(args):
     prog = ArgumentParser(
         config_file_parser_class=YAMLConfigFileParser,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -46,7 +41,8 @@ def main(argv):
             PowerfulSeal
         """),
     )
-    # general settings
+
+    # General settings
     prog.add_argument(
         '-c', '--config',
         is_config_file=True,
@@ -58,8 +54,24 @@ def main(argv):
         help='Verbose logging.'
     )
 
-    # inventory related config
-    inventory_options = prog.add_mutually_exclusive_group(required=True)
+    # Policy
+    # If --validate-policy-file is set, the other arguments are not used
+    policy_options = prog.add_mutually_exclusive_group(required=True)
+    policy_options.add_argument('--validate-policy-file',
+        help='reads the policy file, validates the schema, returns'
+    )
+    policy_options.add_argument('--run-policy-file',
+        default=os.environ.get("POLICY_FILE"),
+        help='location of the policy file to read',
+    )
+    policy_options.add_argument('--interactive',
+        help='will start the seal in interactive mode',
+        action='store_true',
+    )
+    is_validate_policy_file_set = '--validate-policy-file' in args
+
+    # Inventory
+    inventory_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
     inventory_options.add_argument('-i', '--inventory-file',
         default=os.environ.get("INVENTORY_FILE"),
         help='the inventory file of group of hosts to test'
@@ -70,7 +82,7 @@ def main(argv):
         action='store_true',
     )
 
-    # ssh related options
+    # SSH
     args_ssh = prog.add_argument_group('SSH settings')
     args_ssh.add_argument(
         '--remote-user',
@@ -89,8 +101,8 @@ def main(argv):
         help='Path to ssh private key',
     )
 
-    # cloud driver related config
-    cloud_options = prog.add_mutually_exclusive_group(required=True)
+    # Cloud Driver
+    cloud_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',
@@ -145,7 +157,7 @@ def main(argv):
         type=check_valid_port
     )
 
-    # KUBERNETES CONFIG
+    # Kubernetes
     args_kubernetes = prog.add_argument_group('Kubernetes settings')
     args_kubernetes.add_argument(
         '--kube-config',
@@ -153,21 +165,14 @@ def main(argv):
         help='Location of kube-config file',
     )
 
-    # policy-related settings
-    policy_options = prog.add_mutually_exclusive_group(required=True)
-    policy_options.add_argument('--validate-policy-file',
-        help='reads the policy file, validates the schema, returns'
-    )
-    policy_options.add_argument('--run-policy-file',
-        default=os.environ.get("POLICY_FILE"),
-        help='location of the policy file to read',
-    )
-    policy_options.add_argument('--interactive',
-        help='will start the seal in interactive mode',
-        action='store_true',
-    )
+    return prog.parse_args(args=args)
 
-    args = prog.parse_args(args=argv)
+
+def main(argv):
+    """
+        The main function to invoke the powerfulseal cli
+    """
+    args = parse_args(args=argv)
 
     # Configure logging
     if not args.verbose:
@@ -198,7 +203,6 @@ def main(argv):
     else:
         logger.info("No driver - some functionality disabled")
         driver = NoCloudDriver()
-
 
     # build a k8s client
     kube_config = args.kube_config
@@ -270,6 +274,7 @@ def main(argv):
 
 def start():
     main(sys.argv[1:])
+
 
 if __name__ == '__main__':
     start()

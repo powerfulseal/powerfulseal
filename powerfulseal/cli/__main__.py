@@ -70,7 +70,7 @@ def parse_args(args):
         action='store_true',
     )
     policy_options.add_argument('--label',
-        help='starts the seal inn label mode',
+        help='starts the seal in label mode',
         action='store_true',
     )
 

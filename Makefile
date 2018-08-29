@@ -1,5 +1,5 @@
 INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
-TOX_CALL ?= tox
+TOX_CALL ?= tox -r
 
 test:
 	$(TOX_CALL)

@@ -18,39 +18,11 @@ import random
 import pytest
 from mock import MagicMock
 
-from powerfulseal.policy.pod_scenario import PodScenario
 
+# noinspection PyUnresolvedReferences
+from tests.fixtures import pod_scenario
+from tests.fixtures import dummy_object
 
-EXAMPLE_SCHEMA = {
-    "match": [
-        {
-            "property": {
-                "name": "attr",
-                "value": "a.*"
-            }
-        },
-    ]
-}
-
-class Dummy():
-    pass
-
-@pytest.fixture
-def dummy_object():
-    return Dummy()
-
-@pytest.fixture
-def pod_scenario():
-    inventory = MagicMock()
-    k8s_inventory = MagicMock()
-    executor = MagicMock()
-    return PodScenario(
-        name="test scenario",
-        schema=EXAMPLE_SCHEMA,
-        inventory=inventory,
-        k8s_inventory=k8s_inventory,
-        executor=executor,
-    )
 
 def test_matching_namespace(pod_scenario):
     a, b = dummy_object(), dummy_object()

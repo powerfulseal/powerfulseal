@@ -21,6 +21,9 @@ import textwrap
 import sys
 import os
 
+from prometheus_client import start_http_server
+
+from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
@@ -106,6 +109,40 @@ def main(argv):
     prog.add_argument('--open-stack-cloud-name',
         default=os.environ.get("OPENSTACK_CLOUD_NAME"),
         help="the name of the open stack cloud from your config file to use (if using config file)",
+    )
+
+    # metric collector related config
+    metric_options = prog.add_mutually_exclusive_group(required=False)
+    metric_options.add_argument('--stdout-collector',
+        default=os.environ.get("STDOUT_COLLECTOR"),
+        action='store_true',
+        help="print metrics collected to stdout"
+    )
+    metric_options.add_argument('--prometheus-collector',
+        default=os.environ.get("PROMETHEUS_COLLECTOR"),
+        action='store_true',
+        help="store metrics in Prometheus and expose metrics over a HTTP server"
+    )
+
+    def check_valid_port(value):
+        parsed = int(value)
+        min_port = 0
+        max_port = 65535
+        if parsed < min_port or parsed > max_port:
+            raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
+        return parsed
+
+    args_prometheus = prog.add_argument_group('Prometheus settings')
+    args_prometheus.add_argument(
+        '--prometheus-host',
+        default='127.0.0.1',
+        help='Host to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag'
+    )
+    args_prometheus.add_argument(
+        '--prometheus-port',
+        default=8000,
+        help='Port to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag',
+        type=check_valid_port
     )
 
     # KUBERNETES CONFIG
@@ -194,6 +231,16 @@ def main(argv):
         ssh_path_to_private_key=args.ssh_path_to_private_key,
     )
 
+    # create the collector which defaults to StdoutCollector()
+    metric_collector = StdoutCollector()
+    if args.prometheus_collector:
+        if not args.prometheus_host:
+            raise argparse.ArgumentTypeError("The Prometheus host must be specified with --prometheus-host")
+        if not args.prometheus_port:
+            raise argparse.ArgumentTypeError("The Prometheus port must be specified with --prometheus-port")
+        start_http_server(args.prometheus_port, args.prometheus_host)
+        metric_collector = PrometheusCollector()
+
     if args.interactive:
         # create a command parser
         cmd = PSCmd(
@@ -217,7 +264,8 @@ def main(argv):
         print("All good, captain")
     elif args.run_policy_file:
         policy = PolicyRunner.validate_file(args.run_policy_file)
-        PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
+        PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor,
+                         metric_collector=metric_collector)
 
 
 def start():

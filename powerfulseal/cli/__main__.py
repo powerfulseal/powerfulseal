@@ -83,8 +83,14 @@ def parse_args(args):
         help='minimum seconds between runs'
     )
     label_options.add_argument('--max-seconds-between-runs',
-       default=300,
-       help='maximum seconds between runs'
+        default=300,
+        help='maximum seconds between runs'
+    )
+
+    # Specify the namespace for label mode
+    prog.add_argument('--namespace',
+        default='default',
+        help='Namespace to use for label mode, defaults to the default namespace (set to blank for all namespaces)'
     )
 
     # Inventory
@@ -283,7 +289,8 @@ def main(argv):
     elif args.label:
         label_runner = LabelRunner(inventory, k8s_inventory, driver, executor,
                                    min_seconds_between_runs=int(args.min_seconds_between_runs),
-                                   max_seconds_between_runs=int(args.max_seconds_between_runs))
+                                   max_seconds_between_runs=int(args.max_seconds_between_runs),
+                                   namespace=args.namespace)
         label_runner.run()
     elif args.validate_policy_file:
         PolicyRunner.validate_file(args.validate_policy_file)

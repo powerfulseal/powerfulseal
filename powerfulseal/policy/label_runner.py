@@ -42,7 +42,8 @@ class LabelRunner:
                               'sat': 5, 'sun': 6}
 
     def __init__(self, inventory, k8s_inventory, driver, executor,
-                 min_seconds_between_runs=0, max_seconds_between_runs=300, logger=None):
+                 min_seconds_between_runs=0, max_seconds_between_runs=300, logger=None,
+                 namespace=None):
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.driver = driver
@@ -50,13 +51,14 @@ class LabelRunner:
         self.min_seconds_between_runs = min_seconds_between_runs
         self.max_seconds_between_runs = max_seconds_between_runs
         self.logger = logger or logging.getLogger(__name__)
+        self.namespace = namespace
 
     def run(self):
         while True:
             # Filter
-            all_pods = self.k8s_inventory.get_all_pods()
-            self.logger.info("Found %d pods" % len(all_pods))
-            pods = self.filter_pods(all_pods)
+            app_pods_in_namespace = self.k8s_inventory.find_pods(self.namespace)
+            self.logger.info("Found %d pods" % len(app_pods_in_namespace))
+            pods = self.filter_pods(app_pods_in_namespace)
             self.logger.info("Filtered to %d pods" % len(pods))
 
             # Execute

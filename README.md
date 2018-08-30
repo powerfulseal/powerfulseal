@@ -76,19 +76,7 @@ A [full featured example](./tests/policy/example_config.yml) listing most of the
 
 Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
 
-Labels can be manually set using the `kubectl label pods [POD NAME] [LABEL]` command. The labels (all optional) available are:
-
-| Label                 | Description                                                                                                                             | Default               |
-|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------|-----------------------|
-| seal/enabled          | Either "true" or "false"                                                                                                                | "false"               |
-| seal/force-kill       | Either "true" or "false"                                                                                                                | "false"               |
-| seal/kill-probability | A value between "0" and "1" inclusive describing the probability that a pod should be killed                                            | "1"                   |
-| seal/days             | A comma-separated string consisting of "mon", "tue", "wed", "thu", "fri", "sat", "sun", describing the days which the pod can be killed | "mon,tue,wed,thu,fri" |
-| seal/start-time       | A value "HH-MM-SS" describing the inclusive start boundary of when a pod can be killed in the local timezone                            | "10-00-00"            |
-| seal/end-time         | A value "HH-MM-SS" describing the exclusive end boundary of when a pod can be killed in the local time zone                             | "17-30-00"            |
-
-To run label mode, use the `--label` flag. You may also wish to set the `--min-seconds-between-runs` and `--max-seconds-between-runs` flags which default to `0` and `300` respectively.
-
+Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
 ## Setup
 

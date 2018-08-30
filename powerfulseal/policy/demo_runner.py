@@ -42,7 +42,7 @@ class DemoRunner:
 
     def __init__(self, inventory, k8s_inventory, driver, executor, metric_client,
                  min_seconds_between_runs=0, max_seconds_between_runs=300,
-                 aggressiveness=MIN_AGGRESSIVENESS, logger=None):
+                 aggressiveness=MIN_AGGRESSIVENESS, logger=None, namespace=None):
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.driver = driver
@@ -52,11 +52,12 @@ class DemoRunner:
         self.aggressiveness = aggressiveness
         self.metric_client = metric_client
         self.logger = logger or logging.getLogger(__name__)
+        self.namespace=None
 
     def run(self):
         while True:
             # Filter
-            all_pods = self.k8s_inventory.get_all_pods()
+            all_pods = self.k8s_inventory.find_pods(self.namespace)
             self.logger.info("Found %d pods" % len(all_pods))
             pods = self.filter_pods(self.fill_metrics(all_pods))
             self.logger.info("Filtered to %d pods" % len(pods))

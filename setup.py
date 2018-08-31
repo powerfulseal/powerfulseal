@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='1.5.0',
+    version='1.6.0',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
@@ -25,6 +25,7 @@ setup(
         'jsonschema>=2.6.0,<3',
         'boto3>=1.5.15,<2.0.0',
         'future>=0.16.0,<1',
+        'requests>=2.19.1,<3',
         'prometheus_client>=0.3.0,<1'
     ],
     extras_require={

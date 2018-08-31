@@ -20,8 +20,9 @@ import textwrap
 import sys
 import os
 
+from powerfulseal.k8s.heapster_client import HeapsterClient
+from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
-
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
 from powerfulseal.policy.label_runner import LabelRunner
 from ..node import NodeInventory
@@ -73,24 +74,39 @@ def parse_args(args):
         help='starts the seal in label mode',
         action='store_true',
     )
+    policy_options.add_argument('--demo',
+        help='starts the demo mode',
+        action='store_true'
+    )
 
     is_validate_policy_file_set = '--validate-policy-file' in args
 
-    # Label mode arguments
-    label_options = prog.add_argument_group()
-    label_options.add_argument('--min-seconds-between-runs',
-        default=0,
-        help='minimum seconds between runs'
+    # Demo mode
+    demo_options = prog.add_argument_group()
+    demo_options.add_argument('--heapster-path',
+        help='Base path of Heapster without trailing slash'
     )
-    label_options.add_argument('--max-seconds-between-runs',
-        default=300,
-        help='maximum seconds between runs'
+    demo_options.add_argument('--aggressiveness',
+        help='Aggressiveness of demo mode (default: 3)',
+        default=3,
+        type=int
     )
 
-    # Specify the namespace for label mode
+    # Arguments for both label and demo mode
     prog.add_argument('--namespace',
         default='default',
-        help='Namespace to use for label mode, defaults to the default namespace (set to blank for all namespaces)'
+        help='Namespace to use for label and demo mode, defaults to the default '
+             'namespace (set to blank for all namespaces)'
+    )
+    prog.add_argument('--min-seconds-between-runs',
+        help='Minimum number of seconds between runs',
+        default=0,
+        type = int
+    )
+    prog.add_argument('--max-seconds-between-runs',
+        help='Maximum number of seconds between runs',
+        default=300,
+        type = int
     )
 
     # Inventory
@@ -146,7 +162,7 @@ def parse_args(args):
         help="the name of the open stack cloud from your config file to use (if using config file)",
     )
 
-    # metric collector related config
+    # Metric Collector
     metric_options = prog.add_mutually_exclusive_group(required=False)
     metric_options.add_argument('--stdout-collector',
         default=os.environ.get("STDOUT_COLLECTOR"),
@@ -286,6 +302,19 @@ def main(argv):
                 input()
             except KeyboardInterrupt:
                 sys.exit(0)
+    elif args.demo:
+        aggressiveness = int(args.aggressiveness)
+        if not 1 <= aggressiveness <= 5:
+            print("Aggressiveness must be between 1 and 5 inclusive")
+            exit()
+
+        heapster_client = HeapsterClient(args.heapster_path)
+        demo_runner = DemoRunner(inventory, k8s_inventory, driver, executor,
+                                 heapster_client, aggressiveness=aggressiveness,
+                                 min_seconds_between_runs=int(args.min_seconds_between_runs),
+                                 max_seconds_between_runs=int(args.max_seconds_between_runs),
+                                 namespace=args.namespace)
+        demo_runner.run()
     elif args.label:
         label_runner = LabelRunner(inventory, k8s_inventory, driver, executor,
                                    min_seconds_between_runs=int(args.min_seconds_between_runs),

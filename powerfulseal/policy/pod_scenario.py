@@ -19,6 +19,8 @@ import random
 from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .scenario import Scenario
 
+POD_KILL_CMD_TEMPLATE = "sudo docker kill -s {signal} {container_id}"
+
 
 class PodScenario(Scenario):
     """ Pod scenario handler.

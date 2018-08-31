@@ -56,7 +56,10 @@ class K8sInventory():
     def find_deployments(self, namespace=None, labels=None):
         """ Find deployments for a namespace (default to "default" namespace).
         """
-        namespace = namespace or "default"
+        # Check if namespace is None instead of using "or" as Kubernetes treats
+        # an empty string as the */all wildcard
+        if namespace is None:
+            namespace = "default"
         return [
             item.metadata.name
             for item in self.k8s_client.list_deployments(
@@ -68,7 +71,10 @@ class K8sInventory():
     def find_pods(self, namespace, selector=None, deployment_name=None):
         """ Find pods in a namespace, for a deployment or selector.
         """
-        namespace = namespace or "default"
+        # Check if namespace is None instead of using "or" as Kubernetes treats
+        # an empty string as the */all wildcard
+        if namespace is None:
+            namespace = "default"
         pods = self.k8s_client.list_pods(
             namespace=namespace,
             selector=selector,
@@ -93,3 +99,9 @@ class K8sInventory():
         ] if pods else []
         self.last_pods = pod_objects
         return pod_objects
+
+    def get_all_pods(self):
+        """
+        Retrieves all pods for all namespaces
+        """
+        return self.find_pods("")

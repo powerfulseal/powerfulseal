@@ -16,34 +16,13 @@
 
 import random
 import datetime
-import pytest
 from mock import MagicMock
 
-from powerfulseal.policy.scenario import Scenario
+import pytest
 
-class Dummy():
-    pass
-
-@pytest.fixture
-def dummy_object():
-    return Dummy()
-
-
-class NoopScenario(Scenario):
-
-    def match(self):
-        return []
-
-    def act(self, items):
-        pass
-
-
-@pytest.fixture
-def noop_scenario():
-    return NoopScenario(
-        name="test scenario",
-        schema={}
-    )
+# noinspection PyUnresolvedReferences
+from tests.fixtures import noop_scenario
+from tests.fixtures import dummy_object
 
 
 def test_empty_property_criteria_dont_match(noop_scenario):
@@ -172,6 +151,7 @@ def test_random_sample_percentage(noop_scenario):
         assert len(sample) == int(percentage * len(candidates))
         for elem in sample:
             assert elem in candidates
+
 
 def test_random_doesnt_pass_on_empty_criterion(noop_scenario):
     candidates = [dummy_object() for x in range(100)]

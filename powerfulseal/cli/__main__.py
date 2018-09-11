@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +20,11 @@ import textwrap
 import sys
 import os
 
+from powerfulseal.k8s.heapster_client import HeapsterClient
+from powerfulseal.policy.demo_runner import DemoRunner
+from prometheus_client import start_http_server
+from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
+from powerfulseal.policy.label_runner import LabelRunner
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
@@ -29,12 +33,8 @@ from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
 
-def main(argv):
-    """
-        The main function to invoke the powerfulseal cli
-    """
 
-    # Describe our configuration.
+def parse_args(args):
     prog = ArgumentParser(
         config_file_parser_class=YAMLConfigFileParser,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -43,7 +43,8 @@ def main(argv):
             PowerfulSeal
         """),
     )
-    # general settings
+
+    # General settings
     prog.add_argument(
         '-c', '--config',
         is_config_file=True,
@@ -55,8 +56,61 @@ def main(argv):
         help='Verbose logging.'
     )
 
-    # inventory related config
-    inventory_options = prog.add_mutually_exclusive_group(required=True)
+    # Policy
+    # If --validate-policy-file is set, the other arguments are not used
+    policy_options = prog.add_mutually_exclusive_group(required=True)
+    policy_options.add_argument('--validate-policy-file',
+        help='reads the policy file, validates the schema, returns'
+    )
+    policy_options.add_argument('--run-policy-file',
+        default=os.environ.get("POLICY_FILE"),
+        help='location of the policy file to read',
+    )
+    policy_options.add_argument('--interactive',
+        help='will start the seal in interactive mode',
+        action='store_true',
+    )
+    policy_options.add_argument('--label',
+        help='starts the seal in label mode',
+        action='store_true',
+    )
+    policy_options.add_argument('--demo',
+        help='starts the demo mode',
+        action='store_true'
+    )
+
+    is_validate_policy_file_set = '--validate-policy-file' in args
+
+    # Demo mode
+    demo_options = prog.add_argument_group()
+    demo_options.add_argument('--heapster-path',
+        help='Base path of Heapster without trailing slash'
+    )
+    demo_options.add_argument('--aggressiveness',
+        help='Aggressiveness of demo mode (default: 3)',
+        default=3,
+        type=int
+    )
+
+    # Arguments for both label and demo mode
+    prog.add_argument('--namespace',
+        default='default',
+        help='Namespace to use for label and demo mode, defaults to the default '
+             'namespace (set to blank for all namespaces)'
+    )
+    prog.add_argument('--min-seconds-between-runs',
+        help='Minimum number of seconds between runs',
+        default=0,
+        type = int
+    )
+    prog.add_argument('--max-seconds-between-runs',
+        help='Maximum number of seconds between runs',
+        default=300,
+        type = int
+    )
+
+    # Inventory
+    inventory_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
     inventory_options.add_argument('-i', '--inventory-file',
         default=os.environ.get("INVENTORY_FILE"),
         help='the inventory file of group of hosts to test'
@@ -67,7 +121,7 @@ def main(argv):
         action='store_true',
     )
 
-    # ssh related options
+    # SSH
     args_ssh = prog.add_argument_group('SSH settings')
     args_ssh.add_argument(
         '--remote-user',
@@ -86,8 +140,8 @@ def main(argv):
         help='Path to ssh private key',
     )
 
-    # cloud driver related config
-    cloud_options = prog.add_mutually_exclusive_group(required=True)
+    # Cloud Driver
+    cloud_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',
@@ -108,7 +162,41 @@ def main(argv):
         help="the name of the open stack cloud from your config file to use (if using config file)",
     )
 
-    # KUBERNETES CONFIG
+    # Metric Collector
+    metric_options = prog.add_mutually_exclusive_group(required=False)
+    metric_options.add_argument('--stdout-collector',
+        default=os.environ.get("STDOUT_COLLECTOR"),
+        action='store_true',
+        help="print metrics collected to stdout"
+    )
+    metric_options.add_argument('--prometheus-collector',
+        default=os.environ.get("PROMETHEUS_COLLECTOR"),
+        action='store_true',
+        help="store metrics in Prometheus and expose metrics over a HTTP server"
+    )
+
+    def check_valid_port(value):
+        parsed = int(value)
+        min_port = 0
+        max_port = 65535
+        if parsed < min_port or parsed > max_port:
+            raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
+        return parsed
+
+    args_prometheus = prog.add_argument_group('Prometheus settings')
+    args_prometheus.add_argument(
+        '--prometheus-host',
+        default='127.0.0.1',
+        help='Host to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag'
+    )
+    args_prometheus.add_argument(
+        '--prometheus-port',
+        default=8000,
+        help='Port to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag',
+        type=check_valid_port
+    )
+
+    # Kubernetes
     args_kubernetes = prog.add_argument_group('Kubernetes settings')
     args_kubernetes.add_argument(
         '--kube-config',
@@ -116,21 +204,14 @@ def main(argv):
         help='Location of kube-config file',
     )
 
-    # policy-related settings
-    policy_options = prog.add_mutually_exclusive_group(required=True)
-    policy_options.add_argument('--validate-policy-file',
-        help='reads the policy file, validates the schema, returns'
-    )
-    policy_options.add_argument('--run-policy-file',
-        default=os.environ.get("POLICY_FILE"),
-        help='location of the policy file to read',
-    )
-    policy_options.add_argument('--interactive',
-        help='will start the seal in interactive mode',
-        action='store_true',
-    )
+    return prog.parse_args(args=args)
 
-    args = prog.parse_args(args=argv)
+
+def main(argv):
+    """
+        The main function to invoke the powerfulseal cli
+    """
+    args = parse_args(args=argv)
 
     # Configure logging
     if not args.verbose:
@@ -161,7 +242,6 @@ def main(argv):
     else:
         logger.info("No driver - some functionality disabled")
         driver = NoCloudDriver()
-
 
     # build a k8s client
     kube_config = args.kube_config
@@ -194,6 +274,16 @@ def main(argv):
         ssh_path_to_private_key=args.ssh_path_to_private_key,
     )
 
+    # create the collector which defaults to StdoutCollector()
+    metric_collector = StdoutCollector()
+    if args.prometheus_collector:
+        if not args.prometheus_host:
+            raise argparse.ArgumentTypeError("The Prometheus host must be specified with --prometheus-host")
+        if not args.prometheus_port:
+            raise argparse.ArgumentTypeError("The Prometheus port must be specified with --prometheus-port")
+        start_http_server(args.prometheus_port, args.prometheus_host)
+        metric_collector = PrometheusCollector()
+
     if args.interactive:
         # create a command parser
         cmd = PSCmd(
@@ -212,16 +302,37 @@ def main(argv):
                 input()
             except KeyboardInterrupt:
                 sys.exit(0)
+    elif args.demo:
+        aggressiveness = int(args.aggressiveness)
+        if not 1 <= aggressiveness <= 5:
+            print("Aggressiveness must be between 1 and 5 inclusive")
+            exit()
+
+        heapster_client = HeapsterClient(args.heapster_path)
+        demo_runner = DemoRunner(inventory, k8s_inventory, driver, executor,
+                                 heapster_client, aggressiveness=aggressiveness,
+                                 min_seconds_between_runs=int(args.min_seconds_between_runs),
+                                 max_seconds_between_runs=int(args.max_seconds_between_runs),
+                                 namespace=args.namespace)
+        demo_runner.run()
+    elif args.label:
+        label_runner = LabelRunner(inventory, k8s_inventory, driver, executor,
+                                   min_seconds_between_runs=int(args.min_seconds_between_runs),
+                                   max_seconds_between_runs=int(args.max_seconds_between_runs),
+                                   namespace=args.namespace)
+        label_runner.run()
     elif args.validate_policy_file:
         PolicyRunner.validate_file(args.validate_policy_file)
         print("All good, captain")
     elif args.run_policy_file:
         policy = PolicyRunner.validate_file(args.run_policy_file)
-        PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
+        PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor,
+                         metric_collector=metric_collector)
 
 
 def start():
     main(sys.argv[1:])
+
 
 if __name__ == '__main__':
     start()

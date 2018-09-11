@@ -18,17 +18,20 @@ Embrace the inevitable failure. __Embrace The Seal__.
 - works with `OpenStack`, `AWS` and local machines
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
+- metric collection and exposition to `Prometheus`
 - minimal setup, easy yaml-based policies
 - easy to extend
 
 
 ## Introduction
 
-__PowerfulSeal__ works in two modes: interactive and autonomous.
+__PowerfulSeal__ works in three modes: interactive, autonomous and label.
 
 __Interactive__ mode is designed to allow you to discover your cluster's components, and manually break things to see what happens. It operates on nodes, pods, deployments and namespaces.
 
 __Autonomous__ mode reads a policy file, which can contain any number of pod and node scenarios. Each scenario describes a list of matches, filters and actions to execute on your cluster.
+
+__Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
 
 ## Interactive mode
 
@@ -49,8 +52,11 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 
 ![pipeline](./media/pipeline.png)
 
+### Metric Collection
 
-## Writing policies
+Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
+
+### Writing policies
 
 A minimal policy file, doing nothing, looks like this:
 
@@ -67,6 +73,12 @@ podScenarios: []
 The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json)
 
 A [full featured example](./tests/policy/example_config.yml) listing most of the available options can be found in the [tests](./tests/policy).
+
+## Label mode
+
+Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
+
+Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
 ## Setup
 
@@ -91,6 +103,13 @@ powerfulseal --help # or seal --help
 ```
 
 Both Python 2.7 and Python 3 are supported.
+
+### Demo mode
+
+The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
+
+Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `--demo` flag along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
+
 
 ## Testing
 

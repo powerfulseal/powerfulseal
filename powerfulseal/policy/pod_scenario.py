@@ -15,7 +15,11 @@
 
 
 import random
+
+from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .scenario import Scenario
+
+POD_KILL_CMD_TEMPLATE = "sudo docker kill -s {signal} {container_id}"
 
 
 class PodScenario(Scenario):
@@ -24,12 +28,13 @@ class PodScenario(Scenario):
         Adds metching for k8s-specific things and pod-specific actions
     """
 
-    def __init__(self, name, schema, inventory, k8s_inventory, executor, logger=None):
-        Scenario.__init__(self, name, schema, logger=logger)
+    def __init__(self, name, schema, inventory, k8s_inventory, executor,
+                 logger=None, metric_collector=None):
+        Scenario.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor
-        self.cmd_template = "sudo docker kill -s {signal} {container_id}"
+        self.cmd_template = POD_KILL_CMD_TEMPLATE
 
     def match(self):
         """ Makes a union of all the pods matching any of the policy criteria.
@@ -48,6 +53,8 @@ class PodScenario(Scenario):
                     for pod in method(params):
                         self.logger.info("Matching %r", pod)
                         selected.add(pod)
+        if len(selected) == 0:
+            self.metric_collector.add_matched_to_empty_set_metric(POD_SOURCE)
         return list(selected)
 
     def match_namespace(self, params):
@@ -102,7 +109,7 @@ class PodScenario(Scenario):
             signal=signal,
             container_id=container_id.replace("docker://",""),
         )
-        
+
         probability = params.get("probability", 1)
         if probability >= random.random():
             self.logger.info("Action execute '%s' on %r", cmd, item)
@@ -111,6 +118,9 @@ class PodScenario(Scenario):
             ).values():
                 if value["ret_code"] > 0:
                     self.logger.info("Error return code: %s", value)
+                    self.metric_collector.add_pod_kill_failed_metric(item)
+                else:
+                    self.metric_collector.add_pod_killed_metric(item)
 
     def act(self, items):
         """ Executes all the supported actions on the list of pods.

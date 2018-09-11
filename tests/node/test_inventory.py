@@ -20,7 +20,7 @@ from powerfulseal.node.inventory import read_inventory_file_to_dict
 
 
 def test_reads_sample_inventory():
-    filename = pkg_resources.resource_filename('node', 'example_inventory')
+    filename = pkg_resources.resource_filename('tests.node', 'example_inventory')
     groups = read_inventory_file_to_dict(filename)
     assert groups["groupa"] == ["192.168.1.1"]
     assert groups["groupb"] == ["192.168.2.1"]

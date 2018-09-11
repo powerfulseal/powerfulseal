@@ -1,0 +1,50 @@
+- name: PowerfulSeal Alerts
+  rules:
+  - alert: pod_kills_failing
+    expr: rate(seal_pod_kills_total{status="failure"}[5m]) > 0
+    for: 5m
+    annotations:
+      summary: Pod kills failing for {{ $labels.namespace }}/{{ $labels.name }}
+      description: >
+        PowerfulSeal has been unable to kill {{ $labels.namespace }}/{{ $labels.name }}
+        for a while now.
+    labels:
+     type: seal
+  - alert: node_kills_failing
+    expr: rate(seal_node_stopped_total{status="failed"}[5m]) > 0
+    for: 5m
+    annotations:
+      summary: Node stops failing for {{ $labels.name }}
+      description: >
+        PowerfulSeal has been unable to kill node {{ $labels.name }} with UID
+        {{ $labels.uid }} for a while now.
+    labels:
+     type: mute
+  - alert: command_executions_failing
+    expr: rate(seal_execute_failed_total{status="failed"}[5m]) > 0
+    for: 5m
+    annotations:
+      summary: Node command executions failing for {{ $labels.name }}
+      description: >
+        PowerfulSeal has been unable to successfully execute commands on node
+        {{ $labels.name }} with UID {{ $labels.uid }} for a while now.
+    labels:
+     type: seal
+  - alert: filtering_to_empty_set
+    expr: rate(seal_empty_filter_total[10m]) > 0
+    for: 10m
+    annotations:
+      summary: Filtering stage returning empty sets
+      description: >
+        The filtering stage is returning empty sets.
+    labels:
+     type: seal
+  - alert: matching_to_empty_set
+    expr: rate(seal_empty_match_total[10m]) > 0
+    for: 10m
+    annotations:
+      summary: Matching stage returning empty sets
+      description: >
+        The matching for {{ $labels.source }} is returning empty sets
+    labels:
+     type: seal

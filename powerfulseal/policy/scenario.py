@@ -22,6 +22,9 @@ import random
 import logging
 import abc
 
+from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
+
+
 class Scenario():
     """ Basic class to represent a single testing scenario.
 
@@ -37,10 +40,11 @@ class Scenario():
         used by itself. It's extended for both node and pod scenarios.
     """
 
-    def __init__(self, name, schema, logger=None):
+    def __init__(self, name, schema, logger=None, metric_collector=None):
         self.name = name
         self.schema = schema
         self.logger = logger or logging.getLogger(__name__ + "." + name)
+        self.metric_collector = metric_collector or StdoutCollector()
         self.property_rewrite = {
             "group": "groups",
         }
@@ -165,6 +169,7 @@ class Scenario():
         """
         proba = float(criterion.get("probabilityPassAll", 0.5))
         if random.random() > proba:
+            self.metric_collector.add_probability_filter_passed_no_nodes_filter()
             return []
         return candidates
 
@@ -186,6 +191,10 @@ class Scenario():
             if not items:
                 self.logger.info("Empty set after %r", criterion)
                 break
+
+        if not items:
+            self.metric_collector.add_filtered_to_empty_set_metric()
+
         return items
 
     @abc.abstractmethod

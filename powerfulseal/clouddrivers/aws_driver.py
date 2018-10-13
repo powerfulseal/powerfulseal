@@ -10,9 +10,7 @@ def create_connection_from_config():
     return conn
 
 def get_all_ips(instance):
-    """
-        Digs out all the IPs from the instance.private_ip_address field
-        of an AWS EC2 instances
+    """ Returns the private and public ip address of an AWS EC2 instances
     """
     output = []
     output.append(instance.private_ip_address)
@@ -62,7 +60,7 @@ class AWSDriver(AbstractDriver):
         self.logger.info("Fetched %s remote servers" % len(self.amount_of_servers))
 
     def get_by_ip(self, ip):
-        """ Retreive an instance of Node by its IP.
+        """ Retrieve an instance of Node by its IP.
         """
         for server in self.remote_servers:
             addresses = get_all_ips(server)

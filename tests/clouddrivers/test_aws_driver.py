@@ -3,7 +3,9 @@ from mock import patch, MagicMock
 from powerfulseal.clouddrivers import aws_driver
 from powerfulseal.node import Node
 
-IPS = ['198.168.1.1', '198.168.2.1']
+PRIVATE_IPS = ['198.168.1.1', '198.168.2.1']
+PUBLIC_IPS = ['31.31.31.31', '41.41.41.41']
+INVALID_IP = '198.168.3.1'
 
 class EC2instance():
     def __init__(self, id, private_ip_address, public_ip_address, zone, state):
@@ -22,10 +24,28 @@ def ec2_instances():
 ]
 
 @patch('powerfulseal.clouddrivers.aws_driver.create_connection_from_config')
-def test_aws_driver(create_connection_from_config, ec2_instances):
-    some = aws_driver.AWSDriver()
-    some.remote_servers = ec2_instances
-    nodes = some.get_by_ip(IPS[0])
-    assert ec2_instances[0].id is nodes.id
-    assert ec2_instances[0].placement['AvailabilityZone'] is nodes.az
-    assert ec2_instances[0].private_ip_address == nodes.ip
+def test_get_by_ip_private_ip_nodes(create_connection_from_config, ec2_instances):
+    driver = aws_driver.AWSDriver()
+    driver.remote_servers = ec2_instances
+    node_index = 0
+    nodes = driver.get_by_ip(PRIVATE_IPS[node_index])
+    assert ec2_instances[node_index].id is nodes.id
+    assert ec2_instances[node_index].placement['AvailabilityZone'] is nodes.az
+    assert ec2_instances[node_index].private_ip_address == nodes.ip
+
+@patch('powerfulseal.clouddrivers.aws_driver.create_connection_from_config')
+def test_get_by_ip_public_ip_nodes(create_connection_from_config, ec2_instances):
+    driver = aws_driver.AWSDriver()
+    driver.remote_servers = ec2_instances
+    node_index = 1
+    nodes = driver.get_by_ip(PUBLIC_IPS[node_index])
+    assert ec2_instances[node_index].id is nodes.id
+    assert ec2_instances[node_index].placement['AvailabilityZone'] is nodes.az
+    assert ec2_instances[node_index].public_ip_address == nodes.ip
+
+@patch('powerfulseal.clouddrivers.aws_driver.create_connection_from_config')
+def test_get_by_ip_no_nodes(create_connection_from_config, ec2_instances):
+    driver = aws_driver.AWSDriver()
+    driver.remote_servers = ec2_instances
+    nodes = driver.get_by_ip(INVALID_IP)
+    assert nodes is None

@@ -166,3 +166,8 @@ Check out our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information about
 
 It might have been inspired by [this comic](https://randowis.com/2015/01/07/the-tower/).
 
+
+
+## Footnotes
+
+PowerfulSeal logo Copyright 2018 The Linux Foundation, and distributed under the Creative Commons Attribution (CC-BY-4.0) [license](https://creativecommons.org/licenses/by/4.0/legalcode).

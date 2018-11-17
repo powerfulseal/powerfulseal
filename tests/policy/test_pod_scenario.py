@@ -21,11 +21,11 @@ from mock import MagicMock
 
 # noinspection PyUnresolvedReferences
 from tests.fixtures import pod_scenario
-from tests.fixtures import dummy_object
+from tests.fixtures import make_dummy_object
 
 
 def test_matching_namespace(pod_scenario):
-    a, b = dummy_object(), dummy_object()
+    a, b = make_dummy_object(), make_dummy_object()
     pod_scenario.schema = {
         "match": [
             {
@@ -41,7 +41,7 @@ def test_matching_namespace(pod_scenario):
     assert pod_scenario.k8s_inventory.find_pods.call_args[1] == {"namespace": "something"}
 
 def test_matching_deployment(pod_scenario):
-    a, b = dummy_object(), dummy_object()
+    a, b = make_dummy_object(), make_dummy_object()
     pod_scenario.schema = {
         "match": [
             {
@@ -61,7 +61,7 @@ def test_matching_deployment(pod_scenario):
     }
 
 def test_matching_labels(pod_scenario):
-    a, b = dummy_object(), dummy_object()
+    a, b = make_dummy_object(), make_dummy_object()
     pod_scenario.schema = {
         "match": [
             {

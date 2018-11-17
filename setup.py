@@ -26,7 +26,7 @@ setup(
         'boto3>=1.5.15,<2.0.0',
         'future>=0.16.0,<1',
         'requests>=2.19.1,<3',
-        'prometheus_client>=0.3.0,<1'
+        'prometheus_client>=0.3.0,<0.4.0'
     ],
     extras_require={
         'testing': [

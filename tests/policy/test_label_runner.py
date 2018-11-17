@@ -114,19 +114,24 @@ def test_filter_day_time():
         "seal/days": "mon,tue,wed,thu,fri,sat,sun"
     }
 
-    now = datetime.now().replace(microsecond=0)
-    test_cases = [
-        (now.replace(hour=8, minute=0, second=0), False, "far too early"),
-        (now.replace(hour=9, minute=59, second=59), False, "just too early"),
-        (now.replace(hour=10, minute=0, second=0), True, "inclusive start"),
-        (now.replace(hour=13, minute=0, second=0), True, "within"),
-        (now.replace(hour=17, minute=30, second=0), False, "exclusive end"),
-        (now.replace(hour=17, minute=30, second=1), False, "just too late"),
-        (now.replace(hour=20, minute=0, second=0), False, "far too late")
-    ]
+    for day in range(7):
+        now = datetime.now()
+        # check that it works for all the days of the week, as specified above
+        now.replace(day=day+1)
+        # set the microseconds to 0, to pass the inclusive start
+        now.replace(microsecond=0)
+        test_cases = [
+            (now.replace(hour=8, minute=0, second=0), False, "far too early"),
+            (now.replace(hour=9, minute=59, second=59), False, "just too early"),
+            (now.replace(hour=10, minute=0, second=0), True, "inclusive start"),
+            (now.replace(hour=13, minute=0, second=0), True, "within"),
+            (now.replace(hour=17, minute=30, second=0), False, "exclusive end"),
+            (now.replace(hour=17, minute=30, second=1), False, "just too late"),
+            (now.replace(hour=20, minute=0, second=0), False, "far too late")
+        ]
 
-    for test_case in test_cases:
-        assert (len(label_runner.filter_day_time([pod], test_case[0])) == 1) == test_case[1]
+        for test_case in test_cases:
+            assert (len(label_runner.filter_day_time([pod], test_case[0])) == 1) == test_case[1]
 
 
 def test_get_integer_days_from_days_label():

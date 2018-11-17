@@ -110,7 +110,8 @@ def test_filter_day_time():
     pod = MagicMock
     pod.labels = {
         "seal/start-time": "10-00-00",
-        "seal/end-time": "17-30-00"
+        "seal/end-time": "17-30-00",
+        "seal/days": "mon,tue,wed,thu,fri,sat,sun"
     }
 
     now = datetime.now()

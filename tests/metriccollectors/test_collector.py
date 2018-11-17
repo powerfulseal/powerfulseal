@@ -25,7 +25,7 @@ from tests.fixtures import noop_scenario
 from tests.fixtures import pod_scenario
 # noinspection PyUnresolvedReferences
 from tests.fixtures import node_scenario
-from tests.fixtures import dummy_object
+from tests.fixtures import make_dummy_object
 
 
 # test_collector.py tests to ensure that add_*_metric functions are called when
@@ -188,7 +188,7 @@ def test_add_probability_filter_passed_no_nodes_metric(noop_scenario):
     """
     assert noop_scenario.name == "test scenario"
     random.seed(6)  # make the tests deterministic
-    candidates = [dummy_object()]
+    candidates = [make_dummy_object()]
 
     with mock.patch('powerfulseal.metriccollectors.StdoutCollector.add_probability_filter_passed_no_nodes_filter') \
             as metric_function:

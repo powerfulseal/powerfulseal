@@ -23,10 +23,12 @@ from powerfulseal.policy.scenario import Scenario
 class Dummy():
     pass
 
+def make_dummy_object():
+    return Dummy()
 
 @pytest.fixture
 def dummy_object():
-    return Dummy()
+    return make_dummy_object()
 
 
 # Scenario fixtures

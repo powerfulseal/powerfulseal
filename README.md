@@ -2,6 +2,8 @@
 
 __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect problems in your systems as early as possible. It kills targeted pods and takes VMs up and down.
 
+![Powerful Seal Logo](media/powerful-seal.png)
+
 It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey).
 
 Embrace the inevitable failure. __Embrace The Seal__.
@@ -176,7 +178,7 @@ We would love you to. In particular, it would be great to get help with:
 
 - get more [cloud drivers](./powerfulseal/clouddrivers/driver.py) (currently `OpenStack` and `AWS`)
 - get more [awesome filters](./powerfulseal/policy/scenario.py)
-- __get an amazing logo__
+- <del>__get an amazing logo__</del>
 - make the PowerfulSeal more powerful
 
 Check out our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information about how to contribute.
@@ -185,3 +187,8 @@ Check out our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information about
 
 It might have been inspired by [this comic](https://randowis.com/2015/01/07/the-tower/).
 
+
+
+## Footnotes
+
+PowerfulSeal logo Copyright 2018 The Linux Foundation, and distributed under the Creative Commons Attribution (CC-BY-4.0) [license](https://creativecommons.org/licenses/by/4.0/legalcode).

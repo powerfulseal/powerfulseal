@@ -142,7 +142,7 @@ class LabelRunner:
             start_time_label = pod.labels.get("seal/start-time", "10-00-00")
             try:
                 hours, minutes, seconds = self.process_time_label(start_time_label)
-                start_time = now.replace(hour=hours, minute=minutes, second=seconds)
+                start_time = now.replace(hour=hours, minute=minutes, second=seconds, microsecond=0)
                 if now < start_time:
                     continue
             except ValueError:
@@ -153,7 +153,7 @@ class LabelRunner:
             end_time_label = pod.labels.get("seal/end-time", "17-30-00")
             try:
                 hours, minutes, seconds = self.process_time_label(end_time_label)
-                end_time = now.replace(hour=hours, minute=minutes, second=seconds)
+                end_time = now.replace(hour=hours, minute=minutes, second=seconds, microsecond=0)
                 if now >= end_time:
                     continue
             except ValueError:

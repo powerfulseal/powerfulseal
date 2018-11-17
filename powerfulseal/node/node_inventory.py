@@ -31,7 +31,7 @@ class NodeInventory():
         self.nodes_by_ip = {}
         self.azs = set()
 
-    def __get_all_nodes(self, sort_key="no"):
+    def get_all_nodes(self, sort_key="no"):
         nodes = self.nodes_by_id.values()
         return sorted(nodes, key=lambda x: getattr(x, sort_key))
 
@@ -45,7 +45,7 @@ class NodeInventory():
 
         # all the queries and 'all' keyword
         if not query or query == 'all':
-            for node in self.__get_all_nodes():
+            for node in self.get_all_nodes():
                 yield node
             return
 
@@ -64,13 +64,13 @@ class NodeInventory():
 
         # match AZ
         if query in self.azs:
-            for node in self.__get_all_nodes():
+            for node in self.get_all_nodes():
                 if node.az == query:
                     yield node
             return
 
         # match IP or ID or no or name
-        for node in self.__get_all_nodes():
+        for node in self.get_all_nodes():
             if (
                 node.id == query
                 or node.ip == query
@@ -86,7 +86,7 @@ class NodeInventory():
         except KeyError:
             pass
         else:
-            for node in self.__get_all_nodes():
+            for node in self.get_all_nodes():
                 if node.state == state:
                     yield node
 

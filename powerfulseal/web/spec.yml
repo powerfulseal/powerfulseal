@@ -1,0 +1,351 @@
+swagger: "2.0"
+info:
+  description: "This is the API for the PowerfulSeal web server."
+  version: "1.0.0"
+  title: "PowerfulSeal Web Interface"
+  contact:
+    email: "mpawlikowski1@bloomberg.net"
+  license:
+    name: "Apache 2.0"
+    url: "https://github.com/bloomberg/powerfulseal/blob/master/LICENSE"
+tags:
+- name: "autonomous-mode"
+  description: "Handles autonomous mode"
+- name: "logs"
+  description: "Logs for PowerfulSeal actions"
+- name: "items"
+  description: "Actions for nodes and pods (interactive mode)"
+schemes:
+- "http"
+paths:
+  /api/autonomous-mode:
+    get:
+      tags:
+      - "autonomous-mode"
+      summary: "Gets the status of autonomous mode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Returns status"
+          schema:
+            type: "object"
+            properties:
+              isStarted:
+                type: "boolean"
+                example: True
+    post:
+      tags:
+      - "autonomous-mode"
+      summary: "Sets the status of autonomous mode"
+      description: "Sets the status of autonomous mode. If any actions are made which do not reflect the current state of autonomous mode (i.e., start action while autonomous mode is already running, a 412 response will be given."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: ""
+        required: true
+        schema:
+          type: "object"
+          properties:
+            action:
+              type: "string"
+              description: "Action to take, where `action` is either `start` or `stop`."
+              enum: ["start", "stop"]
+      responses:
+        200:
+          description: "Action successful"
+        400:
+          description: "Bad request: `action` field missing"
+        412:
+          description: "Autonomous mode is already in the state requested"
+        500:
+          description: "Autonomous mode is in an inconsistent state and cannot be recovered"
+        501:
+          description: "Unhandled HTTP method"
+  /api/policy:
+    get:
+      tags:
+      - "autonomous-mode"
+      summary: "Gets the policy for autonomous mode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Policy file in JSON format"
+          schema:
+            type: "object"
+            properties:
+              minSecondsBetweenRuns:
+                type: "integer"
+              maxSecondsBetweenRuns:
+                type: "integer"
+              nodeScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Node scenario object"
+              podScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Pod scenario object"
+    post:
+      tags:
+      - "autonomous-mode"
+      summary: "Gets the processed YAML equivalent of the policy"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "policy"
+        required: true
+        schema:
+            type: "object"
+            properties:
+              minSecondsBetweenRuns:
+                type: "integer"
+              maxSecondsBetweenRuns:
+                type: "integer"
+              nodeScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Node scenario object"
+              podScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Pod scenario object"
+      responses:
+        200:
+          description: "Policy YAML serialized to JSON"
+          schema:
+            type: "object"
+            properties:
+              policy:
+                type: "string"
+        400:
+          description: "Policy field missing or invalid"
+    put:
+      tags:
+      - "autonomous-mode"
+      summary: "Overwrites the policy file for autonomous mode"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "policy"
+        required: true
+        schema:
+            type: "object"
+            properties:
+              minSecondsBetweenRuns:
+                type: "integer"
+              maxSecondsBetweenRuns:
+                type: "integer"
+              nodeScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Node scenario object"
+              podScenarios:
+                type: "array"
+                items:
+                  type: "object"
+                  description: "Pod scenario object"
+      responses:
+        200:
+          description: "Policy successfully modified"
+        400:
+          description: "Policy field missing or invalid"
+        500:
+          description: "Unable to overwrite policy file"
+  /api/logs:
+    get:
+      tags:
+      - "logs"
+      summary: "Retrieves the PowerfulSeal logs"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "offset"
+        type: "integer"
+        description: "Returns logs from offset inclusive (e.g., if the offset is 3, then return from fourth item in list of logs inclusive [3:]). If offset is greater than bounds, an empty list is returned. If offset is negative, error is returned."
+      responses:
+        200:
+          description: "List of logs"
+          schema:
+            type: "object"
+            properties:
+              logs:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    timestamp:
+                      type: "integer"
+                      description: "Seconds since UNIX epoch"
+                    level:
+                      type: "string"
+                    message:
+                      type: "string"
+        400:
+          description: "Negative offset not allowed"
+  /api/nodes:
+    get:
+      tags:
+      - "items"
+      summary: "Retrieves all nodes"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: ""
+          schema:
+            type: "object"
+            properties:
+              nodes:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                    name:
+                      type: "string"
+                    ip:
+                      type: "string"
+                    az:
+                      type: "string"
+                    groups:
+                      type: "string"
+                    no:
+                      type: "string"
+                    state:
+                      type: "integer"
+                      description: "Enum: 1 - Unknown; 2 - Up; 3 - Down"
+    post:
+      tags:
+      - "items"
+      summary: "Starts or stops a node identified by its IP address"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: ""
+        required: true
+        schema:
+          type: "object"
+          properties:
+            action:
+              type: "string"
+              description: "Action to take, either `start` or `stop`"
+              enum: ["start", "stop"]
+            ip:
+              type: "string"
+              description: "IP address to identify the node"
+      responses:
+        200:
+          description: "Action successful"
+        400:
+          description: "Bad request: action/IP address fields missing; invalid action"
+        404:
+          description: "Node IP address not found"
+        500:
+          description: "Action on node failed"
+  /api/pods:
+    get:
+      tags:
+      - "items"
+      summary: "Retrieves all pods"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "namespace"
+        type: "string"
+        description: "Filters the list of pods based on namespace"
+      responses:
+        200:
+          description: ""
+          schema:
+            type: "object"
+            properties:
+              pods:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    namespace:
+                      type: "string"
+                    num:
+                      type: "integer"
+                    uid:
+                      type: "string"
+                    host_ip:
+                      type: "string"
+                    ip:
+                      type: "string"
+                    container_ids:
+                      type: "string"
+                    restart_count:
+                      type: "integer"
+                    state:
+                      type: "string"
+                    labels:
+                      type: "string"
+    post:
+      tags:
+      - "items"
+      summary: "Starts or stops a pod identified by its IP address"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: ""
+        required: true
+        schema:
+          type: "object"
+          properties:
+            isForced:
+              type: "boolean"
+              description: "Flag for whether pod termination is forced. Defaults to `false` if not supplied."
+            uid:
+              type: "string"
+              description: "UID identifier of a pod"
+      responses:
+        200:
+          description: "Action successful"
+        400:
+          description: "UID field missing"
+        404:
+          description: "Pod UID not found"
+        500:
+          description: "Action on pod failed"
+externalDocs:
+  description: "Find out more about PowerfulSeal"
+  url: "https://github.com/bloomberg/powerfulseal"

@@ -18,6 +18,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 - works with `OpenStack`, `AWS` and local machines
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
+- web interface to interact with PowerfulSeal
 - metric collection and exposition to `Prometheus`
 - minimal setup, easy yaml-based policies
 - easy to extend
@@ -55,6 +56,17 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 ### Metric Collection
 
 Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
+
+### Web Interface
+
+PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
+
+- starting/stopping autonomous mode
+- viewing and filtering logs
+- changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
+- stopping/killing individual nodes and pods
+
+![web interface](./media/web.png)
 
 ### Writing policies
 
@@ -102,6 +114,15 @@ pip install powerfulseal
 powerfulseal --help # or seal --help
 ```
 
+If you are using the web interface, you will need to clone this repository and run:
+```sh
+pip install .   # Installs package locally
+make web        # Installs npm packages
+powerfulseal --help
+```
+
+To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
+
 Both Python 2.7 and Python 3 are supported.
 
 ### Demo mode
@@ -117,7 +138,7 @@ PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test with multiple ve
 
 Once the required Python versions are set up and can be discovered by tox (e.g., by having them discoverable in your PATH), you can run the tests by running `tox`.
 
-More details in [TESTING.md](TESTING.md) 
+For testing the web server and more details on testing, see [TESTING.md](TESTING.md). 
 
 ## Read about the PowerfulSeal
 

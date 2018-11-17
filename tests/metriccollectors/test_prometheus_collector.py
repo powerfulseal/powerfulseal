@@ -24,7 +24,7 @@ from powerfulseal.metriccollectors.prometheus_collector import STATUS_SUCCESS, \
     EXECUTE_FAILED_METRIC_NAME, FILTERED_TO_EMPTY_SET_METRIC_NAME, \
     PROBABILITY_FILTER_NOT_PASSED_METRIC_NAME, MATCHED_TO_EMPTY_SET_METRIC_NAME
 # noinspection PyUnresolvedReferences
-from tests.fixtures import node_scenario, dummy_object
+from tests.fixtures import node_scenario, make_dummy_object
 # noinspection PyUnresolvedReferences
 from tests.fixtures import noop_scenario
 # noinspection PyUnresolvedReferences
@@ -290,7 +290,7 @@ def test_add_probability_filter_passed_no_nodes_metric(prometheus_noop_scenario)
     """
     assert prometheus_noop_scenario.name == "test scenario"
     random.seed(6)  # make the tests deterministic
-    candidates = [dummy_object()]
+    candidates = [make_dummy_object()]
 
     before = REGISTRY.get_sample_value(PROBABILITY_FILTER_NOT_PASSED_METRIC_NAME)
     assert before == 0

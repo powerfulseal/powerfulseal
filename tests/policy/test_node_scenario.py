@@ -18,11 +18,11 @@ from mock import MagicMock
 
 # noinspection PyUnresolvedReferences
 from tests.fixtures import node_scenario
-from tests.fixtures import dummy_object
+from tests.fixtures import make_dummy_object
 
 
 def test_matching_matches(node_scenario):
-    a, b = dummy_object(), dummy_object()
+    a, b = make_dummy_object(), make_dummy_object()
     a.attr = "a - this should match"
     b.attr = "b - this won't"
     node_scenario.schema = {
@@ -41,7 +41,7 @@ def test_matching_matches(node_scenario):
 
 
 def test_matching_returns_things_once_if_multimatch(node_scenario):
-    a, b = dummy_object(), dummy_object()
+    a, b = make_dummy_object(), make_dummy_object()
     a.attr = "a - this should match"
     b.attr = "b - this won't"
     node_scenario.schema = {

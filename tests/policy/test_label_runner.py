@@ -114,7 +114,7 @@ def test_filter_day_time():
         "seal/days": "mon,tue,wed,thu,fri,sat,sun"
     }
 
-    now = datetime.now()
+    now = datetime.now().replace(microsecond=0)
     test_cases = [
         (now.replace(hour=8, minute=0, second=0), False, "far too early"),
         (now.replace(hour=9, minute=59, second=59), False, "just too early"),

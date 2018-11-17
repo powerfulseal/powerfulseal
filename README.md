@@ -157,7 +157,7 @@ We would love you to. In particular, it would be great to get help with:
 
 - get more [cloud drivers](./powerfulseal/clouddrivers/driver.py) (currently `OpenStack` and `AWS`)
 - get more [awesome filters](./powerfulseal/policy/scenario.py)
-- __get an amazing logo__
+- <del>__get an amazing logo__</del>
 - make the PowerfulSeal more powerful
 
 Check out our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information about how to contribute.

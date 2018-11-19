@@ -61,25 +61,76 @@ def parse_args(args):
 
     # Policy
     # If --validate-policy-file is set, the other arguments are not used
-    policy_options = prog.add_mutually_exclusive_group(required=True)
-    policy_options.add_argument('--validate-policy-file',
-        help='reads the policy file, validates the schema, returns'
+    modes = prog.add_argument_group(
+        title='MODES OF OPERATION',
+        description=(
+            'Pick one of the following options to start the Seal in the '
+            'specified mode. Note, that depending on the mode, various '
+            'other options might be required. '
+            'Learn more at '
+            'https://github.com/bloomberg/powerfulseal#introduction'
+        )
     )
-    policy_options.add_argument('--run-policy-file',
-        default=os.environ.get("POLICY_FILE"),
-        help='location of the policy file to read',
-    )
-    policy_options.add_argument('--interactive',
-        help='will start the seal in interactive mode',
+    operation_mode_options = modes.add_mutually_exclusive_group(required=True)
+    operation_mode_options.add_argument('--interactive-mode',
         action='store_true',
+        help=(
+            'Starts an interactive CLI, which allows to manually issue '
+            'commands on pods and nodes and provides a sweet autocomplete. '
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts, and optionally a cloud driver to read '
+            'metadata about nodes, and modify their state. '
+            'If you\'re reading this for the first time, you should probably '
+            'start here. '
+            'This is a DAEMONLESS mode of operation.'
+        ),
     )
-    policy_options.add_argument('--label',
-        help='starts the seal in label mode',
+    operation_mode_options.add_argument('--autonomous-mode',
+        default=os.environ.get('POLICY_FILE'),
+        metavar='POLICY_FILE',
+        help=(
+            'Starts in autonomous mode. '
+            'This is the main mode of operation. The Seal reads the policy '
+            'file and executes it indefinitely. '
+            'It works on nodes and pods. '
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts, and optionally a cloud driver to read '
+            'metadata about nodes, and modify their state. '
+            'This is a DAEMONLESS mode of operation.'
+        ),
+    )
+    operation_mode_options.add_argument('--label-mode',
         action='store_true',
+        help=(
+            'Starts in label mode. '
+            'It reads Kubernetes pods in a specified namespace, and checks '
+            ' their \'seal/*\' labels to decide which ones to kill.'
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts. There is no policy needed in this mode. '
+            'To learn about supported labels, read more at '
+            'https://github.com/bloomberg/powerfulseal/ '
+            'This is a DAEMONLESS mode of operation. '
+        ),
     )
-    policy_options.add_argument('--demo',
-        help='starts the demo mode',
-        action='store_true'
+    operation_mode_options.add_argument('--demo-mode',
+        action='store_true',
+        help=(
+            'Starts in demo mode. '
+            'It reads Kubernetes pods in specified namespaces, and reads '
+            'HEAPSTER metrics to guess what\'s worth killing. '
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts. There is no policy needed in this mode. '
+            'This is a DAEMONLESS mode of operation. '
+        ),
+    )
+    operation_mode_options.add_argument('--validate-policy-file',
+        default=os.environ.get('POLICY_FILE'),
+        metavar='POLICY_FILE',
+        help=(
+            'Validates any file against the policy schema, returns.'
+            'You can use this to check that your policy is correct, '
+            'before using it in autonomus mode.'
+        )
     )
 
     is_validate_policy_file_set = '--validate-policy-file' in args

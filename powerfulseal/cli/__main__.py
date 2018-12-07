@@ -42,7 +42,7 @@ def add_kubernetes_options(parser):
     args_kubernetes = parser.add_argument_group('Kubernetes settings')
     args_kubernetes.add_argument(
         '--kube-config',
-        default=None,
+        default='~/.kube/config',
         help='Location of kube-config file',
     )
 

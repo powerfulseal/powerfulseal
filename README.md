@@ -112,7 +112,7 @@ Label mode is a more imperative alternative to autonomous mode, allowing you to 
 Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
 
-### Demo mode
+## Demo mode
 
 The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
 

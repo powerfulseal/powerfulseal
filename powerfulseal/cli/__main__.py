@@ -340,8 +340,19 @@ def main(argv):
     """
     args = parse_args(args=argv)
 
-    # Configure logging
+    ##########################################################################
+    # VALIDATE POLICY MODE
+    ##########################################################################
+    if args.mode == 'validate':
+        policy = PolicyRunner.load_file(args.policy_file)
+        if PolicyRunner.is_policy_valid(policy):
+            return print('OK')
+        print("Policy not valid. See log output above.")
+        return os.exit(1)
 
+    ##########################################################################
+    # LOGGING
+    ##########################################################################
     # Ensure the logger config propagates from the root module of this package
     logger = logging.getLogger(__name__.split('.')[0])
 

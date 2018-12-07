@@ -152,6 +152,20 @@ For testing the web server and more details on testing, see [TESTING.md](TESTING
 
 ## FAQ
 
+### How do I add a driver for cloud XXX ?
+
+Rolling out a new driver is pretty straightforward. In broad strokes, it involves:
+
+1. Picking up a reliable python library for interacting with the Cloud of your choosing.
+2. Adding a well defined dependency in [`setup.py`](https://github.com/bloomberg/powerfulseal/blob/master/setup.py#L21)
+3. Adding a new class that implements [AbstractDriver](https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/clouddrivers/driver.py) class, which boils down to writing 5 simple methods. Both [OpenStack](https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/clouddrivers/open_stack_driver.py) and [AWS](https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/clouddrivers/aws_driver.py) drivers are around 100 lines of code.
+4. Adding test coverage for your driver.
+5. Adding a [cloud flag to the main function](https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/cli/__main__.py#L162) and instantiating your driver if needed.
+
+Here's an example of community-contributed AWS driver: https://github.com/bloomberg/powerfulseal/pull/35
+
+As a side note, please make sure you add `-s` flag to your commits, when you're pushing the PR, so that the `Signed-off by` note is added, and that we can merge it away 👍 
+
 ### Where can I learn more about Chaos Engineering ?
 
 We found these two links to be a good start:

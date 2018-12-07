@@ -37,161 +37,18 @@ from .pscmd import PSCmd
 from ..policy import PolicyRunner
 
 
-def parse_args(args):
-    prog = ArgumentParser(
-        config_file_parser_class=YAMLConfigFileParser,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        default_config_files=['~/.config/seal', '~/.seal'],
-        description=textwrap.dedent("""\
-            PowerfulSeal
-        """),
+def add_kubernetes_options(parser):
+    # Kubernetes
+    args_kubernetes = parser.add_argument_group('Kubernetes settings')
+    args_kubernetes.add_argument(
+        '--kube-config',
+        default=None,
+        help='Location of kube-config file',
     )
 
-    # General settings
-    prog.add_argument(
-        '-c', '--config',
-        is_config_file=True,
-        env_var="CONFIG",
-        help='Config file path',
-    )
-    prog.add_argument('-v', '--verbose',
-        action='count',
-        help='Verbose logging.'
-    )
-
-    # Policy
-    # If --validate-policy-file is set, the other arguments are not used
-    modes = prog.add_argument_group(
-        title='MODES OF OPERATION',
-        description=(
-            'Pick one of the following options to start the Seal in the '
-            'specified mode. Note, that depending on the mode, various '
-            'other options might be required. '
-            'Learn more at '
-            'https://github.com/bloomberg/powerfulseal#introduction'
-        )
-    )
-    operation_mode_options = modes.add_mutually_exclusive_group(required=True)
-    operation_mode_options.add_argument('--interactive-mode',
-        action='store_true',
-        help=(
-            'Starts an interactive CLI, which allows to manually issue '
-            'commands on pods and nodes and provides a sweet autocomplete. '
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts, and optionally a cloud driver to read '
-            'metadata about nodes, and modify their state. '
-            'If you\'re reading this for the first time, you should probably '
-            'start here. '
-            'This is a DAEMONLESS mode of operation.'
-        ),
-    )
-    operation_mode_options.add_argument('--autonomous-mode',
-        default=os.environ.get('POLICY_FILE'),
-        metavar='POLICY_FILE',
-        help=(
-            'Starts in autonomous mode. '
-            'This is the main mode of operation. The Seal reads the policy '
-            'file and executes it indefinitely. '
-            'It works on nodes and pods. '
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts, and optionally a cloud driver to read '
-            'metadata about nodes, and modify their state. '
-            'This is a DAEMONLESS mode of operation.'
-        ),
-    )
-    operation_mode_options.add_argument('--label-mode',
-        action='store_true',
-        help=(
-            'Starts in label mode. '
-            'It reads Kubernetes pods in a specified namespace, and checks '
-            ' their \'seal/*\' labels to decide which ones to kill.'
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts. There is no policy needed in this mode. '
-            'To learn about supported labels, read more at '
-            'https://github.com/bloomberg/powerfulseal/ '
-            'This is a DAEMONLESS mode of operation. '
-        ),
-    )
-    operation_mode_options.add_argument('--demo-mode',
-        action='store_true',
-        help=(
-            'Starts in demo mode. '
-            'It reads Kubernetes pods in specified namespaces, and reads '
-            'HEAPSTER metrics to guess what\'s worth killing. '
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts. There is no policy needed in this mode. '
-            'This is a DAEMONLESS mode of operation. '
-        ),
-    )
-    operation_mode_options.add_argument('--validate-policy-file',
-        default=os.environ.get('POLICY_FILE'),
-        metavar='POLICY_FILE',
-        help=(
-            'Validates any file against the policy schema, returns.'
-            'You can use this to check that your policy is correct, '
-            'before using it in autonomus mode.'
-        )
-    )
-
-    is_validate_policy_file_set = '--validate-policy-file' in args
-
-    # Demo mode
-    demo_options = prog.add_argument_group()
-    demo_options.add_argument('--heapster-path',
-        help='Base path of Heapster without trailing slash'
-    )
-    demo_options.add_argument('--aggressiveness',
-        help='Aggressiveness of demo mode (default: 3)',
-        default=3,
-        type=int
-    )
-
-    # Arguments for both label and demo mode
-    prog.add_argument('--namespace',
-        default='default',
-        help='Namespace to use for label and demo mode, defaults to the default '
-             'namespace (set to blank for all namespaces)'
-    )
-    prog.add_argument('--min-seconds-between-runs',
-        help='Minimum number of seconds between runs',
-        default=0,
-        type = int
-    )
-    prog.add_argument('--max-seconds-between-runs',
-        help='Maximum number of seconds between runs',
-        default=300,
-        type = int
-    )
-
-    # Web
-    prog.add_argument(
-        '--server',
-        help='Start PowerfulSeal in web server mode',
-        action='store_true'
-    )
-    prog.add_argument(
-        '--server-host',
-        help='Specify host for the PowerfulSeal web server'
-    )
-    prog.add_argument(
-        '--server-port',
-        help='Specify port for the PowerfulSeal web server'
-    )
-
-    # Inventory
-    inventory_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
-    inventory_options.add_argument('-i', '--inventory-file',
-        default=os.environ.get("INVENTORY_FILE"),
-        help='the inventory file of group of hosts to test'
-    )
-    inventory_options.add_argument('--inventory-kubernetes',
-        default=os.environ.get("INVENTORY_KUBERNETES"),
-        help='will read all cluster nodes as inventory',
-        action='store_true',
-    )
-
+def add_ssh_options(parser):
     # SSH
-    args_ssh = prog.add_argument_group('SSH settings')
+    args_ssh = parser.add_argument_group('SSH settings')
     args_ssh.add_argument(
         '--remote-user',
         default=os.environ.get("PS_REMOTE_USER", "cloud-user"),
@@ -209,8 +66,24 @@ def parse_args(args):
         help='Path to ssh private key',
     )
 
+def add_inventory_options(parser):
+    # Inventory
+    args = parser.add_argument_group('Inventory settings')
+    inventory_options = args.add_mutually_exclusive_group(required=True)
+    inventory_options.add_argument('-i', '--inventory-file',
+        default=os.environ.get("INVENTORY_FILE"),
+        help='the inventory file of groups of hosts to work with'
+    )
+    inventory_options.add_argument('--inventory-kubernetes',
+        default=os.environ.get("INVENTORY_KUBERNETES"),
+        help='reads all kubernetes cluster nodes as inventory',
+        action='store_true',
+    )
+
+def add_cloud_options(parser):
     # Cloud Driver
-    cloud_options = prog.add_mutually_exclusive_group(required=not is_validate_policy_file_set)
+    args = parser.add_argument_group('Cloud settings')
+    cloud_options = args.add_mutually_exclusive_group(required=True)
     cloud_options.add_argument('--open-stack-cloud',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',
@@ -226,13 +99,145 @@ def parse_args(args):
         action='store_true',
         help="don't use cloud provider",
     )
-    prog.add_argument('--open-stack-cloud-name',
+    # other options
+    args.add_argument('--open-stack-cloud-name',
         default=os.environ.get("OPENSTACK_CLOUD_NAME"),
         help="the name of the open stack cloud from your config file to use (if using config file)",
     )
 
-    # Metric Collector
-    metric_options = prog.add_mutually_exclusive_group(required=False)
+def add_namespace_options(parser):
+    args = parser.add_argument_group('Kubernetes options')
+    args.add_argument('--kubernetes-namespace',
+        default='default',
+        help='Namespace to use for label and demo mode, defaults to the default '
+             'namespace (set to blank for all namespaces)'
+    )
+
+def add_policy_options(parser):
+    # Policy
+    args = parser.add_argument_group('Policy settings')
+    args.add_argument('--policy-file',
+        default=os.environ.get("POLICY_FILE"),
+        help='the policy file to run'
+    )
+
+
+
+def parse_args(args):
+    parser = ArgumentParser(
+        config_file_parser_class=YAMLConfigFileParser,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        default_config_files=['~/.config/seal', '~/.seal'],
+        description=textwrap.dedent("""\
+            PowerfulSeal
+            The Chaos Engineering tool for Kubernetes
+
+        """),
+    )
+
+    # General settings
+    parser.add_argument(
+        '-c', '--config',
+        is_config_file=True,
+        env_var="CONFIG",
+        help='Config file path',
+    )
+    parser.add_argument('-v', '--verbose',
+        action='count',
+        help='Verbose logging.'
+    )
+    # subparsers
+    subparsers = parser.add_subparsers(
+        title='MODES OF OPERATION',
+        description=(
+            'Pick one of the following options to start the Seal in the '
+            'specified mode. Learn more at '
+            'https://github.com/bloomberg/powerfulseal#introduction'
+        ),
+    )
+
+    ##########################################################################
+    # INTERACTIVE MODE
+    ##########################################################################
+    parser_interactive = subparsers.add_parser('interactive',
+        help=(
+            'Starts an interactive CLI, which allows to manually issue '
+            'commands on pods and nodes and provides a sweet autocomplete. '
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts, and optionally a cloud driver to read '
+            'metadata about nodes, and modify their state. '
+            'If you\'re reading this for the first time, you should probably '
+            'start here. '
+            'This is a DAEMONLESS mode of operation.'
+        ),
+    )
+    add_kubernetes_options(parser_interactive)
+    add_cloud_options(parser_interactive)
+    add_inventory_options(parser_interactive)
+    add_ssh_options(parser_interactive)
+
+
+    ##########################################################################
+    # AUTONOMOUS MODE
+    ##########################################################################
+    parser_autonomous = subparsers.add_parser('autonomous',
+        help=(
+            'Starts in autonomous mode. '
+            'This is the main mode of operation. The Seal reads the policy '
+            'file and executes it indefinitely. '
+            'It works on nodes and pods. '
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts, and optionally a cloud driver to read '
+            'metadata about nodes, and modify their state. '
+            'This is a DAEMONLESS mode of operation.'
+        ),
+    )
+    add_policy_options(parser_autonomous)
+    add_kubernetes_options(parser_autonomous)
+    add_cloud_options(parser_autonomous)
+    add_inventory_options(parser_autonomous)
+    add_ssh_options(parser_autonomous)
+
+    # policy settings
+    run_args = parser_autonomous.add_argument_group(
+        title='Policy settings'
+    )
+    run_args.add_argument('--min-seconds-between-runs',
+        help='Minimum number of seconds between runs',
+        default=0,
+        type = int
+    )
+    run_args.add_argument('--max-seconds-between-runs',
+        help='Maximum number of seconds between runs',
+        default=300,
+        type = int
+    )
+
+    # web ui settings
+    web_args = parser_autonomous.add_argument_group(
+        title='Web UI settings'
+    )
+    web_args.add_argument(
+        '--disable-server',
+        help='Start PowerfulSeal without the UI',
+        action='store_true'
+    )
+    web_args.add_argument(
+        '--host',
+        help='Specify host for the PowerfulSeal web server',
+        default='127.0.0.1'
+    )
+    web_args.add_argument(
+        '--port',
+        help='Specify port for the PowerfulSeal web server',
+        default='8080'
+    )
+
+    # metrics settings
+    autonomous_args = parser_autonomous.add_argument_group(
+        title='Metrics settings'
+    )
+    metric_options = autonomous_args.add_mutually_exclusive_group(required=False)
     metric_options.add_argument('--stdout-collector',
         default=os.environ.get("STDOUT_COLLECTOR"),
         action='store_true',
@@ -252,7 +257,7 @@ def parse_args(args):
             raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
         return parsed
 
-    args_prometheus = prog.add_argument_group('Prometheus settings')
+    args_prometheus = parser_autonomous.add_argument_group('Prometheus settings')
     args_prometheus.add_argument(
         '--prometheus-host',
         default='127.0.0.1',
@@ -260,20 +265,72 @@ def parse_args(args):
     )
     args_prometheus.add_argument(
         '--prometheus-port',
-        default=8000,
+        default=8081,
         help='Port to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag',
         type=check_valid_port
     )
 
-    # Kubernetes
-    args_kubernetes = prog.add_argument_group('Kubernetes settings')
-    args_kubernetes.add_argument(
-        '--kube-config',
-        default=None,
-        help='Location of kube-config file',
+
+    ##########################################################################
+    # LABEL MODE
+    ##########################################################################
+    parser_label = subparsers.add_parser('label',
+        help=(
+            'Starts in label mode. '
+            'It reads Kubernetes pods in a specified namespace, and checks '
+            ' their \'seal/*\' labels to decide which ones to kill.'
+            'It requires access to Kubernetes. '
+            'There is no policy needed in this mode. '
+            'To learn about supported labels, read more at '
+            'https://github.com/bloomberg/powerfulseal/ '
+            'This is a DAEMONLESS mode of operation. '
+        ),
+    )
+    add_kubernetes_options(parser_label)
+    add_namespace_options(parser_label)
+
+    ##########################################################################
+    # DEMO MODE
+    ##########################################################################
+    parser_demo = subparsers.add_parser('demo',
+        help=(
+            'Starts in demo mode. '
+            'It reads Kubernetes pods in specified namespaces, and reads '
+            'HEAPSTER metrics to guess what\'s worth killing. '
+            'It requires access to Kubernetes, SSH access to execute kill '
+            'commands on the hosts. There is no policy needed in this mode. '
+            'This is a DAEMONLESS mode of operation. '
+        ),
+    )
+    add_kubernetes_options(parser_demo)
+    add_namespace_options(parser_demo)
+
+    demo_options = parser_demo.add_argument_group(
+        title='Heapster settings'
+    )
+    demo_options.add_argument('--heapster-path',
+        help='Base path of Heapster without trailing slash',
+        required=True
+    )
+    demo_options.add_argument('--aggressiveness',
+        help='Aggressiveness of demo mode (default: 3)',
+        default=3,
+        type=int
     )
 
-    return prog.parse_args(args=args)
+    ##########################################################################
+    # VALIDATE POLICY MODE
+    ##########################################################################
+    parser_validate_policy = subparsers.add_parser('validate',
+        help=(
+            'Validates any file against the policy schema, returns.'
+            'You can use this to check that your policy is correct, '
+            'before using it in autonomus mode.'
+        )
+    )
+    add_policy_options(parser_validate_policy)
+
+    return parser.parse_args(args=args)
 
 
 def main(argv):

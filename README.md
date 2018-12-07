@@ -4,7 +4,7 @@ __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect 
 
 ![Powerful Seal Logo](media/powerful-seal.png)
 
-It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey). [Watch the Seal at KubeCon 2017 Austin](https://youtu.be/00BMn0UjsG4)
+It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey). [Watch the Seal at KubeCon 2017 Austin](https://youtu.be/00BMn0UjsG4).
 
 Embrace the inevitable failure. __Embrace The Seal__.
 

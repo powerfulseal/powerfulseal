@@ -154,6 +154,7 @@ def parse_args(args):
             'specified mode. Learn more at '
             'https://github.com/bloomberg/powerfulseal#introduction'
         ),
+        dest='mode'
     )
 
     ##########################################################################

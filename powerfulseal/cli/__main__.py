@@ -84,12 +84,12 @@ def add_cloud_options(parser):
     # Cloud Driver
     args = parser.add_argument_group('Cloud settings')
     cloud_options = args.add_mutually_exclusive_group(required=True)
-    cloud_options.add_argument('--open-stack-cloud',
+    cloud_options.add_argument('--openstack',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',
         help="use OpenStack cloud provider",
     )
-    cloud_options.add_argument('--aws-cloud',
+    cloud_options.add_argument('--aws',
         default=os.environ.get("AWS_CLOUD"),
         action='store_true',
         help="use AWS cloud provider",
@@ -100,7 +100,7 @@ def add_cloud_options(parser):
         help="don't use cloud provider",
     )
     # other options
-    args.add_argument('--open-stack-cloud-name',
+    args.add_argument('--openstack-cloud-name',
         default=os.environ.get("OPENSTACK_CLOUD_NAME"),
         help="the name of the open stack cloud from your config file to use (if using config file)",
     )

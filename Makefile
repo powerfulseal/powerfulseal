@@ -52,4 +52,11 @@ run-validate:
 		validate \
 			--policy-file ./examples/policy_kill_random_default.yml
 
+run-label:
+	seal \
+		-vv \
+		label \
+			--kubeconfig ~/.kube/config
+
+
 .PHONY: test watch web run-openstack run-openstack-headless run-valiadte

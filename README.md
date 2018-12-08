@@ -180,13 +180,13 @@ Web UI settings:
   --port PORT           Specify port for the PowerfulSeal web server
 ```
 
-![pipeline](./media/pipeline.png)
-
 ### Metrics collection
 
 Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
 
 ### Web user interface
+
+#### If you're not going to use the UI, use the flag `--headless` to disable it
 
 PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
 
@@ -195,7 +195,6 @@ PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Fe
 - changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
 - stopping/killing individual nodes and pods
 
-#### If you're not going to use the UI, use the flag `--headless` to disable it
 
 ![web interface](./media/web.png)
 

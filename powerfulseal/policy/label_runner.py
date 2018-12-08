@@ -43,7 +43,7 @@ class LabelRunner:
 
     def __init__(self, inventory, k8s_inventory, driver, executor,
                  min_seconds_between_runs=0, max_seconds_between_runs=300, logger=None,
-                 namespace=None):
+                 namespace=None, metric_collector=None):
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.driver = driver
@@ -52,6 +52,7 @@ class LabelRunner:
         self.max_seconds_between_runs = max_seconds_between_runs
         self.logger = logger or logging.getLogger(__name__)
         self.namespace = namespace
+        self.metric_collector = metric_collector
 
     def run(self):
         while True:
@@ -91,6 +92,9 @@ class LabelRunner:
         for value in self.executor.execute(cmd, nodes=[node]).values():
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
+                self.metric_collector.add_pod_kill_failed_metric(item)
+            else:
+                self.metric_collector.add_pod_killed_metric(item)
 
     def filter_pods(self, pods):
         filters = [

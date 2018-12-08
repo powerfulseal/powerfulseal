@@ -261,6 +261,7 @@ def parse_args(args):
     )
     add_common_options(parser_autonomous)
     add_policy_options(parser_autonomous)
+    add_metrics_options(parser_autonomous)
 
     # web ui settings
     web_args = parser_autonomous.add_argument_group(
@@ -301,6 +302,7 @@ def parse_args(args):
     add_common_options(parser_label)
     add_namespace_options(parser_label)
     add_run_options(parser_label)
+    add_metrics_options(parser_label)
 
     ##########################################################################
     # DEMO MODE
@@ -318,6 +320,7 @@ def parse_args(args):
     add_common_options(parser_demo)
     add_namespace_options(parser_demo)
     add_run_options(parser_demo)
+    add_metrics_options(parser_demo)
 
     demo_options = parser_demo.add_argument_group(
         title='Heapster settings'
@@ -403,57 +406,57 @@ def main(argv):
     ##########################################################################
     # CLOUD DRIVER
     ##########################################################################
-    needs_driver_and_inventory = (args.mode in ['interactive', 'autonomous'])
-    driver = None
-    if not needs_driver_and_inventory:
-        logger.info("Not building a cloud driver")
+    if args.openstack:
+        logger.info("Building OpenStack driver")
+        driver = OpenStackDriver(
+            cloud=args.openstack_cloud_name,
+        )
+    elif args.aws:
+        logger.info("Building AWS driver")
+        driver = AWSDriver()
     else:
-        if args.openstack:
-            logger.info("Building OpenStack driver")
-            driver = OpenStackDriver(
-                cloud=args.openstack_cloud_name,
-            )
-        elif args.aws:
-            logger.info("Building AWS driver")
-            driver = AWSDriver()
-        else:
-            logger.info("No driver - some functionality disabled")
-            driver = NoCloudDriver()
+        logger.info("No driver - some functionality disabled")
+        driver = NoCloudDriver()
 
     ##########################################################################
     # INVENTORY
     ##########################################################################
-    inventory = None
-    if not needs_driver_and_inventory:
-        logger.info("Not fetching the invetory")
-    else:
-        if args.inventory_file:
-            logger.info("Reading inventory from %s", args.inventory_file)
-            groups_to_restrict_to = read_inventory_file_to_dict(
-                args.inventory_file
-            )
-        else:
-            logger.info("Attempting to read the inventory from kubernetes")
-            groups_to_restrict_to = k8s_client.get_nodes_groups()
-
-        logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
-
-        inventory = NodeInventory(
-            driver=driver,
-            restrict_to_groups=groups_to_restrict_to,
+    if args.inventory_file:
+        logger.info("Reading inventory from %s", args.inventory_file)
+        groups_to_restrict_to = read_inventory_file_to_dict(
+            args.inventory_file
         )
-        inventory.sync()
+    else:
+        logger.info("Attempting to read the inventory from kubernetes")
+        groups_to_restrict_to = k8s_client.get_nodes_groups()
+
+    logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
+
+    inventory = NodeInventory(
+        driver=driver,
+        restrict_to_groups=groups_to_restrict_to,
+    )
+    inventory.sync()
 
     ##########################################################################
     # SSH EXECUTOR
     ##########################################################################
-    executor = None
-    if needs_driver_and_inventory:
-        executor = RemoteExecutor(
-            user=args.remote_user,
-            ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
-            ssh_path_to_private_key=args.ssh_path_to_private_key,
-        )
+    executor = RemoteExecutor(
+        user=args.remote_user,
+        ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
+        ssh_path_to_private_key=args.ssh_path_to_private_key,
+    )
+
+    ##########################################################################
+    # METRICS
+    ##########################################################################
+    metric_collector = StdoutCollector()
+    if args.prometheus_collector:
+        logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
+        start_http_server(args.prometheus_port, args.prometheus_host)
+        metric_collector = PrometheusCollector()
+    else:
+        logger.info("Not starting prometheus collector")
 
     ##########################################################################
     # AUTONOMOUS
@@ -479,15 +482,6 @@ def main(argv):
                 sys.exit(0)
 
     elif args.mode == 'autonomous':
-
-        # build a metrics collector
-        metric_collector = StdoutCollector()
-        if args.prometheus_collector:
-            logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
-            start_http_server(args.prometheus_port, args.prometheus_host)
-            metric_collector = PrometheusCollector()
-        else:
-            logger.info("Not starting prometheus collector")
 
         # read and validate the policy
         policy = PolicyRunner.load_file(args.policy_file)
@@ -539,6 +533,7 @@ def main(argv):
             min_seconds_between_runs=args.min_seconds_between_runs,
             max_seconds_between_runs=args.max_seconds_between_runs,
             namespace=args.kubernetes_namespace,
+            metric_collector=metric_collector,
         )
         logger.info("STARTING LABEL MODE")
         label_runner.run()
@@ -560,6 +555,7 @@ def main(argv):
             min_seconds_between_runs=args.min_seconds_between_runs,
             max_seconds_between_runs=args.max_seconds_between_runs,
             namespace=args.kubernetes_namespace,
+            metric_collector=metric_collector,
         )
         logger.info("STARTING DEMO MODE")
         demo_runner.run()

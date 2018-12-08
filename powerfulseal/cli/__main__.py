@@ -433,7 +433,7 @@ def main(argv):
             logger.info("Attempting to read the inventory from kubernetes")
             groups_to_restrict_to = k8s_client.get_nodes_groups()
 
-        logger.info("Restricting inventory to %s" % groups_to_restrict_to)
+        logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
 
         inventory = NodeInventory(
             driver=driver,

@@ -51,7 +51,7 @@ class PodScenario(Scenario):
                 if key in criterion:
                     params = criterion.get(key)
                     for pod in method(params):
-                        self.logger.info("Matching %r", pod)
+                        self.logger.debug("Matching %r", pod)
                         selected.add(pod)
         if len(selected) == 0:
             self.metric_collector.add_matched_to_empty_set_metric(POD_SOURCE)

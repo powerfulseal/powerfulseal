@@ -229,8 +229,8 @@ def parse_args(args):
         title='Web UI settings'
     )
     web_args.add_argument(
-        '--disable-server',
-        help='Start PowerfulSeal without the UI',
+        '--headless',
+        help='Doesn\'t start the UI, just runs the policy',
         action='store_true'
     )
     web_args.add_argument(
@@ -490,12 +490,10 @@ def main(argv):
             return os.exit(1)
 
         # run the metrics server if requested
-        if args.disable_server:
-            logger.info("NOT starting the UI server")
-        else:
+        if not args.headless:
             # Create an instance of the singleton server state, ensuring all logs
             # for retrieval from the web interface
-            ServerState(
+            state = ServerState(
                 policy,
                 inventory,
                 k8s_inventory,
@@ -509,19 +507,22 @@ def main(argv):
             server_log_handler = ServerStateLogHandler()
             server_log_handler.setLevel(log_level)
             logger.addHandler(server_log_handler)
+            state.start_policy_runner()
             # start the server
             logger.info("Starting the UI server")
             start_server(args.host, args.port)
+        else:
+            logger.info("NOT starting the UI server")
 
-        logger.info("STARTING AUTONOMOUS MODE")
-        PolicyRunner.run(
-            policy,
-            inventory,
-            k8s_inventory,
-            driver,
-            executor,
-            metric_collector=metric_collector
-        )
+            logger.info("STARTING AUTONOMOUS MODE")
+            PolicyRunner.run(
+                policy,
+                inventory,
+                k8s_inventory,
+                driver,
+                executor,
+                metric_collector=metric_collector
+            )
 
     elif args.label:
         label_runner = LabelRunner(

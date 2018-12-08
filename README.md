@@ -55,6 +55,48 @@ __PowerfulSeal__ works in several modes:
 
 ## Interactive mode
 
+```sh
+$ seal interactive --help
+usage: seal interactive [-h] --kubeconfig KUBECONFIG
+                        (--openstack | --aws | --no-cloud)
+                        [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                        (-i INVENTORY_FILE | --inventory-kubernetes)
+                        [--remote-user REMOTE_USER]
+                        [--ssh-allow-missing-host-keys]
+                        [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+```
+
+
+
 Here's a sneak peek of what you can do in the interactive mode:
 
 ![demo nodes](./media/video-nodes.gif)

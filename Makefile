@@ -17,7 +17,7 @@ upload:
 	python setup.py sdist
 	twine upload dist/*
 
-run-openstack:
+run:
 	seal \
 		-vv \
 		autonomous \
@@ -32,7 +32,7 @@ run-openstack:
 			--host 0.0.0.0 \
 			--port 30100
 
-run-openstack-headless:
+run-headless:
 	seal \
 		-vv \
 		autonomous \
@@ -46,21 +46,20 @@ run-openstack-headless:
 			--prometheus-port 9999 \
 			--ssh-allow-missing-host-keys
 
-run-validate:
+validate:
 	seal \
 		-vv \
 		validate \
 			--policy-file ./examples/policy_kill_random_default.yml
 
-run-openstack-label:
+label:
 	seal \
 		-vv \
 		label \
 			--kubeconfig ~/.kube/config \
 			--openstack \
-			--policy-file ./examples/policy_kill_random_default.yml \
 			--inventory-kubernetes \
 			--ssh-allow-missing-host-keys
 
 
-.PHONY: test watch web run-openstack run-openstack-headless run-valiadte
+.PHONY: test watch web run run-headless validate label

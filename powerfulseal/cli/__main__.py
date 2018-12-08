@@ -139,6 +139,48 @@ def add_run_options(parser):
         type=int
     )
 
+def add_metrics_options(parser):
+    # metrics settings
+    autonomous_args = parser.add_argument_group(
+        title='Metrics settings'
+    )
+    metric_options = autonomous_args.add_mutually_exclusive_group(required=False)
+    metric_options.add_argument('--stdout-collector',
+        default=os.environ.get("STDOUT_COLLECTOR"),
+        action='store_true',
+        help="print metrics collected to stdout"
+    )
+    metric_options.add_argument('--prometheus-collector',
+        default=os.environ.get("PROMETHEUS_COLLECTOR"),
+        action='store_true',
+        help="store metrics in Prometheus and expose metrics over a HTTP server"
+    )
+
+    args_prometheus = parser.add_argument_group('Prometheus settings')
+    args_prometheus.add_argument(
+        '--prometheus-host',
+        default='127.0.0.1',
+        help=(
+            'Host to expose Prometheus metrics via the HTTP server when using '
+            'the --prometheus-collector flag'
+        ),
+    )
+    args_prometheus.add_argument(
+        '--prometheus-port',
+        default=8081,
+        help=(
+            'Port to expose Prometheus metrics via the HTTP server '
+            'when using the --prometheus-collector flag'
+        ),
+        type=check_valid_port
+    )
+
+def add_common_options(parser):
+    add_kubernetes_options(parser)
+    add_cloud_options(parser)
+    add_inventory_options(parser)
+    add_ssh_options(parser)
+
 
 def check_valid_port(value):
     parsed = int(value)
@@ -199,10 +241,7 @@ def parse_args(args):
             'This is a DAEMONLESS mode of operation.'
         ),
     )
-    add_kubernetes_options(parser_interactive)
-    add_cloud_options(parser_interactive)
-    add_inventory_options(parser_interactive)
-    add_ssh_options(parser_interactive)
+    add_common_options(parser_interactive)
 
 
     ##########################################################################
@@ -220,11 +259,8 @@ def parse_args(args):
             'This is a DAEMONLESS mode of operation.'
         ),
     )
+    add_common_options(parser_autonomous)
     add_policy_options(parser_autonomous)
-    add_kubernetes_options(parser_autonomous)
-    add_cloud_options(parser_autonomous)
-    add_inventory_options(parser_autonomous)
-    add_ssh_options(parser_autonomous)
 
     # web ui settings
     web_args = parser_autonomous.add_argument_group(
@@ -247,42 +283,6 @@ def parse_args(args):
         type=check_valid_port
     )
 
-    # metrics settings
-    autonomous_args = parser_autonomous.add_argument_group(
-        title='Metrics settings'
-    )
-    metric_options = autonomous_args.add_mutually_exclusive_group(required=False)
-    metric_options.add_argument('--stdout-collector',
-        default=os.environ.get("STDOUT_COLLECTOR"),
-        action='store_true',
-        help="print metrics collected to stdout"
-    )
-    metric_options.add_argument('--prometheus-collector',
-        default=os.environ.get("PROMETHEUS_COLLECTOR"),
-        action='store_true',
-        help="store metrics in Prometheus and expose metrics over a HTTP server"
-    )
-
-    args_prometheus = parser_autonomous.add_argument_group('Prometheus settings')
-    args_prometheus.add_argument(
-        '--prometheus-host',
-        default='127.0.0.1',
-        help=(
-            'Host to expose Prometheus metrics via the HTTP server when using '
-            'the --prometheus-collector flag'
-        ),
-    )
-    args_prometheus.add_argument(
-        '--prometheus-port',
-        default=8081,
-        help=(
-            'Port to expose Prometheus metrics via the HTTP server '
-            'when using the --prometheus-collector flag'
-        ),
-        type=check_valid_port
-    )
-
-
     ##########################################################################
     # LABEL MODE
     ##########################################################################
@@ -298,7 +298,7 @@ def parse_args(args):
             'This is a DAEMONLESS mode of operation. '
         ),
     )
-    add_kubernetes_options(parser_label)
+    add_common_options(parser_label)
     add_namespace_options(parser_label)
     add_run_options(parser_label)
 
@@ -315,7 +315,7 @@ def parse_args(args):
             'This is a DAEMONLESS mode of operation. '
         ),
     )
-    add_kubernetes_options(parser_demo)
+    add_common_options(parser_demo)
     add_namespace_options(parser_demo)
     add_run_options(parser_demo)
 
@@ -393,7 +393,7 @@ def main(argv):
     coloredlogs.install(logger=logger)
 
     ##########################################################################
-    # KUBERNETES CLIENT
+    # KUBERNETES
     ##########################################################################
     kube_config = args.kubeconfig
     logger.info("Creating kubernetes client with config %s", kube_config)
@@ -538,7 +538,7 @@ def main(argv):
             executor,
             min_seconds_between_runs=args.min_seconds_between_runs,
             max_seconds_between_runs=args.max_seconds_between_runs,
-            namespace=args.namespace
+            namespace=args.kubernetes_namespace,
         )
         logger.info("STARTING LABEL MODE")
         label_runner.run()
@@ -559,7 +559,7 @@ def main(argv):
             aggressiveness=aggressiveness,
             min_seconds_between_runs=args.min_seconds_between_runs,
             max_seconds_between_runs=args.max_seconds_between_runs,
-            namespace=args.namespace
+            namespace=args.kubernetes_namespace,
         )
         logger.info("STARTING DEMO MODE")
         demo_runner.run()

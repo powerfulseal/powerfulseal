@@ -121,6 +121,8 @@ class PodScenario(Scenario):
                     self.metric_collector.add_pod_kill_failed_metric(item)
                 else:
                     self.metric_collector.add_pod_killed_metric(item)
+        else:
+            self.logger.info("Pod got lucky - not killing")
 
     def act(self, items):
         """ Executes all the supported actions on the list of pods.

@@ -118,7 +118,8 @@ def add_policy_options(parser):
     args = parser.add_argument_group('Policy settings')
     args.add_argument('--policy-file',
         default=os.environ.get("POLICY_FILE"),
-        help='the policy file to run'
+        help='the policy file to run',
+        required=True
     )
 
 

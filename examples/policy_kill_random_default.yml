@@ -19,6 +19,6 @@ podScenarios:
     # The actions will be executed in the order specified
     actions:
       - kill:
-          probability: 1
+          probability: 0.77
           force: true
 

@@ -437,6 +437,7 @@ class ServerState:
             return self.policy_runner is not None and not self.policy_runner_stop_event.is_set()
 
     def start_policy_runner(self):
+        self.logger.info("Starting policy runner")
         with self.lock:
             if self.policy_runner is not None and not self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already running')
@@ -449,6 +450,7 @@ class ServerState:
             self.policy_runner.start()
 
     def stop_policy_runner(self):
+        self.logger.info("Stopping policy runner")
         with self.lock:
             if self.policy_runner is None or self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already stopped')

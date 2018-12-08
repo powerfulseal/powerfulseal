@@ -32,4 +32,24 @@ run-openstack:
 			--host 0.0.0.0 \
 			--port 30100
 
-.PHONY: test watch web run-openstack
+run-openstack-headless:
+	seal \
+		-vv \
+		autonomous \
+			--headless \
+			--kubeconfig ~/.kube/config \
+			--openstack \
+			--policy-file ./examples/policy_kill_random_default.yml \
+			--inventory-kubernetes \
+			--prometheus-collector \
+			--prometheus-host 0.0.0.0 \
+			--prometheus-port 9999 \
+			--ssh-allow-missing-host-keys
+
+run-validate:
+	seal \
+		-vv \
+		validate \
+			--policy-file ./examples/policy_kill_random_default.yml
+
+.PHONY: test watch web run-openstack run-openstack-headless run-valiadte

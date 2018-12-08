@@ -1,17 +1,32 @@
-# PowerfulSeal
+# PowerfulSeal [![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.org/bloomberg/powerfulseal) [![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
 
 __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect problems in your systems as early as possible. It kills targeted pods and takes VMs up and down.
 
 ![Powerful Seal Logo](media/powerful-seal.png)
 
-It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey).
+It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey). [Watch the Seal at KubeCon 2017 Austin](https://youtu.be/00BMn0UjsG4).
 
 Embrace the inevitable failure. __Embrace The Seal__.
 
-[![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
-[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.org/bloomberg/powerfulseal)
 
-[Watch us introduce the Seal at Kubecon 2017 Austin](https://youtu.be/00BMn0UjsG4)
+## On the menu
+
+- [Highlights](#highlights)
+- [Introduction](#introduction)
+- [Modes of operation](#modes-of-operation)
+  - [Interactive mode](#interactive-mode)
+  - [Autonomous mode](#autonomous-mode)
+    - [Metrics Collection](#metrics-collection)
+    - [Web user interface](#web-user-interface)
+    - [Writing policies](#writing-policies)
+  - [Label mode](#label-mode)
+  - [Demo mode](#demo-mode)
+- [Setup](#setup)
+- [Getting started](#getting-started)
+- [Testing](#testing)
+- [Read about the PowerfulSeal](#read-about-the-powerfulseal)
+- [FAQ](#faq)
+- [Footnotes](#footnotes)
 
 ## Highlights
 
@@ -26,13 +41,17 @@ Embrace the inevitable failure. __Embrace The Seal__.
 
 ## Introduction
 
-__PowerfulSeal__ works in three modes: interactive, autonomous and label.
+__PowerfulSeal__ works in several modes:
 
-__Interactive__ mode is designed to allow you to discover your cluster's components, and manually break things to see what happens. It operates on nodes, pods, deployments and namespaces.
+- __Interactive__ mode is designed to allow you to discover your cluster's components and manually break things to see what happens. It operates on nodes, pods, deployments and namespaces.
 
-__Autonomous__ mode reads a policy file, which can contain any number of pod and node scenarios. Each scenario describes a list of matches, filters and actions to execute on your cluster.
+- __Autonomous__ mode reads a policy file, which can contain any number of pod and node scenarios. Each scenario describes a list of matches, filters and actions to execute on your cluster, and will be executed in a loop.
 
-__Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
+- __Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
+
+- __Demo__ mode allows you to point the Seal at a cluster and a `heapster` server and let it try to figure out what to kill based on the resource utilisation.
+
+## Modes of operation
 
 ## Interactive mode
 
@@ -53,11 +72,11 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 
 ![pipeline](./media/pipeline.png)
 
-### Metric Collection
+### Metrics collection
 
 Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
 
-### Web Interface
+### Web user interface
 
 PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
 
@@ -92,8 +111,15 @@ Label mode is a more imperative alternative to autonomous mode, allowing you to 
 
 Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
-## Setup
 
+## Demo mode
+
+The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
+
+Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `--demo` flag along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
+
+
+## Setup
 
 Setup includes:
 - pointing PowerfulSeal at your Kubernetes cluster by giving it a Kubernetes config file
@@ -114,23 +140,9 @@ pip install powerfulseal
 powerfulseal --help # or seal --help
 ```
 
-If you are using the web interface, you will need to clone this repository and run:
-```sh
-pip install .   # Installs package locally
-make web        # Installs npm packages
-powerfulseal --help
-```
-
 To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
 
 Both Python 2.7 and Python 3 are supported.
-
-### Demo mode
-
-The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
-
-Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `--demo` flag along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
-
 
 ## Testing
 

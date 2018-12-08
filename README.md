@@ -251,6 +251,76 @@ A [full featured example](./tests/policy/example_config.yml) listing most of the
 
 Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
 
+```sh
+$ seal label --help
+usage: seal label [-h] --kubeconfig KUBECONFIG
+                  (--openstack | --aws | --no-cloud)
+                  [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                  (-i INVENTORY_FILE | --inventory-kubernetes)
+                  [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
+                  [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                  [--kubernetes-namespace KUBERNETES_NAMESPACE]
+                  [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
+                  [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
+                  [--stdout-collector | --prometheus-collector]
+                  [--prometheus-host PROMETHEUS_HOST]
+                  [--prometheus-port PROMETHEUS_PORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+
+Kubernetes options:
+  --kubernetes-namespace KUBERNETES_NAMESPACE
+                        Namespace to use for label and demo mode (set to blank
+                        for all namespaces)
+
+Policy settings:
+  --min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS
+                        Minimum number of seconds between runs
+  --max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS
+                        Maximum number of seconds between runs
+
+Metrics settings:
+  --stdout-collector    print metrics collected to stdout
+  --prometheus-collector
+                        store metrics in Prometheus and expose metrics over a
+                        HTTP server
+
+Prometheus settings:
+  --prometheus-host PROMETHEUS_HOST
+                        Host to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+  --prometheus-port PROMETHEUS_PORT
+                        Port to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+```
+
 Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
 

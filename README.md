@@ -196,6 +196,8 @@ PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Fe
 - changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
 - stopping/killing individual nodes and pods
 
+#### If you're not going to use the UI, use the flag `--headless` to disable it
+
 ![web interface](./media/web.png)
 
 ### Writing policies
@@ -213,6 +215,35 @@ podScenarios: []
 ```
 
 The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json)
+
+
+A more interesting schema, that kills a random pod in `default` namespace every 1-30 seconds:
+
+```yaml
+config:
+  minSecondsBetweenRuns: 1
+  maxSecondsBetweenRuns: 30
+
+# the scenarios describing actions on nodes
+nodeScenarios: []
+# the scenarios describing actions on kubernetes pods
+podScenarios:
+  - name: "delete random pods in default namespace"
+
+    match:
+      - namespace:
+          name: "default"
+
+    filters:
+      - randomSample:
+          size: 1
+
+    # The actions will be executed in the order specified
+    actions:
+      - kill:
+          probability: 0.77
+          force: true
+```
 
 A [full featured example](./tests/policy/example_config.yml) listing most of the available options can be found in the [tests](./tests/policy).
 

@@ -52,11 +52,15 @@ run-validate:
 		validate \
 			--policy-file ./examples/policy_kill_random_default.yml
 
-run-label:
+run-openstack-label:
 	seal \
 		-vv \
 		label \
-			--kubeconfig ~/.kube/config
+			--kubeconfig ~/.kube/config \
+			--openstack \
+			--policy-file ./examples/policy_kill_random_default.yml \
+			--inventory-kubernetes \
+			--ssh-allow-missing-host-keys
 
 
 .PHONY: test watch web run-openstack run-openstack-headless run-valiadte

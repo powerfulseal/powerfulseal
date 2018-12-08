@@ -233,9 +233,6 @@ def parse_args(args):
         help=(
             'Starts an interactive CLI, which allows to manually issue '
             'commands on pods and nodes and provides a sweet autocomplete. '
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts, and optionally a cloud driver to read '
-            'metadata about nodes, and modify their state. '
             'If you\'re reading this for the first time, you should probably '
             'start here. '
             'This is a DAEMONLESS mode of operation.'
@@ -253,9 +250,6 @@ def parse_args(args):
             'This is the main mode of operation. The Seal reads the policy '
             'file and executes it indefinitely. '
             'It works on nodes and pods. '
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts, and optionally a cloud driver to read '
-            'metadata about nodes, and modify their state. '
             'This is a DAEMONLESS mode of operation.'
         ),
     )
@@ -292,7 +286,6 @@ def parse_args(args):
             'Starts in label mode. '
             'It reads Kubernetes pods in a specified namespace, and checks '
             ' their \'seal/*\' labels to decide which ones to kill.'
-            'It requires access to Kubernetes. '
             'There is no policy needed in this mode. '
             'To learn about supported labels, read more at '
             'https://github.com/bloomberg/powerfulseal/ '
@@ -312,8 +305,6 @@ def parse_args(args):
             'Starts in demo mode. '
             'It reads Kubernetes pods in specified namespaces, and reads '
             'HEAPSTER metrics to guess what\'s worth killing. '
-            'It requires access to Kubernetes, SSH access to execute kill '
-            'commands on the hosts. There is no policy needed in this mode. '
             'This is a DAEMONLESS mode of operation. '
         ),
     )

@@ -384,88 +384,72 @@ def main(argv):
     stdout_handler.setLevel(log_level)
     logger.addHandler(stdout_handler)
 
-    # build cloud provider driver
-    logger.debug("Building the driver")
-    if args.open_stack_cloud:
-        logger.info("Building OpenStack driver")
-        driver = OpenStackDriver(
-            cloud=args.open_stack_cloud_name,
-        )
-    elif args.aws_cloud:
-        logger.info("Building AWS driver")
-        driver = AWSDriver()
-    else:
-        logger.info("No driver - some functionality disabled")
-        driver = NoCloudDriver()
-
-    # build a k8s client
-    kube_config = args.kube_config
+    ##########################################################################
+    # KUBERNETES CLIENT
+    ##########################################################################
+    kube_config = args.kubeconfig
     logger.debug("Creating kubernetes client with config %d", kube_config)
     k8s_client = K8sClient(kube_config=kube_config)
     k8s_inventory = K8sInventory(k8s_client=k8s_client)
 
-    # read the local inventory
-    logger.debug("Fetching the inventory")
-    if args.inventory_file:
-        groups_to_restrict_to = read_inventory_file_to_dict(
-            args.inventory_file
-        )
+    ##########################################################################
+    # CLOUD DRIVER
+    ##########################################################################
+    needs_driver_and_inventory = (args.mode in ['interactive', 'autonomous'])
+    driver = None
+    if not needs_driver_and_inventory:
+        logger.debug("Not building a cloud driver")
     else:
-        logger.info("Attempting to read the inventory from kubernetes")
-        groups_to_restrict_to = k8s_client.get_nodes_groups()
+        logger.debug("Building the driver")
+        if args.openstack:
+            logger.info("Building OpenStack driver")
+            driver = OpenStackDriver(
+                cloud=args.openstack_cloud_name,
+            )
+        elif args.aws:
+            logger.info("Building AWS driver")
+            driver = AWSDriver()
+        else:
+            logger.info("No driver - some functionality disabled")
+            driver = NoCloudDriver()
 
-    logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
+    ##########################################################################
+    # INVENTORY
+    ##########################################################################
+    inventory = None
+    if not needs_driver_and_inventory:
+        logger.debug("Not fetching the invetory")
+    else:
+        if args.inventory_file:
+            logger.debug("Reading inventory from %s", args.inventory_file)
+            groups_to_restrict_to = read_inventory_file_to_dict(
+                args.inventory_file
+            )
+        else:
+            logger.info("Attempting to read the inventory from kubernetes")
+            groups_to_restrict_to = k8s_client.get_nodes_groups()
 
-    inventory = NodeInventory(
-        driver=driver,
-        restrict_to_groups=groups_to_restrict_to,
-    )
-    inventory.sync()
+        logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
 
-    # create an executor
+        inventory = NodeInventory(
+            driver=driver,
+            restrict_to_groups=groups_to_restrict_to,
+        )
+        inventory.sync()
+
+    ##########################################################################
+    # SSH EXECUTOR
+    ##########################################################################
     executor = RemoteExecutor(
         user=args.remote_user,
         ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
         ssh_path_to_private_key=args.ssh_path_to_private_key,
     )
 
-    # create the collector which defaults to StdoutCollector()
-    metric_collector = StdoutCollector()
-    if args.prometheus_collector:
-        if not args.prometheus_host:
-            raise argparse.ArgumentTypeError("The Prometheus host must be specified with --prometheus-host")
-        if not args.prometheus_port:
-            raise argparse.ArgumentTypeError("The Prometheus port must be specified with --prometheus-port")
-        start_http_server(args.prometheus_port, args.prometheus_host)
-        metric_collector = PrometheusCollector()
-
-    if args.server:
-        # If the policy file already exists, then it must be valid. Otherwise,
-        # create the policy file and write a default, empty policy to it.
-        try:
-            if not (os.path.exists(args.run_policy_file) and os.path.isfile(args.run_policy_file)):
-                # Create a new policy file
-                with open(args.run_policy_file, "w") as f:
-                    policy = PolicyRunner.DEFAULT_POLICY
-                    f.write(yaml.dump(policy, default_flow_style=False))
-            else:
-                policy = PolicyRunner.load_file(args.run_policy_file)
-                if not PolicyRunner.is_policy_valid(policy):
-                    print("Policy file exists but is not valid. Exiting.")
-                    sys.exit(-1)
-        except IOError:
-            print("Unable to perform file operations. Exiting.")
-            sys.exit(-1)
-
-        # Create an instance of the singleton server state, ensuring all logs
-        # for retrieval from the web interface
-        ServerState(policy, inventory, k8s_inventory, driver, executor,
-                    args.server_host, args.server_port, args.run_policy_file)
-        server_log_handler = ServerStateLogHandler()
-        server_log_handler.setLevel(logging.DEBUG)
-        logger.addHandler(server_log_handler)
-        start_server(args.server_host, int(args.server_port))
-    elif args.interactive:
+    ##########################################################################
+    # AUTONOMOUS
+    ##########################################################################
+    if args.mode == 'interactive':
         # create a command parser
         cmd = PSCmd(
             inventory=inventory,
@@ -483,37 +467,81 @@ def main(argv):
                 input()
             except KeyboardInterrupt:
                 sys.exit(0)
+
+    elif args.mode == 'autonomous':
+
+        # build a metrics collector
+        metric_collector = StdoutCollector()
+        if args.prometheus_collector:
+            start_http_server(args.prometheus_port, args.prometheus_host)
+            metric_collector = PrometheusCollector()
+
+        # read and validate the policy
+        policy = PolicyRunner.load_file(args.run_policy_file)
+        if not PolicyRunner.is_policy_valid(policy):
+            logger.error("Policy not valid. See log output above.")
+            return os.exit(1)
+
+        # run the metrics server if requested
+        if not args.disable_server:
+            # Create an instance of the singleton server state, ensuring all logs
+            # for retrieval from the web interface
+            ServerState(
+                policy,
+                inventory,
+                k8s_inventory,
+                driver,
+                executor,
+                args.server_host,
+                args.server_port,
+                args.run_policy_file
+            )
+            server_log_handler = ServerStateLogHandler()
+            server_log_handler.setLevel(logging.DEBUG)
+            logger.addHandler(server_log_handler)
+            # start the metrics server
+            start_server(args.prometheus_host, args.prometheus_port)
+
+        PolicyRunner.run(
+            policy,
+            inventory,
+            k8s_inventory,
+            driver,
+            executor,
+            metric_collector=metric_collector
+        )
+
+    elif args.label:
+        label_runner = LabelRunner(
+            inventory,
+            k8s_inventory,
+            driver,
+            executor,
+            min_seconds_between_runs=args.min_seconds_between_runs,
+            max_seconds_between_runs=args.max_seconds_between_runs,
+            namespace=args.namespace
+        )
+        label_runner.run()
+
     elif args.demo:
         aggressiveness = int(args.aggressiveness)
         if not 1 <= aggressiveness <= 5:
             print("Aggressiveness must be between 1 and 5 inclusive")
-            exit()
+            os.exit(1)
 
         heapster_client = HeapsterClient(args.heapster_path)
-        demo_runner = DemoRunner(inventory, k8s_inventory, driver, executor,
-                                 heapster_client, aggressiveness=aggressiveness,
-                                 min_seconds_between_runs=int(args.min_seconds_between_runs),
-                                 max_seconds_between_runs=int(args.max_seconds_between_runs),
-                                 namespace=args.namespace)
+        demo_runner = DemoRunner(
+            inventory,
+            k8s_inventory,
+            driver,
+            executor,
+            heapster_client,
+            aggressiveness=aggressiveness,
+            min_seconds_between_runs=args.min_seconds_between_runs,
+            max_seconds_between_runs=args.max_seconds_between_runs,
+            namespace=args.namespace
+        )
         demo_runner.run()
-    elif args.label:
-        label_runner = LabelRunner(inventory, k8s_inventory, driver, executor,
-                                   min_seconds_between_runs=int(args.min_seconds_between_runs),
-                                   max_seconds_between_runs=int(args.max_seconds_between_runs),
-                                   namespace=args.namespace)
-        label_runner.run()
-    elif args.validate_policy_file:
-        policy = PolicyRunner.load_file(args.validate_policy_file)
-        if PolicyRunner.is_policy_valid(policy):
-            logger.info("All good, captain")
-        else:
-            logger.error("Policy not valid. See log output above.")
-    elif args.run_policy_file:
-        policy = PolicyRunner.load_file(args.run_policy_file)
-        if not PolicyRunner.is_policy_valid(policy):
-            logger.error("Policy not valid. See log output above.")
-        PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor,
-                         metric_collector=metric_collector)
 
 
 def start():

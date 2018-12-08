@@ -505,7 +505,7 @@ def main(argv):
                 args.policy_file
             )
             server_log_handler = ServerStateLogHandler()
-            server_log_handler.setLevel(logging.DEBUG)
+            server_log_handler.setLevel(log_level)
             logger.addHandler(server_log_handler)
             # start the server
             logger.info("Starting the UI server")

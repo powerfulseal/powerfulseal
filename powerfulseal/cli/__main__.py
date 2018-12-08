@@ -18,6 +18,7 @@ import argparse
 import yaml
 from configargparse import ArgumentParser, YAMLConfigFileParser
 import logging
+import coloredlogs
 import textwrap
 import sys
 import os
@@ -385,6 +386,7 @@ def main(argv):
     stdout_handler = logging.StreamHandler()
     stdout_handler.setLevel(log_level)
     logger.addHandler(stdout_handler)
+    coloredlogs.install(logger=logger)
 
     ##########################################################################
     # KUBERNETES CLIENT

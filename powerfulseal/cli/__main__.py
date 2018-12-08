@@ -479,7 +479,7 @@ def main(argv):
             metric_collector = PrometheusCollector()
 
         # read and validate the policy
-        policy = PolicyRunner.load_file(args.run_policy_file)
+        policy = PolicyRunner.load_file(args.policy_file)
         if not PolicyRunner.is_policy_valid(policy):
             logger.error("Policy not valid. See log output above.")
             return os.exit(1)
@@ -494,15 +494,15 @@ def main(argv):
                 k8s_inventory,
                 driver,
                 executor,
-                args.server_host,
-                args.server_port,
-                args.run_policy_file
+                args.host,
+                args.port,
+                args.policy_file
             )
             server_log_handler = ServerStateLogHandler()
             server_log_handler.setLevel(logging.DEBUG)
             logger.addHandler(server_log_handler)
-            # start the metrics server
-            start_server(args.prometheus_host, args.prometheus_port)
+            # start the server
+            start_server(args.host, args.port)
 
         PolicyRunner.run(
             policy,

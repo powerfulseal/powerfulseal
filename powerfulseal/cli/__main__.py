@@ -390,7 +390,7 @@ def main(argv):
     # KUBERNETES CLIENT
     ##########################################################################
     kube_config = args.kubeconfig
-    logger.debug("Creating kubernetes client with config %d", kube_config)
+    logger.info("Creating kubernetes client with config %s", kube_config)
     k8s_client = K8sClient(kube_config=kube_config)
     k8s_inventory = K8sInventory(k8s_client=k8s_client)
 
@@ -400,9 +400,9 @@ def main(argv):
     needs_driver_and_inventory = (args.mode in ['interactive', 'autonomous'])
     driver = None
     if not needs_driver_and_inventory:
-        logger.debug("Not building a cloud driver")
+        logger.info("Not building a cloud driver")
     else:
-        logger.debug("Building the driver")
+        logger.info("Building the driver")
         if args.openstack:
             logger.info("Building OpenStack driver")
             driver = OpenStackDriver(
@@ -420,10 +420,10 @@ def main(argv):
     ##########################################################################
     inventory = None
     if not needs_driver_and_inventory:
-        logger.debug("Not fetching the invetory")
+        logger.info("Not fetching the invetory")
     else:
         if args.inventory_file:
-            logger.debug("Reading inventory from %s", args.inventory_file)
+            logger.info("Reading inventory from %s", args.inventory_file)
             groups_to_restrict_to = read_inventory_file_to_dict(
                 args.inventory_file
             )
@@ -431,7 +431,7 @@ def main(argv):
             logger.info("Attempting to read the inventory from kubernetes")
             groups_to_restrict_to = k8s_client.get_nodes_groups()
 
-        logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
+        logger.info("Restricting inventory to %s" % groups_to_restrict_to)
 
         inventory = NodeInventory(
             driver=driver,
@@ -459,6 +459,7 @@ def main(argv):
             executor=executor,
             k8s_inventory=k8s_inventory,
         )
+        logger.info("STARTING INTERACTIVE MODE")
         while True:
             try:
                 cmd.cmdloop()
@@ -475,20 +476,22 @@ def main(argv):
         # build a metrics collector
         metric_collector = StdoutCollector()
         if args.prometheus_collector:
-            logger.debug("Starting prometheus metrics server on %s", args.prometheus_port)
+            logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
             start_http_server(args.prometheus_port, args.prometheus_host)
             metric_collector = PrometheusCollector()
         else:
-            logger.debug("Not starting prometheus collector")
+            logger.info("Not starting prometheus collector")
 
         # read and validate the policy
         policy = PolicyRunner.load_file(args.policy_file)
         if not PolicyRunner.is_policy_valid(policy):
-            logger.error("Policy not valid. See log output above.")
+            logger.info("Policy not valid. See log output above.")
             return os.exit(1)
 
         # run the metrics server if requested
-        if not args.disable_server:
+        if args.disable_server:
+            logger.info("NOT starting the UI server")
+        else:
             # Create an instance of the singleton server state, ensuring all logs
             # for retrieval from the web interface
             ServerState(
@@ -505,8 +508,10 @@ def main(argv):
             server_log_handler.setLevel(logging.DEBUG)
             logger.addHandler(server_log_handler)
             # start the server
+            logger.info("Starting the UI server")
             start_server(args.host, args.port)
 
+        logger.info("STARTING AUTONOMOUS MODE")
         PolicyRunner.run(
             policy,
             inventory,
@@ -526,6 +531,7 @@ def main(argv):
             max_seconds_between_runs=args.max_seconds_between_runs,
             namespace=args.namespace
         )
+        logger.info("STARTING LABEL MODE")
         label_runner.run()
 
     elif args.demo:
@@ -546,6 +552,7 @@ def main(argv):
             max_seconds_between_runs=args.max_seconds_between_runs,
             namespace=args.namespace
         )
+        logger.info("STARTING DEMO MODE")
         demo_runner.run()
 
 

@@ -330,6 +330,83 @@ The main way to use PowerfulSeal is to write a policy file for Autonomous mode w
 
 Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `--demo` flag along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
 
+```sh
+$ seal demo --help
+usage: seal demo [-h] --kubeconfig KUBECONFIG
+                 (--openstack | --aws | --no-cloud)
+                 [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                 (-i INVENTORY_FILE | --inventory-kubernetes)
+                 [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
+                 [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                 [--kubernetes-namespace KUBERNETES_NAMESPACE]
+                 [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
+                 [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
+                 [--stdout-collector | --prometheus-collector]
+                 [--prometheus-host PROMETHEUS_HOST]
+                 [--prometheus-port PROMETHEUS_PORT] --heapster-path
+                 HEAPSTER_PATH [--aggressiveness AGGRESSIVENESS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+
+Kubernetes options:
+  --kubernetes-namespace KUBERNETES_NAMESPACE
+                        Namespace to use for label and demo mode (set to blank
+                        for all namespaces)
+
+Policy settings:
+  --min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS
+                        Minimum number of seconds between runs
+  --max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS
+                        Maximum number of seconds between runs
+
+Metrics settings:
+  --stdout-collector    print metrics collected to stdout
+  --prometheus-collector
+                        store metrics in Prometheus and expose metrics over a
+                        HTTP server
+
+Prometheus settings:
+  --prometheus-host PROMETHEUS_HOST
+                        Host to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+  --prometheus-port PROMETHEUS_PORT
+                        Port to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+
+Heapster settings:
+  --heapster-path HEAPSTER_PATH
+                        Base path of Heapster without trailing slash
+  --aggressiveness AGGRESSIVENESS
+                        Aggressiveness of demo mode (default: 3)
+```
+
 
 ## Setup
 

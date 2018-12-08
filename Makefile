@@ -1,6 +1,7 @@
 INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
 NPM_CALL ?= cd powerfulseal/web/ui && npm install && npm run build
 TOX_CALL ?= tox -r
+HEAPSTER_URL ?= http://heapster.kube-system.svc.kubernetes.cluster/
 
 test:
 	$(TOX_CALL)
@@ -59,7 +60,24 @@ label:
 			--kubeconfig ~/.kube/config \
 			--openstack \
 			--inventory-kubernetes \
+			--prometheus-collector \
+			--prometheus-host 0.0.0.0 \
+			--prometheus-port 9999 \
 			--ssh-allow-missing-host-keys
 
+demo:
+	HTTP_PROXY=  \
+	http_proxy=  \
+	seal \
+		-vv \
+		demo \
+			--kubeconfig ~/.kube/config \
+			--openstack \
+			--inventory-kubernetes \
+			--prometheus-collector \
+			--prometheus-host 0.0.0.0 \
+			--prometheus-port 9999 \
+			--ssh-allow-missing-host-keys \
+			--heapster-path $(HEAPSTER_URL)
 
-.PHONY: test watch web run run-headless validate label
+.PHONY: test watch web run run-headless validate label demo

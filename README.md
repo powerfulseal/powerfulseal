@@ -106,6 +106,11 @@ Here's a sneak peek of what you can do in the interactive mode:
 
 ## Autonomous mode
 
+Autonomous reads the scenarios to execute from the policy file, and runs them:
+
+1. The matches are combined together and deduplicated to produce an initial working set
+2. They are run through a series of filters
+3. For all the items remaining after the filters, all actions are executed
 
 ```sh
 $ seal autonomous --help
@@ -175,12 +180,6 @@ Web UI settings:
   --port PORT           Specify port for the PowerfulSeal web server
 ```
 
-Autonomous reads the scenarios to execute from the policy file, and runs them:
-
-1. The matches are combined together and deduplicated to produce an initial working set
-2. They are run through a series of filters
-3. For all the items remaining after the filters, all actions are executed
-
 ![pipeline](./media/pipeline.png)
 
 ### Metrics collection
@@ -221,9 +220,7 @@ config:
   minSecondsBetweenRuns: 1
   maxSecondsBetweenRuns: 30
 
-# the scenarios describing actions on nodes
 nodeScenarios: []
-# the scenarios describing actions on kubernetes pods
 podScenarios:
   - name: "delete random pods in default namespace"
 
@@ -235,7 +232,6 @@ podScenarios:
       - randomSample:
           size: 1
 
-    # The actions will be executed in the order specified
     actions:
       - kill:
           probability: 0.77

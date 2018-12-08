@@ -123,6 +123,23 @@ def add_policy_options(parser):
         required=True
     )
 
+def add_run_options(parser):
+    # policy settings
+    run_args = parser.add_argument_group(
+        title='Policy settings'
+    )
+    run_args.add_argument('--min-seconds-between-runs',
+        help='Minimum number of seconds between runs',
+        default=0,
+        type=int
+    )
+    run_args.add_argument('--max-seconds-between-runs',
+        help='Maximum number of seconds between runs',
+        default=300,
+        type=int
+    )
+
+
 def check_valid_port(value):
     parsed = int(value)
     min_port = 0
@@ -209,21 +226,6 @@ def parse_args(args):
     add_inventory_options(parser_autonomous)
     add_ssh_options(parser_autonomous)
 
-    # policy settings
-    run_args = parser_autonomous.add_argument_group(
-        title='Policy settings'
-    )
-    run_args.add_argument('--min-seconds-between-runs',
-        help='Minimum number of seconds between runs',
-        default=0,
-        type=int
-    )
-    run_args.add_argument('--max-seconds-between-runs',
-        help='Maximum number of seconds between runs',
-        default=300,
-        type=int
-    )
-
     # web ui settings
     web_args = parser_autonomous.add_argument_group(
         title='Web UI settings'
@@ -298,6 +300,7 @@ def parse_args(args):
     )
     add_kubernetes_options(parser_label)
     add_namespace_options(parser_label)
+    add_run_options(parser_label)
 
     ##########################################################################
     # DEMO MODE
@@ -314,6 +317,7 @@ def parse_args(args):
     )
     add_kubernetes_options(parser_demo)
     add_namespace_options(parser_demo)
+    add_run_options(parser_demo)
 
     demo_options = parser_demo.add_argument_group(
         title='Heapster settings'
@@ -443,11 +447,13 @@ def main(argv):
     ##########################################################################
     # SSH EXECUTOR
     ##########################################################################
-    executor = RemoteExecutor(
-        user=args.remote_user,
-        ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
-        ssh_path_to_private_key=args.ssh_path_to_private_key,
-    )
+    executor = None
+    if needs_driver_and_inventory:
+        executor = RemoteExecutor(
+            user=args.remote_user,
+            ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
+            ssh_path_to_private_key=args.ssh_path_to_private_key,
+        )
 
     ##########################################################################
     # AUTONOMOUS
@@ -524,7 +530,7 @@ def main(argv):
                 metric_collector=metric_collector
             )
 
-    elif args.label:
+    elif args.mode == 'label':
         label_runner = LabelRunner(
             inventory,
             k8s_inventory,
@@ -537,7 +543,7 @@ def main(argv):
         logger.info("STARTING LABEL MODE")
         label_runner.run()
 
-    elif args.demo:
+    elif args.mode == 'demo':
         aggressiveness = int(args.aggressiveness)
         if not 1 <= aggressiveness <= 5:
             print("Aggressiveness must be between 1 and 5 inclusive")

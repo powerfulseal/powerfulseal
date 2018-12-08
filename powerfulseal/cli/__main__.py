@@ -110,8 +110,8 @@ def add_namespace_options(parser):
     args = parser.add_argument_group('Kubernetes options')
     args.add_argument('--kubernetes-namespace',
         default='default',
-        help='Namespace to use for label and demo mode, defaults to the default '
-             'namespace (set to blank for all namespaces)'
+        help='Namespace to use for label and demo mode '
+             '(set to blank for all namespaces)'
     )
 
 def add_policy_options(parser):

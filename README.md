@@ -106,6 +106,75 @@ Here's a sneak peek of what you can do in the interactive mode:
 
 ## Autonomous mode
 
+
+```sh
+$ seal autonomous --help
+usage: seal autonomous [-h] --kubeconfig KUBECONFIG
+                       (--openstack | --aws | --no-cloud)
+                       [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                       (-i INVENTORY_FILE | --inventory-kubernetes)
+                       [--remote-user REMOTE_USER]
+                       [--ssh-allow-missing-host-keys]
+                       [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                       --policy-file POLICY_FILE
+                       [--stdout-collector | --prometheus-collector]
+                       [--prometheus-host PROMETHEUS_HOST]
+                       [--prometheus-port PROMETHEUS_PORT] [--headless]
+                       [--host HOST] [--port PORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+
+Policy settings:
+  --policy-file POLICY_FILE
+                        the policy file to run
+
+Metrics settings:
+  --stdout-collector    print metrics collected to stdout
+  --prometheus-collector
+                        store metrics in Prometheus and expose metrics over a
+                        HTTP server
+
+Prometheus settings:
+  --prometheus-host PROMETHEUS_HOST
+                        Host to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+  --prometheus-port PROMETHEUS_PORT
+                        Port to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+
+Web UI settings:
+  --headless            Doesn't start the UI, just runs the policy
+  --host HOST           Specify host for the PowerfulSeal web server
+  --port PORT           Specify port for the PowerfulSeal web server
+```
+
 Autonomous reads the scenarios to execute from the policy file, and runs them:
 
 1. The matches are combined together and deduplicated to produce an initial working set

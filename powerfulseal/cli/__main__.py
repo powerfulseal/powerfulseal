@@ -41,9 +41,9 @@ def add_kubernetes_options(parser):
     # Kubernetes
     args_kubernetes = parser.add_argument_group('Kubernetes settings')
     args_kubernetes.add_argument(
-        '--kube-config',
-        default='~/.kube/config',
+        '--kubeconfig',
         help='Location of kube-config file',
+        required=True,
     )
 
 def add_ssh_options(parser):
@@ -102,7 +102,7 @@ def add_cloud_options(parser):
     # other options
     args.add_argument('--openstack-cloud-name',
         default=os.environ.get("OPENSTACK_CLOUD_NAME"),
-        help="the name of the open stack cloud from your config file to use (if using config file)",
+        help="optional name of the open stack cloud from your config file to use",
     )
 
 def add_namespace_options(parser):
@@ -206,12 +206,12 @@ def parse_args(args):
     run_args.add_argument('--min-seconds-between-runs',
         help='Minimum number of seconds between runs',
         default=0,
-        type = int
+        type=int
     )
     run_args.add_argument('--max-seconds-between-runs',
         help='Maximum number of seconds between runs',
         default=300,
-        type = int
+        type=int
     )
 
     # web ui settings
@@ -262,12 +262,18 @@ def parse_args(args):
     args_prometheus.add_argument(
         '--prometheus-host',
         default='127.0.0.1',
-        help='Host to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag'
+        help=(
+            'Host to expose Prometheus metrics via the HTTP server when using '
+            'the --prometheus-collector flag'
+        ),
     )
     args_prometheus.add_argument(
         '--prometheus-port',
         default=8081,
-        help='Port to expose Prometheus metrics via the HTTP server when using the --prometheus-collector flag',
+        help=(
+            'Port to expose Prometheus metrics via the HTTP server '
+            'when using the --prometheus-collector flag'
+        ),
         type=check_valid_port
     )
 
@@ -326,7 +332,7 @@ def parse_args(args):
         help=(
             'Validates any file against the policy schema, returns.'
             'You can use this to check that your policy is correct, '
-            'before using it in autonomus mode.'
+            'before using it in autonomous mode.'
         )
     )
     add_policy_options(parser_validate_policy)

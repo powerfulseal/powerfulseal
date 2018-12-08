@@ -250,6 +250,10 @@ The schemas are validated against the [powerful JSON schema](./powerfulseal/poli
 
 Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
 
+To mark a pod for attack, do `kubectl label pods my-app-1 seal/enabled=true`, and the `Seal` will start attacking it, but only during working hours (defaults).
+
+Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
+
 ```sh
 $ seal label --help
 usage: seal label [-h] --kubeconfig KUBECONFIG
@@ -319,8 +323,6 @@ Prometheus settings:
                         Port to expose Prometheus metrics via the HTTP server
                         when using the --prometheus-collector flag
 ```
-
-Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
 
 ## Demo mode

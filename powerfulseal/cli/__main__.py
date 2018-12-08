@@ -503,7 +503,8 @@ def main(argv):
                 executor,
                 args.host,
                 args.port,
-                args.policy_file
+                args.policy_file,
+                metric_collector=metric_collector,
             )
             server_log_handler = ServerStateLogHandler()
             server_log_handler.setLevel(log_level)

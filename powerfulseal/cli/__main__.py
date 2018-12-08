@@ -346,6 +346,9 @@ def main(argv):
     """
     args = parse_args(args=argv)
 
+    if args.mode is None:
+        return parse_args(['--help'])
+
     ##########################################################################
     # VALIDATE POLICY MODE
     ##########################################################################

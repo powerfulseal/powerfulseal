@@ -404,7 +404,6 @@ def main(argv):
     if not needs_driver_and_inventory:
         logger.info("Not building a cloud driver")
     else:
-        logger.info("Building the driver")
         if args.openstack:
             logger.info("Building OpenStack driver")
             driver = OpenStackDriver(

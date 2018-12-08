@@ -1,6 +1,6 @@
 config:
-  minSecondsBetweenRuns: 60
-  maxSecondsBetweenRuns: 360
+  minSecondsBetweenRuns: 1
+  maxSecondsBetweenRuns: 30
 
 # the scenarios describing actions on nodes
 nodeScenarios: []

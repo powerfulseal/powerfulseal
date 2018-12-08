@@ -19,11 +19,11 @@ upload:
 
 run-openstack:
 	seal \
-		--verbose \
+		-vv \
 		autonomous \
 			--kubeconfig ~/.kube/config \
 			--openstack \
-			--policy-file ./tests/policy/example_config.yml \
+			--policy-file ./examples/policy_kill_random_default.yml \
 			--inventory-kubernetes \
 			--prometheus-collector \
 			--prometheus-host 0.0.0.0 \

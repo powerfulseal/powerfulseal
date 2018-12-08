@@ -122,6 +122,14 @@ def add_policy_options(parser):
         required=True
     )
 
+def check_valid_port(value):
+    parsed = int(value)
+    min_port = 0
+    max_port = 65535
+    if parsed < min_port or parsed > max_port:
+        raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
+    return parsed
+
 
 
 def parse_args(args):
@@ -227,12 +235,13 @@ def parse_args(args):
     web_args.add_argument(
         '--host',
         help='Specify host for the PowerfulSeal web server',
-        default='127.0.0.1'
+        default=os.environ.get('HOST', '127.0.0.1')
     )
     web_args.add_argument(
         '--port',
         help='Specify port for the PowerfulSeal web server',
-        default='8080'
+        default=int(os.environ.get('PORT', '8080')),
+        type=check_valid_port
     )
 
     # metrics settings
@@ -250,14 +259,6 @@ def parse_args(args):
         action='store_true',
         help="store metrics in Prometheus and expose metrics over a HTTP server"
     )
-
-    def check_valid_port(value):
-        parsed = int(value)
-        min_port = 0
-        max_port = 65535
-        if parsed < min_port or parsed > max_port:
-            raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
-        return parsed
 
     args_prometheus = parser_autonomous.add_argument_group('Prometheus settings')
     args_prometheus.add_argument(

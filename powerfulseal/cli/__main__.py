@@ -475,8 +475,11 @@ def main(argv):
         # build a metrics collector
         metric_collector = StdoutCollector()
         if args.prometheus_collector:
+            logger.debug("Starting prometheus metrics server on %s", args.prometheus_port)
             start_http_server(args.prometheus_port, args.prometheus_host)
             metric_collector = PrometheusCollector()
+        else:
+            logger.debug("Not starting prometheus collector")
 
         # read and validate the policy
         policy = PolicyRunner.load_file(args.policy_file)

@@ -184,7 +184,7 @@ Web UI settings:
 
 Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
 
-### Web user interface
+### Web User Interface
 
 #### If you're not going to use the UI, use the flag `--headless` to disable it
 

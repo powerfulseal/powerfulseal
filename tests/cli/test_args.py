@@ -25,6 +25,14 @@ def test_validate_policy_file_does_not_require_other_arguments():
     ])
     assert parser.mode == "validate"
     assert parser.policy_file == 'test/config.yml'
+    
+def test_kubeconfig_default():
+    parser = parse_args([
+        'interactive',
+        '--inventory-kubernetes',
+        '--no-cloud'
+    ])
+    assert parser.kubeconfig == HOME + '/.kube/config'
 
 
 def test_interactive_mode_integration():

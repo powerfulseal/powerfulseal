@@ -67,6 +67,13 @@ def add_ssh_options(parser):
         default=os.environ.get("PS_PRIVATE_KEY"),
         help='Path to ssh private key',
     )
+    args_ssh.add_argument(
+        '--override-ssh-host',
+        help=(
+            'If you\'d like to execute all commands on a different host '
+            '(for example for minikube) you can override it here'
+        )
+    )
 
 def add_inventory_options(parser):
     # Inventory
@@ -437,6 +444,7 @@ def main(argv):
         user=args.remote_user,
         ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
         ssh_path_to_private_key=args.ssh_path_to_private_key,
+        override_host=args.override_ssh_host,
     )
     
     ##########################################################################

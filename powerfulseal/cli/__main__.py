@@ -44,7 +44,8 @@ def add_kubernetes_options(parser):
     args_kubernetes.add_argument(
         '--kubeconfig',
         help='Location of kube-config file',
-        required=True,
+        default=os.environ.get('KUBECONFIG', '~/.kube/config'),
+        type=os.path.expanduser,
     )
 
 def add_ssh_options(parser):
@@ -65,6 +66,13 @@ def add_ssh_options(parser):
         '--ssh-path-to-private-key',
         default=os.environ.get("PS_PRIVATE_KEY"),
         help='Path to ssh private key',
+    )
+    args_ssh.add_argument(
+        '--override-ssh-host',
+        help=(
+            'If you\'d like to execute all commands on a different host '
+            '(for example for minikube) you can override it here'
+        )
     )
 
 def add_inventory_options(parser):
@@ -436,21 +444,11 @@ def main(argv):
         user=args.remote_user,
         ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
         ssh_path_to_private_key=args.ssh_path_to_private_key,
+        override_host=args.override_ssh_host,
     )
-
+    
     ##########################################################################
-    # METRICS
-    ##########################################################################
-    metric_collector = StdoutCollector()
-    if args.prometheus_collector:
-        logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
-        start_http_server(args.prometheus_port, args.prometheus_host)
-        metric_collector = PrometheusCollector()
-    else:
-        logger.info("Not starting prometheus collector")
-
-    ##########################################################################
-    # AUTONOMOUS
+    # INTERACTIVE MODE
     ##########################################################################
     if args.mode == 'interactive':
         # create a command parser
@@ -471,8 +469,23 @@ def main(argv):
                 input()
             except KeyboardInterrupt:
                 sys.exit(0)
+        return
 
-    elif args.mode == 'autonomous':
+    ##########################################################################
+    # METRICS
+    ##########################################################################
+    metric_collector = StdoutCollector()
+    if args.prometheus_collector:
+        logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
+        start_http_server(args.prometheus_port, args.prometheus_host)
+        metric_collector = PrometheusCollector()
+    else:
+        logger.info("Not starting prometheus collector")
+
+    ##########################################################################
+    # AUTONOMOUS MODE
+    ##########################################################################
+    if args.mode == 'autonomous':
 
         # read and validate the policy
         policy = PolicyRunner.load_file(args.policy_file)
@@ -515,6 +528,9 @@ def main(argv):
                 metric_collector=metric_collector
             )
 
+    ##########################################################################
+    # LABEL MODE
+    ##########################################################################
     elif args.mode == 'label':
         label_runner = LabelRunner(
             inventory,
@@ -529,6 +545,9 @@ def main(argv):
         logger.info("STARTING LABEL MODE")
         label_runner.run()
 
+    ##########################################################################
+    # DEMO MODE
+    ##########################################################################
     elif args.mode == 'demo':
         aggressiveness = int(args.aggressiveness)
         if not 1 <= aggressiveness <= 5:

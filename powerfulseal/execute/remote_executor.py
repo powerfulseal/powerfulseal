@@ -28,13 +28,14 @@ class RemoteExecutor(object):
 
     def __init__(self, nodes=None, user="cloud-user",
                  ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None,
-                 logger=None):
+                 override_host=None, logger=None):
         self.nodes = nodes or []
         self.user = user
         self.missing_host_key = (spur.ssh.MissingHostKey.accept
                                  if ssh_allow_missing_host_keys
                                  else spur.ssh.MissingHostKey.raise_error)
         self.ssh_path_to_private_key = ssh_path_to_private_key
+        self.override_host = override_host
         self.logger = logger or logging.getLogger(__name__)
 
     def execute(self, cmd, nodes=None, debug=False):
@@ -43,7 +44,7 @@ class RemoteExecutor(object):
         cmd_full = self.PREFIX + [cmd]
         for node in nodes:
             shell = spur.SshShell(
-                hostname=node.ip,
+                hostname=self.override_host or node.ip,
                 username=self.user,
                 missing_host_key=self.missing_host_key,
                 private_key_file=self.ssh_path_to_private_key,

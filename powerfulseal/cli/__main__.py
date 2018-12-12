@@ -44,6 +44,8 @@ def add_kubernetes_options(parser):
     args_kubernetes.add_argument(
         '--kubeconfig',
         help='Location of kube-config file',
+        default=os.environ.get('KUBECONFIG', '~/.kube/config'),
+        type=os.path.expanduser,
         required=True,
     )
 

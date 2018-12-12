@@ -30,7 +30,7 @@ setup(
         'flask-cors>=3.0.6,<4',
         'flask-swagger-ui>=3.18.0<4',
         'coloredlogs>=10.0.0,<11.0.0',
-	'six>=1.12.0,<2'
+        'six>=1.12.0,<2'
     ],
     extras_require={
         'testing': [

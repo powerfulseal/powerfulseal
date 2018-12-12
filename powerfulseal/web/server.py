@@ -254,7 +254,8 @@ def start_server(host, port):
 
 
 class ThreadedPolicyRunner(threading.Thread):
-    def __init__(self, policy, inventory, k8s_inventory, driver, executor, stop_event, logger=None):
+    def __init__(self, policy, inventory, k8s_inventory, driver, executor,
+            stop_event, logger=None, metric_collector=None):
         threading.Thread.__init__(self)
         config = policy.get("config", {})
         self.wait_min = config.get("minSecondsBetweenRuns", 0)
@@ -267,6 +268,7 @@ class ThreadedPolicyRunner(threading.Thread):
                 inventory=inventory,
                 driver=driver,
                 executor=executor,
+                metric_collector=metric_collector,
             )
             for item in policy.get("nodeScenarios", [])
         ]
@@ -278,6 +280,7 @@ class ThreadedPolicyRunner(threading.Thread):
                 inventory=inventory,
                 k8s_inventory=k8s_inventory,
                 executor=executor,
+                metric_collector=metric_collector,
             )
             for item in policy.get("podScenarios", [])
         ]
@@ -319,7 +322,8 @@ class ThreadedPolicyRunner(threading.Thread):
 
 class ServerState:
     def __init__(self, policy, inventory, k8s_inventory, driver, executor,
-                 server_host, server_port, policy_path, logger=None):
+                 server_host, server_port, policy_path, logger=None,
+                 metric_collector=None):
         # server_state must be accessed in a global context as Flask works within
         # a module level scope. As a result, there is no intuitive way for Flask
         # API endpoints to access the server state without first making the server
@@ -335,6 +339,7 @@ class ServerState:
         self.server_host = server_host
         self.server_port = server_port
         self.policy_path = policy_path
+        self.metric_collector = metric_collector
 
         self.logger = logger or logging.getLogger(__name__)
         self.logs = []
@@ -432,16 +437,20 @@ class ServerState:
             return self.policy_runner is not None and not self.policy_runner_stop_event.is_set()
 
     def start_policy_runner(self):
+        self.logger.info("Starting policy runner")
         with self.lock:
             if self.policy_runner is not None and not self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already running')
 
             self.policy_runner = ThreadedPolicyRunner(self.policy, self.inventory,
                                                       self.k8s_inventory, self.driver,
-                                                      self.executor, self.policy_runner_stop_event)
+                                                      self.executor,
+                                                      self.policy_runner_stop_event,
+                                                      metric_collector=self.metric_collector)
             self.policy_runner.start()
 
     def stop_policy_runner(self):
+        self.logger.info("Stopping policy runner")
         with self.lock:
             if self.policy_runner is None or self.policy_runner_stop_event.is_set():
                 raise RuntimeError('Policy runner is already stopped')

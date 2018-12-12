@@ -1,0 +1,24 @@
+config:
+  minSecondsBetweenRuns: 1
+  maxSecondsBetweenRuns: 30
+
+# the scenarios describing actions on nodes
+nodeScenarios: []
+# the scenarios describing actions on kubernetes pods
+podScenarios:
+  - name: "delete random pods in default namespace"
+
+    match:
+      - namespace:
+          name: "default"
+
+    filters:
+      - randomSample:
+          size: 1
+
+    # The actions will be executed in the order specified
+    actions:
+      - kill:
+          probability: 0.77
+          force: true
+

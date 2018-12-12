@@ -63,7 +63,7 @@ class Scenario():
         self.logger.debug("Filtered set: %r", filtered_set)
         self.logger.info("Filtered set length: %d", len(filtered_set))
         self.act(filtered_set)
-        self.logger.info("Done")
+        self.logger.debug("Done")
 
     @abc.abstractmethod
     def match(self):
@@ -186,7 +186,7 @@ class Scenario():
                     len_before = len(items)
                     items = filter_method(items, filter_params)
                     len_after = len(items)
-                    self.logger.info("Filter %s: %d -> %d items", filter_type, len_before, len_after)
+                    self.logger.debug("Filter %s: %d -> %d items", filter_type, len_before, len_after)
                     break
             if not items:
                 self.logger.info("Empty set after %r", criterion)

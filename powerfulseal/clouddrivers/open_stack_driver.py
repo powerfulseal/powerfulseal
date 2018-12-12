@@ -74,7 +74,7 @@ class OpenStackDriver(AbstractDriver):
     def sync(self):
         """ Downloads a fresh set of nodes form the API.
         """
-        self.logger.info("Synchronizing remote nodes")
+        self.logger.debug("Synchronizing remote nodes")
         self.remote_servers = list(self.conn.compute.servers())
         self.logger.info("Fetched %s remote servers" % len(self.remote_servers))
 

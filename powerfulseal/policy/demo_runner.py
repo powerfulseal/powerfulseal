@@ -42,7 +42,8 @@ class DemoRunner:
 
     def __init__(self, inventory, k8s_inventory, driver, executor, metric_client,
                  min_seconds_between_runs=0, max_seconds_between_runs=300,
-                 aggressiveness=MIN_AGGRESSIVENESS, logger=None, namespace=None):
+                 aggressiveness=MIN_AGGRESSIVENESS, logger=None, namespace=None,
+                 metric_collector=None):
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.driver = driver
@@ -52,7 +53,8 @@ class DemoRunner:
         self.aggressiveness = aggressiveness
         self.metric_client = metric_client
         self.logger = logger or logging.getLogger(__name__)
-        self.namespace=None
+        self.namespace = None
+        self.metric_collector = metric_collector
 
     def run(self):
         while True:
@@ -91,6 +93,9 @@ class DemoRunner:
         for value in self.executor.execute(cmd, nodes=[node]).values():
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
+                self.metric_collector.add_pod_kill_failed_metric(pod)
+            else:
+                self.metric_collector.add_pod_killed_metric(pod)
 
     def sort_pods(self, pods):
         return sorted(pods, key=lambda pod: (pod.metrics['cpu'], pod.metrics['memory']), reverse=True)

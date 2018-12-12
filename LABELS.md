@@ -9,7 +9,7 @@ Label mode is a good way to have more granular control over which pods are kille
 
 Labels can be manually set using the `kubectl label pods [POD NAME] [LABEL]` command. Once labels are set, label mode can be run by using the `--label` flag. You may also wish to set the `--min-seconds-between-runs` and `--max-seconds-between-runs` flags which default to `0` and `300` respectively.
 
-To reduce the processing time needed to filter a large number of pods, you can instruct PowerfulSeal to only look up pods under a specific namespace by using the `--namespace` argument. This behaves similar to `kubectl`, where not specifying the argument defaults PowerfulSeal to the `default` namespace, whereas specifying an empty value (`--namespace=`) retrieves all pods across all namespaces.
+To reduce the processing time needed to filter a large number of pods, you can instruct PowerfulSeal to only look up pods under a specific namespace by using the `--kubernetes-namespace` argument. This behaves similar to `kubectl`, where not specifying the argument defaults PowerfulSeal to the `default` namespace, whereas specifying an empty value (`--kubernetes-namespace=`) retrieves all pods across all namespaces.
 
 ## Example
 
@@ -21,9 +21,9 @@ Suppose we have pods `my-app-1`, `my-app-2`, etc. under the `default` namespace 
 
 All of these labels are optional. For additional labels and their defaults, see the reference below.
 
-To finally get PowerfulSeal running, assuming our `kube-config` is at `~/.kube/config` and we'e using the `no-cloud` driver, run: `powerfulseal --label --inventory--kubernetes --kube-config ~/.kube/config --no-cloud`.
+To finally get PowerfulSeal running, assuming our `kube-config` is at `~/.kube/config` and we'e using the `no-cloud` driver, run: `powerfulseal label --inventory--kubernetes --kube-config ~/.kube/config`.
 
-If we were to change the namespace of the `my-app-*` pods to, for example, `production`, PowerfulSeal can be either run with the `--namespace=production` argument to get all pods with the `production` namespace, or `--namespace=` to get all pods across all namespaces (not recommended due to poor performance when is a large number of pods).
+If we were to change the namespace of the `my-app-*` pods to, for example, `production`, PowerfulSeal can be either run with the `--kubernetes-namespace=production` argument to get all pods with the `production` namespace, or `--kubernetes-namespace=` to get all pods across all namespaces (not recommended due to poor performance when is a large number of pods).
 
 ## Reference
 

@@ -55,6 +55,48 @@ __PowerfulSeal__ works in several modes:
 
 ## Interactive mode
 
+```sh
+$ seal interactive --help
+usage: seal interactive [-h] --kubeconfig KUBECONFIG
+                        (--openstack | --aws | --no-cloud)
+                        [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                        (-i INVENTORY_FILE | --inventory-kubernetes)
+                        [--remote-user REMOTE_USER]
+                        [--ssh-allow-missing-host-keys]
+                        [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+```
+
+
+
 Here's a sneak peek of what you can do in the interactive mode:
 
 ![demo nodes](./media/video-nodes.gif)
@@ -70,7 +112,73 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 2. They are run through a series of filters
 3. For all the items remaining after the filters, all actions are executed
 
-![pipeline](./media/pipeline.png)
+```sh
+$ seal autonomous --help
+usage: seal autonomous [-h] --kubeconfig KUBECONFIG
+                       (--openstack | --aws | --no-cloud)
+                       [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                       (-i INVENTORY_FILE | --inventory-kubernetes)
+                       [--remote-user REMOTE_USER]
+                       [--ssh-allow-missing-host-keys]
+                       [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                       --policy-file POLICY_FILE
+                       [--stdout-collector | --prometheus-collector]
+                       [--prometheus-host PROMETHEUS_HOST]
+                       [--prometheus-port PROMETHEUS_PORT] [--headless]
+                       [--host HOST] [--port PORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+
+Policy settings:
+  --policy-file POLICY_FILE
+                        the policy file to run
+
+Metrics settings:
+  --stdout-collector    print metrics collected to stdout
+  --prometheus-collector
+                        store metrics in Prometheus and expose metrics over a
+                        HTTP server
+
+Prometheus settings:
+  --prometheus-host PROMETHEUS_HOST
+                        Host to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+  --prometheus-port PROMETHEUS_PORT
+                        Port to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+
+Web UI settings:
+  --headless            Doesn't start the UI, just runs the policy
+  --host HOST           Specify host for the PowerfulSeal web server
+  --port PORT           Specify port for the PowerfulSeal web server
+```
 
 ### Metrics collection
 
@@ -78,12 +186,15 @@ Autonomous mode also comes with the ability for metrics useful for monitoring to
 
 ### Web User Interface
 
+#### If you're not going to use the UI, use the flag `--headless` to disable it
+
 PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
 
 - starting/stopping autonomous mode
 - viewing and filtering logs
 - changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
 - stopping/killing individual nodes and pods
+
 
 ![web interface](./media/web.png)
 
@@ -101,22 +212,196 @@ nodeScenarios: []
 podScenarios: [] 
 ```
 
-The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json)
+A more interesting schema, that kills a random pod in `default` namespace every 1-30 seconds:
+
+```yaml
+config:
+  minSecondsBetweenRuns: 1
+  maxSecondsBetweenRuns: 30
+
+nodeScenarios: []
+podScenarios:
+  - name: "delete random pods in default namespace"
+
+    match:
+      - namespace:
+          name: "default"
+
+    filters:
+      - randomSample:
+          size: 1
+
+    actions:
+      - kill:
+          probability: 0.77
+          force: true
+```
 
 A [full featured example](./tests/policy/example_config.yml) listing most of the available options can be found in the [tests](./tests/policy).
+
+The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json).
 
 ## Label mode
 
 Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
 
+To mark a pod for attack, do `kubectl label pods my-app-1 seal/enabled=true`, and the `Seal` will start attacking it, but only during working hours (defaults).
+
 Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
+
+```sh
+$ seal label --help
+usage: seal label [-h] --kubeconfig KUBECONFIG
+                  (--openstack | --aws | --no-cloud)
+                  [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                  (-i INVENTORY_FILE | --inventory-kubernetes)
+                  [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
+                  [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                  [--kubernetes-namespace KUBERNETES_NAMESPACE]
+                  [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
+                  [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
+                  [--stdout-collector | --prometheus-collector]
+                  [--prometheus-host PROMETHEUS_HOST]
+                  [--prometheus-port PROMETHEUS_PORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+
+Kubernetes options:
+  --kubernetes-namespace KUBERNETES_NAMESPACE
+                        Namespace to use for label and demo mode (set to blank
+                        for all namespaces)
+
+Policy settings:
+  --min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS
+                        Minimum number of seconds between runs
+  --max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS
+                        Maximum number of seconds between runs
+
+Metrics settings:
+  --stdout-collector    print metrics collected to stdout
+  --prometheus-collector
+                        store metrics in Prometheus and expose metrics over a
+                        HTTP server
+
+Prometheus settings:
+  --prometheus-host PROMETHEUS_HOST
+                        Host to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+  --prometheus-port PROMETHEUS_PORT
+                        Port to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+```
 
 
 ## Demo mode
 
 The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
 
-Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `--demo` flag along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
+Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `demo` subcommand along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
+
+```sh
+$ seal demo --help
+usage: seal demo [-h] --kubeconfig KUBECONFIG
+                 (--openstack | --aws | --no-cloud)
+                 [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                 (-i INVENTORY_FILE | --inventory-kubernetes)
+                 [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
+                 [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                 [--kubernetes-namespace KUBERNETES_NAMESPACE]
+                 [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
+                 [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
+                 [--stdout-collector | --prometheus-collector]
+                 [--prometheus-host PROMETHEUS_HOST]
+                 [--prometheus-port PROMETHEUS_PORT] --heapster-path
+                 HEAPSTER_PATH [--aggressiveness AGGRESSIVENESS]
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+Kubernetes settings:
+  --kubeconfig KUBECONFIG
+                        Location of kube-config file
+
+Cloud settings:
+  --openstack           use OpenStack cloud provider
+  --aws                 use AWS cloud provider
+  --no-cloud            don't use cloud provider
+  --openstack-cloud-name OPENSTACK_CLOUD_NAME
+                        optional name of the open stack cloud from your config
+                        file to use
+
+Inventory settings:
+  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file of groups of hosts to work with
+  --inventory-kubernetes
+                        reads all kubernetes cluster nodes as inventory
+
+SSH settings:
+  --remote-user REMOTE_USER
+                        the of the user for the ssh connections
+  --ssh-allow-missing-host-keys
+                        Allow connection to hosts not present in known_hosts
+  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
+                        Path to ssh private key
+
+Kubernetes options:
+  --kubernetes-namespace KUBERNETES_NAMESPACE
+                        Namespace to use for label and demo mode (set to blank
+                        for all namespaces)
+
+Policy settings:
+  --min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS
+                        Minimum number of seconds between runs
+  --max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS
+                        Maximum number of seconds between runs
+
+Metrics settings:
+  --stdout-collector    print metrics collected to stdout
+  --prometheus-collector
+                        store metrics in Prometheus and expose metrics over a
+                        HTTP server
+
+Prometheus settings:
+  --prometheus-host PROMETHEUS_HOST
+                        Host to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+  --prometheus-port PROMETHEUS_PORT
+                        Port to expose Prometheus metrics via the HTTP server
+                        when using the --prometheus-collector flag
+
+Heapster settings:
+  --heapster-path HEAPSTER_PATH
+                        Base path of Heapster without trailing slash
+  --aggressiveness AGGRESSIVENESS
+                        Aggressiveness of demo mode (default: 3)
+```
 
 
 ## Setup

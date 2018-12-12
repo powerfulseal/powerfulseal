@@ -38,7 +38,7 @@ class NodeScenario(Scenario):
             for criterion in criteria:
                 match = criterion.get("property")
                 if self.match_property(node, match):
-                    self.logger.info("Matching %r", node)
+                    self.logger.debug("Matching %r", node)
                     selected_nodes.add(node)
         if len(selected_nodes) == 0:
             self.metric_collector.add_matched_to_empty_set_metric(NODE_SOURCE)

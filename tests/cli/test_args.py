@@ -16,25 +16,37 @@ from powerfulseal.cli.__main__ import parse_args
 
 
 def test_validate_policy_file_does_not_require_other_arguments():
-    parser = parse_args(['--validate-policy-file', 'test/config.yml'])
-    assert parser.validate_policy_file == 'test/config.yml'
+    parser = parse_args([
+        'validate',
+        '--policy-file', 'test/config.yml'
+    ])
+    assert parser.mode == "validate"
+    assert parser.policy_file == 'test/config.yml'
 
 
 def test_interactive_mode_integration():
-    parser = parse_args(['--inventory-kubernetes', '--kube-config',
-                        '~/.kube/config', '--no-cloud', '--interactive'])
+    parser = parse_args([
+        'interactive',
+        '--inventory-kubernetes',
+        '--kubeconfig', '~/.kube/config',
+        '--no-cloud'
+    ])
+    assert parser.mode == "interactive"
     assert parser.inventory_kubernetes
-    assert parser.kube_config == '~/.kube/config'
+    assert parser.kubeconfig == '~/.kube/config'
     assert parser.no_cloud
-    assert parser.interactive
 
 
 def test_autonomous_mode_integration():
-    parser = parse_args(['--inventory-kubernetes', '--kube-config',
-                        '~/.kube/config', '--no-cloud', '--run-policy-file',
-                        '~/policy.yml', '--inventory-kubernetes'])
+    parser = parse_args([
+        'autonomous',
+        '--inventory-kubernetes',
+        '--kubeconfig', '~/.kube/config',
+        '--no-cloud',
+        '--policy-file', '~/policy.yml'
+    ])
+    assert parser.mode == "autonomous"
     assert parser.inventory_kubernetes
-    assert parser.kube_config == '~/.kube/config'
+    assert parser.kubeconfig == '~/.kube/config'
     assert parser.no_cloud
-    assert parser.run_policy_file == '~/policy.yml'
-    assert parser.inventory_kubernetes
+    assert parser.policy_file == '~/policy.yml'

@@ -51,7 +51,7 @@ class PodScenario(Scenario):
                 if key in criterion:
                     params = criterion.get(key)
                     for pod in method(params):
-                        self.logger.info("Matching %r", pod)
+                        self.logger.debug("Matching %r", pod)
                         selected.add(pod)
         if len(selected) == 0:
             self.metric_collector.add_matched_to_empty_set_metric(POD_SOURCE)
@@ -121,6 +121,8 @@ class PodScenario(Scenario):
                     self.metric_collector.add_pod_kill_failed_metric(item)
                 else:
                     self.metric_collector.add_pod_killed_metric(item)
+        else:
+            self.logger.info("Pod got lucky - not killing")
 
     def act(self, items):
         """ Executes all the supported actions on the list of pods.

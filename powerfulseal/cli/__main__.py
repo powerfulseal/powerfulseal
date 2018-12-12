@@ -439,20 +439,9 @@ def main(argv):
         ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
         ssh_path_to_private_key=args.ssh_path_to_private_key,
     )
-
+    
     ##########################################################################
-    # METRICS
-    ##########################################################################
-    metric_collector = StdoutCollector()
-    if args.prometheus_collector:
-        logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
-        start_http_server(args.prometheus_port, args.prometheus_host)
-        metric_collector = PrometheusCollector()
-    else:
-        logger.info("Not starting prometheus collector")
-
-    ##########################################################################
-    # AUTONOMOUS
+    # INTERACTIVE MODE
     ##########################################################################
     if args.mode == 'interactive':
         # create a command parser
@@ -473,8 +462,23 @@ def main(argv):
                 input()
             except KeyboardInterrupt:
                 sys.exit(0)
+        return
 
-    elif args.mode == 'autonomous':
+    ##########################################################################
+    # METRICS
+    ##########################################################################
+    metric_collector = StdoutCollector()
+    if args.prometheus_collector:
+        logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
+        start_http_server(args.prometheus_port, args.prometheus_host)
+        metric_collector = PrometheusCollector()
+    else:
+        logger.info("Not starting prometheus collector")
+
+    ##########################################################################
+    # AUTONOMOUS MODE
+    ##########################################################################
+    if args.mode == 'autonomous':
 
         # read and validate the policy
         policy = PolicyRunner.load_file(args.policy_file)
@@ -517,6 +521,9 @@ def main(argv):
                 metric_collector=metric_collector
             )
 
+    ##########################################################################
+    # LABEL MODE
+    ##########################################################################
     elif args.mode == 'label':
         label_runner = LabelRunner(
             inventory,
@@ -531,6 +538,9 @@ def main(argv):
         logger.info("STARTING LABEL MODE")
         label_runner.run()
 
+    ##########################################################################
+    # DEMO MODE
+    ##########################################################################
     elif args.mode == 'demo':
         aggressiveness = int(args.aggressiveness)
         if not 1 <= aggressiveness <= 5:

@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from os.path import expanduser
 from powerfulseal.cli.__main__ import parse_args
+
+HOME = expanduser("~")
 
 
 def test_validate_policy_file_does_not_require_other_arguments():
@@ -33,7 +36,7 @@ def test_interactive_mode_integration():
     ])
     assert parser.mode == "interactive"
     assert parser.inventory_kubernetes
-    assert parser.kubeconfig == '~/.kube/config'
+    assert parser.kubeconfig == HOME + '/.kube/config'
     assert parser.no_cloud
 
 
@@ -41,12 +44,12 @@ def test_autonomous_mode_integration():
     parser = parse_args([
         'autonomous',
         '--inventory-kubernetes',
-        '--kubeconfig', '~/.kube/config',
+        '--kubeconfig', '~/config',
         '--no-cloud',
         '--policy-file', '~/policy.yml'
     ])
     assert parser.mode == "autonomous"
     assert parser.inventory_kubernetes
-    assert parser.kubeconfig == '~/.kube/config'
+    assert parser.kubeconfig == HOME + '/config'
     assert parser.no_cloud
     assert parser.policy_file == '~/policy.yml'

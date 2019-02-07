@@ -173,11 +173,11 @@ def test_add_node_stopped_metric(prometheus_node_scenario):
     }
 
     mock_item1 = MagicMock()
-    mock_item1.uid = "1"
+    mock_item1.id = "1"
     mock_item1.name = "node1"
 
     mock_item2 = MagicMock()
-    mock_item2.uid = "2"
+    mock_item2.id = "2"
     mock_item2.name = "node2"
 
     items = [mock_item1, mock_item2]
@@ -191,12 +191,12 @@ def test_add_node_stopped_metric(prometheus_node_scenario):
     assert after_total == 2
 
     after_first = get_aggregated_sample_values(REGISTRY, NODE_STOPS_METRIC_NAME, labels={'status': STATUS_SUCCESS,
-                                                                                         'uid': '1',
+                                                                                         'id': '1',
                                                                                          'name': 'node1'})
     assert after_first == 1
 
     after_second = get_aggregated_sample_values(REGISTRY, NODE_STOPS_METRIC_NAME, labels={'status': STATUS_SUCCESS,
-                                                                                          'uid': '2',
+                                                                                          'id': '2',
                                                                                           'name': 'node2'})
     assert after_second == 1
 
@@ -213,11 +213,11 @@ def test_add_node_stop_failed_metric(prometheus_node_scenario):
     method.side_effect = Exception("something bad")
 
     mock_item1 = MagicMock()
-    mock_item1.uid = "1"
+    mock_item1.id = "1"
     mock_item1.name = "node1"
 
     mock_item2 = MagicMock()
-    mock_item2.uid = "2"
+    mock_item2.id = "2"
     mock_item2.name = "node2"
 
     items = [mock_item1, mock_item2]
@@ -231,12 +231,12 @@ def test_add_node_stop_failed_metric(prometheus_node_scenario):
     assert after_total == 2
 
     after_first = get_aggregated_sample_values(REGISTRY, NODE_STOPS_METRIC_NAME, labels={'status': STATUS_FAILURE,
-                                                                                         'uid': '1',
+                                                                                         'id': '1',
                                                                                          'name': 'node1'})
     assert after_first == 1
 
     after_second = get_aggregated_sample_values(REGISTRY, NODE_STOPS_METRIC_NAME, labels={'status': STATUS_FAILURE,
-                                                                                          'uid': '2',
+                                                                                          'id': '2',
                                                                                           'name': 'node2'})
     assert after_second == 1
 
@@ -260,7 +260,7 @@ def test_add_execute_failed_metric(prometheus_node_scenario):
     prometheus_node_scenario.executor.execute = magic_mock
 
     mock_item = MagicMock()
-    mock_item.uid = '1'
+    mock_item.id = '1'
     mock_item.name = 'node1'
     items = [mock_item]
 
@@ -269,7 +269,7 @@ def test_add_execute_failed_metric(prometheus_node_scenario):
 
     prometheus_node_scenario.act(items)
 
-    after = get_aggregated_sample_values(REGISTRY, EXECUTE_FAILED_METRIC_NAME, labels={'uid': '1', 'name': 'node1'})
+    after = get_aggregated_sample_values(REGISTRY, EXECUTE_FAILED_METRIC_NAME, labels={'id': '1', 'name': 'node1'})
     assert after == 1
 
 

@@ -30,7 +30,7 @@ POD_KILLS = Counter(POD_KILLS_METRIC_NAME,
 NODE_STOPS_METRIC_NAME = 'seal_nodes_stopped_total'
 NODE_STOPS = Counter(NODE_STOPS_METRIC_NAME,
                      'Number of nodes stopped (including failures)',
-                     ['status', 'uid', 'name'])
+                     ['status', 'id', 'name'])
 
 EXECUTE_FAILED_METRIC_NAME = 'seal_execute_failed_total'
 EXECUTE_FAILURES = Counter(EXECUTE_FAILED_METRIC_NAME,

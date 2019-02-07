@@ -35,7 +35,7 @@ NODE_STOPS = Counter(NODE_STOPS_METRIC_NAME,
 EXECUTE_FAILED_METRIC_NAME = 'seal_execute_failed_total'
 EXECUTE_FAILURES = Counter(EXECUTE_FAILED_METRIC_NAME,
                            'Increasing counter for command execution failures',
-                           ['uid', 'name'])
+                           ['id', 'name'])
 
 FILTERED_TO_EMPTY_SET_METRIC_NAME = 'seal_empty_filter_total'
 FILTERED_TO_EMPTY_SET = Counter(FILTERED_TO_EMPTY_SET_METRIC_NAME,

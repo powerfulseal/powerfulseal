@@ -70,13 +70,13 @@ class PrometheusCollector(AbstractCollector):
         POD_KILLS.labels(STATUS_FAILURE, pod.namespace, pod.name).inc()
 
     def add_node_stopped_metric(self, node):
-        NODE_STOPS.labels(STATUS_SUCCESS, node.uid, node.name).inc()
+        NODE_STOPS.labels(STATUS_SUCCESS, node.id, node.name).inc()
 
     def add_node_stop_failed_metric(self, node):
-        NODE_STOPS.labels(STATUS_FAILURE, node.uid, node.name).inc()
+        NODE_STOPS.labels(STATUS_FAILURE, node.id, node.name).inc()
 
     def add_execute_failed_metric(self, node):
-        EXECUTE_FAILURES.labels(node.uid, node.name).inc()
+        EXECUTE_FAILURES.labels(node.id, node.name).inc()
 
     def add_filtered_to_empty_set_metric(self):
         FILTERED_TO_EMPTY_SET.inc()

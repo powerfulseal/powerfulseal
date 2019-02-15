@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='2.0.0',
+    version='2.0.1',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
@@ -29,7 +29,8 @@ setup(
         'prometheus_client>=0.3.0,<0.4.0',
         'flask-cors>=3.0.6,<4',
         'flask-swagger-ui>=3.18.0<4',
-        'coloredlogs>=10.0.0,<11.0.0'
+        'coloredlogs>=10.0.0,<11.0.0',
+        'six>=1.12.0,<2'
     ],
     extras_require={
         'testing': [

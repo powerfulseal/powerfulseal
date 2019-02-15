@@ -21,6 +21,7 @@ from datetime import datetime
 import json
 from termcolor import colored, cprint
 import sys
+import six
 
 try:
     import readline
@@ -432,7 +433,7 @@ class PSCmd(cmd.Cmd):
             ans = False
             while ans not in ("y", "n"):
                 print("Will execute '%s' on %s. Continue ? [y/n]: " % (cmd, node))
-                ans = input().lower()
+                ans = six.moves.input().lower()
             if ans != "y":
                 return print("Cancelling")
             self.execute(cmd, [node])

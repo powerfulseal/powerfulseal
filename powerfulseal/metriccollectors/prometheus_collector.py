@@ -30,12 +30,12 @@ POD_KILLS = Counter(POD_KILLS_METRIC_NAME,
 NODE_STOPS_METRIC_NAME = 'seal_nodes_stopped_total'
 NODE_STOPS = Counter(NODE_STOPS_METRIC_NAME,
                      'Number of nodes stopped (including failures)',
-                     ['status', 'uid', 'name'])
+                     ['status', 'id', 'name'])
 
 EXECUTE_FAILED_METRIC_NAME = 'seal_execute_failed_total'
 EXECUTE_FAILURES = Counter(EXECUTE_FAILED_METRIC_NAME,
                            'Increasing counter for command execution failures',
-                           ['uid', 'name'])
+                           ['id', 'name'])
 
 FILTERED_TO_EMPTY_SET_METRIC_NAME = 'seal_empty_filter_total'
 FILTERED_TO_EMPTY_SET = Counter(FILTERED_TO_EMPTY_SET_METRIC_NAME,
@@ -70,13 +70,13 @@ class PrometheusCollector(AbstractCollector):
         POD_KILLS.labels(STATUS_FAILURE, pod.namespace, pod.name).inc()
 
     def add_node_stopped_metric(self, node):
-        NODE_STOPS.labels(STATUS_SUCCESS, node.uid, node.name).inc()
+        NODE_STOPS.labels(STATUS_SUCCESS, node.id, node.name).inc()
 
     def add_node_stop_failed_metric(self, node):
-        NODE_STOPS.labels(STATUS_FAILURE, node.uid, node.name).inc()
+        NODE_STOPS.labels(STATUS_FAILURE, node.id, node.name).inc()
 
     def add_execute_failed_metric(self, node):
-        EXECUTE_FAILURES.labels(node.uid, node.name).inc()
+        EXECUTE_FAILURES.labels(node.id, node.name).inc()
 
     def add_filtered_to_empty_set_metric(self):
         FILTERED_TO_EMPTY_SET.inc()

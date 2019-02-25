@@ -24,17 +24,18 @@ class RemoteExecutor(object):
         Assumes password-less setup.
     """
 
-    PREFIX = ["sh", "-c"]
+    PREFIX = ["bash", "-c"]
 
     def __init__(self, nodes=None, user="cloud-user",
                  ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None,
-                 override_host=None, logger=None):
+                 ssh_password=None, override_host=None, logger=None):
         self.nodes = nodes or []
         self.user = user
         self.missing_host_key = (spur.ssh.MissingHostKey.accept
                                  if ssh_allow_missing_host_keys
                                  else spur.ssh.MissingHostKey.raise_error)
         self.ssh_path_to_private_key = ssh_path_to_private_key
+        self.ssh_password = ssh_password
         self.override_host = override_host
         self.logger = logger or logging.getLogger(__name__)
 
@@ -43,12 +44,21 @@ class RemoteExecutor(object):
         results = dict()
         cmd_full = self.PREFIX + [cmd]
         for node in nodes:
-            shell = spur.SshShell(
-                hostname=self.override_host or node.ip,
-                username=self.user,
-                missing_host_key=self.missing_host_key,
-                private_key_file=self.ssh_path_to_private_key,
-            )
+            if self.ssh_path_to_private_key is not None:
+                shell = spur.SshShell(
+                    hostname=self.override_host or node.ip,
+                    username=self.user,
+                    missing_host_key=self.missing_host_key,
+                    private_key_file=self.ssh_path_to_private_key,
+                )
+            else:
+                shell = spur.SshShell(
+                    hostname=self.override_host or node.ip,
+                    username=self.user,
+                    missing_host_key=self.missing_host_key,
+                    password=self.ssh_password,
+                )
+
             self.logger.info("Executing '%s' on %s" % (cmd_full, node.name))
             try:
                 with shell:

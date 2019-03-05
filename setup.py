@@ -20,7 +20,7 @@ setup(
         'termcolor>=1.1.0,<2',
         'openstacksdk>=0.10.0,<1',
         'spur>=0.3.20,<1',
-        'kubernetes=8.0.1',
+        'kubernetes>=8.0.1<9',
         'PyYAML>=3.12,<4',
         'jsonschema>=2.6.0,<3',
         'boto3>=1.5.15,<2.0.0',

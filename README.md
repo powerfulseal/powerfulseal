@@ -83,8 +83,9 @@ Cloud settings:
                         file to use
 
 Inventory settings:
-  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
-                        the inventory file of groups of hosts to work with
+   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
+                        the inventory file (in ini format) of groups of hosts
+                                                    to work with
   --inventory-kubernetes
                         reads all kubernetes cluster nodes as inventory
 
@@ -504,6 +505,21 @@ powerfulseal --help # or seal --help
 To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
 
 Both Python 2.7 and Python 3 are supported.
+
+## Inventory File
+
+`PowerfulSeal` can use an ansible-style inventory file (in ini format)
+```ini
+[mygroup]
+myhost01
+
+[mygroup2]
+myhost02
+
+[some_hosts]
+myhost01
+myhost02
+```
 
 ## Testing
 

@@ -28,7 +28,7 @@ class RemoteExecutor(object):
 
     def __init__(self, nodes=None, user="cloud-user",
                  ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None,
-                 override_host=None, logger=None):
+                 override_host=None, use_private_ip=False, logger=None):
         self.nodes = nodes or []
         self.user = user
         self.missing_host_key = (spur.ssh.MissingHostKey.accept
@@ -36,15 +36,20 @@ class RemoteExecutor(object):
                                  else spur.ssh.MissingHostKey.raise_error)
         self.ssh_path_to_private_key = ssh_path_to_private_key
         self.override_host = override_host
+        self.use_private_ip = use_private_ip
         self.logger = logger or logging.getLogger(__name__)
 
-    def execute(self, cmd, nodes=None, debug=False):
+    def execute(self, cmd, nodes=None, use_private_ip=None, debug=False):
         nodes = nodes or self.nodes
+        use_private_ip = use_private_ip or self.use_private_ip
         results = dict()
         cmd_full = self.PREFIX + [cmd]
         for node in nodes:
+            hostip = node.extIp
+            if use_private_ip:
+                hostip = node.ip
             shell = spur.SshShell(
-                hostname=self.override_host or node.ip,
+                hostname=self.override_host or hostip,
                 username=self.user,
                 missing_host_key=self.missing_host_key,
                 private_key_file=self.ssh_path_to_private_key,
@@ -53,13 +58,13 @@ class RemoteExecutor(object):
             try:
                 with shell:
                     output = shell.run(cmd_full)
-                    results[node.ip] = {
+                    results[hostip] = {
                         "ret_code": output.return_code,
                         "stdout": output.output.decode(),
                         "stderr": output.stderr_output.decode(),
                     }
             except Exception as e:
-                results[node.ip] = {
+                results[hostip] = {
                     "ret_code": 1,
                     "error": str(e),
                 }

@@ -32,11 +32,12 @@ class Node(object):
     """
 
 
-    def __init__(self, id, name=None, ip=None, az=None,
+    def __init__(self, id, name=None, ip=None, extIp=None, az=None,
             groups=None, no=None, state=None):
         self.id = id
         self.name = name
         self.ip = ip
+        self.extIp = extIp
         self.az = az
         self.groups = groups or []
         self.no = no
@@ -49,13 +50,14 @@ class Node(object):
 
     def __str__(self):
         return (
-            "[node no={no} id={id} ip={ip} az={az} groups={groups} name={name} "
+            "[node no={no} id={id} ip={ip} extIp={extIp} az={az} groups={groups} name={name} "
             "state={state}]"
         ).format(
             no=self.no,
             id=self.id,
             name=self.name,
             ip=self.ip,
+            extIp=self.extIp,
             az=self.az,
             groups=self.groups,
             state=str(self.state)

@@ -39,6 +39,7 @@ DEFAULT_COLOR_KEYWORDS = {
     "node": "blue",
     "pod": "blue",
     "ip": "yellow",
+    "extIp": "yellow",
 }
 # couple of helpers
 def colour_output(output, extras=None):

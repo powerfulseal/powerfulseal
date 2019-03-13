@@ -81,7 +81,8 @@ def add_inventory_options(parser):
     inventory_options = args.add_mutually_exclusive_group(required=True)
     inventory_options.add_argument('-i', '--inventory-file',
         default=os.environ.get("INVENTORY_FILE"),
-        help='the inventory file of groups of hosts to work with'
+        help=('the inventory file (in ini format) of groups '
+              'of hosts to work with')
     )
     inventory_options.add_argument('--inventory-kubernetes',
         default=os.environ.get("INVENTORY_KUBERNETES"),

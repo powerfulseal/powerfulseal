@@ -85,6 +85,7 @@ def add_ssh_options(parser):
         '--ssh-password',
         default=os.environ.get("PS_SSH_PASSWORD"),
         help='ssh password',
+    )
 
 def add_inventory_options(parser):
     # Inventory

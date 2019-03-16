@@ -115,6 +115,12 @@ class PSCmd(cmd.Cmd):
 
         return suggestions
 
+    ###########################################################################
+    # CLI control
+    ###########################################################################
+    def do_exit(self, line):
+        "Exit CLI"
+        raise GeneratorExit
 
     ###########################################################################
     # NODE (MACHINE) RELATED FUNCTIONALITY

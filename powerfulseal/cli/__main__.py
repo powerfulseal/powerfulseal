@@ -63,16 +63,28 @@ def add_ssh_options(parser):
         help='Allow connection to hosts not present in known_hosts',
     )
     args_ssh.add_argument(
-        '--ssh-path-to-private-key',
-        default=os.environ.get("PS_PRIVATE_KEY"),
-        help='Path to ssh private key',
-    )
-    args_ssh.add_argument(
         '--override-ssh-host',
         help=(
             'If you\'d like to execute all commands on a different host '
             '(for example for minikube) you can override it here'
         )
+    )
+    args_ssh.add_argument(
+        '--use-private-ip',
+        default=False,
+        action='store_true',
+        help='Use the private IP of each node (vs public IP)',
+    )
+    ssh_options = args_ssh.add_mutually_exclusive_group()
+    ssh_options.add_argument(
+        '--ssh-path-to-private-key',
+        default=os.environ.get("PS_PRIVATE_KEY"),
+        help='Path to ssh private key',
+    )
+    ssh_options.add_argument(
+        '--ssh-password',
+        default=os.environ.get("PS_SSH_PASSWORD"),
+        help='ssh password',
     )
 
 def add_inventory_options(parser):
@@ -198,7 +210,6 @@ def check_valid_port(value):
     if parsed < min_port or parsed > max_port:
         raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
     return parsed
-
 
 
 def parse_args(args):
@@ -395,6 +406,9 @@ def main(argv):
     logger.addHandler(stdout_handler)
     coloredlogs.install(logger=logger)
 
+    my_verb = args.verbose
+    logger.info("modules %s : verbosity %s : log level %s : handler level %s ", __name__, my_verb, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
+
     ##########################################################################
     # KUBERNETES
     ##########################################################################
@@ -441,11 +455,15 @@ def main(argv):
     ##########################################################################
     # SSH EXECUTOR
     ##########################################################################
+    if args.use_private_ip:
+        logger.info("Using each node's private IP address")
     executor = RemoteExecutor(
         user=args.remote_user,
         ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
         ssh_path_to_private_key=args.ssh_path_to_private_key,
         override_host=args.override_ssh_host,
+        ssh_password=args.ssh_password,
+        use_private_ip=args.use_private_ip,
     )
     
     ##########################################################################
@@ -463,6 +481,9 @@ def main(argv):
         while True:
             try:
                 cmd.cmdloop()
+            except GeneratorExit:
+                print("Exiting")
+                sys.exit(0)
             except KeyboardInterrupt:
                 print()
                 print("Ctrl-c again to quit")

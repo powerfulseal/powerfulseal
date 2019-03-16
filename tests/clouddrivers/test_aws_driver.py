@@ -41,7 +41,7 @@ def test_get_by_ip_public_ip_nodes(create_connection_from_config, ec2_instances)
     nodes = driver.get_by_ip(PUBLIC_IPS[node_index])
     assert ec2_instances[node_index].id is nodes.id
     assert ec2_instances[node_index].placement['AvailabilityZone'] is nodes.az
-    assert ec2_instances[node_index].public_ip_address == nodes.ip
+    assert ec2_instances[node_index].public_ip_address == nodes.extIp
 
 @patch('powerfulseal.clouddrivers.aws_driver.create_connection_from_config')
 def test_get_by_ip_no_nodes(create_connection_from_config, ec2_instances):

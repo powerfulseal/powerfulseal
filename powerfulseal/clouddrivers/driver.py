@@ -21,6 +21,10 @@ class AbstractDriver():
     """
         Abstract class representing a cloud driver.
         All concrete drivers should implement this.
+
+        NOTE: node.extIp should be an accessible IP.
+              It should the same as node.ip if there is
+              no separate public IP.
     """
 
     @abc.abstractmethod

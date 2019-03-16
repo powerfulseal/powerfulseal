@@ -39,6 +39,7 @@ DEFAULT_COLOR_KEYWORDS = {
     "node": "blue",
     "pod": "blue",
     "ip": "yellow",
+    "extIp": "yellow",
 }
 # couple of helpers
 def colour_output(output, extras=None):
@@ -115,6 +116,12 @@ class PSCmd(cmd.Cmd):
 
         return suggestions
 
+    ###########################################################################
+    # CLI control
+    ###########################################################################
+    def do_exit(self, line):
+        "Exit CLI"
+        raise GeneratorExit
 
     ###########################################################################
     # NODE (MACHINE) RELATED FUNCTIONALITY

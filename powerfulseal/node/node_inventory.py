@@ -18,7 +18,6 @@ import logging
 import ipaddress
 from .node import Node, NodeState
 
-
 class NodeInventory():
 
     def __init__(self, driver, restrict_to_groups=None, filters=None, logger=None):
@@ -74,6 +73,7 @@ class NodeInventory():
             if (
                 node.id == query
                 or node.ip == query
+                or node.extIp == query
                 or str(node.no) == str(query)
                 or node.name == query
             ):
@@ -108,17 +108,21 @@ class NodeInventory():
             # different groups can have the same IPs,
             # so we need to match to the same nodes
             for ip in ips:
+                self.logger.debug("IP processing: %s", ip)
+                # see if we have a matching node in the cached list of nodes
                 node = self.nodes_by_ip.get(ip)
                 if node is None:
+                    # node is not in cached list (or the list is empty), check the clouddriver
                     node = driver.get_by_ip(ip)
                 if node is None: #pragma: no cover
                     # apart from IPs, we will also get hostnames here
                     # for those, debug, otherwise info
                     try:
+                        # validate that this is an IP or not
                         ipaddress.ip_address(ip)
-                        self.logger.info("Couldn't match IP to cloud node: %s" %(ip))
+                        self.logger.info("Couldn't match IP to cloud node: %s", ip)
                     except:
-                        self.logger.debug("Couldn't match to cloud node: %s" %(ip))
+                        self.logger.debug("Couldn't match to cloud node: %s", ip)
                     continue
 
                 self.nodes_by_id[node.id] = node
@@ -126,6 +130,8 @@ class NodeInventory():
                 self.groups[group].append(node)
                 node.groups.append(group)
                 self.azs.add(node.az)
+
+                self.logger.debug("Node added: %s", node)
 
                 # just for easier identification, give them numbers
                 node.no = counter

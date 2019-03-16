@@ -10,7 +10,7 @@ def create_connection_from_config():
     return conn
 
 def get_all_ips(instance):
-    """ Returns the private and public ip address of an AWS EC2 instances
+    """ Returns the public and private ip addresses of an AWS EC2 instances
     """
     output = []
     output.append(instance.private_ip_address)
@@ -27,12 +27,13 @@ MAPPING_STATES_STATUS = {
 def server_status_to_state(status):
     return MAPPING_STATES_STATUS.get(status['Name'].upper(), NodeState.UNKNOWN)
 
-def create_node_from_server(server, ip):
+def create_node_from_server(server):
     """ Translate AWS EC2 Instance representation into a Node object.
     """
     return Node(
         id=server.id,
-        ip=ip,
+        ip=server.private_ip_address,
+        extIp=server.public_ip_address,
         az=server.placement['AvailabilityZone'],
         name="",
         state=server_status_to_state(server.state),
@@ -52,9 +53,6 @@ class AWSDriver(AbstractDriver):
         """ Downloads a fresh set of nodes form the API.
         """
         self.logger.info("Synchronizing remote nodes")
-        """ Downloads a fresh set of nodes form the API.
-        """
-        self.logger.info("Synchronizing remote nodes")
         self.remote_servers = self.conn.instances.all()
         self.amount_of_servers = list(self.conn.instances.all())
         self.logger.info("Fetched %s remote servers" % len(self.amount_of_servers))
@@ -65,11 +63,11 @@ class AWSDriver(AbstractDriver):
         for server in self.remote_servers:
             addresses = get_all_ips(server)
             if not addresses:
-                self.logger.warning("No addresses found: %s", server)
+                self.logger.warning("No ip addresses found: %s", server)
             else:
                 for addr in addresses:
                     if addr == ip:
-                        return create_node_from_server(server, ip)
+                        return create_node_from_server(server)
         return None
 
     def stop(self, node):

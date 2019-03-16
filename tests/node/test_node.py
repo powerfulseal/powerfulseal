@@ -21,8 +21,9 @@ EXAMPLE_NODE_ARGS = dict(
     id="someid",
     name="random_node",
     ip="198.198.1.1",
+    extIp="31.41.51.61",
     az="az1",
-    groups=["group1"],
+    groups=["group1","group2"],
     state=NodeState.UP,
 )
 

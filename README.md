@@ -65,6 +65,7 @@ usage: seal interactive [-h] --kubeconfig KUBECONFIG
                         [--remote-user REMOTE_USER]
                         [--ssh-allow-missing-host-keys]
                         [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                        [--use-private-ip]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -95,6 +96,7 @@ SSH settings:
                         Allow connection to hosts not present in known_hosts
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
+  --use-private-ip      Use the private IP of each node (vs public IP)
 ```
 
 
@@ -123,6 +125,7 @@ usage: seal autonomous [-h] --kubeconfig KUBECONFIG
                        [--remote-user REMOTE_USER]
                        [--ssh-allow-missing-host-keys]
                        [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                       [--use-private-ip]
                        --policy-file POLICY_FILE
                        [--stdout-collector | --prometheus-collector]
                        [--prometheus-host PROMETHEUS_HOST]
@@ -157,6 +160,7 @@ SSH settings:
                         Allow connection to hosts not present in known_hosts
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
+  --use-private-ip      Use the private IP of each node (vs public IP)
 
 Policy settings:
   --policy-file POLICY_FILE
@@ -259,6 +263,7 @@ usage: seal label [-h] --kubeconfig KUBECONFIG
                   (-i INVENTORY_FILE | --inventory-kubernetes)
                   [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
                   [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                  [--use-private-ip]
                   [--kubernetes-namespace KUBERNETES_NAMESPACE]
                   [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
                   [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
@@ -294,6 +299,7 @@ SSH settings:
                         Allow connection to hosts not present in known_hosts
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
+  --use-private-ip      Use the private IP of each node (vs public IP)
 
 Kubernetes options:
   --kubernetes-namespace KUBERNETES_NAMESPACE
@@ -336,6 +342,7 @@ usage: seal demo [-h] --kubeconfig KUBECONFIG
                  (-i INVENTORY_FILE | --inventory-kubernetes)
                  [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
                  [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
+                 [--use-private-ip]
                  [--kubernetes-namespace KUBERNETES_NAMESPACE]
                  [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
                  [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
@@ -372,6 +379,7 @@ SSH settings:
                         Allow connection to hosts not present in known_hosts
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
+  --use-private-ip      Use the private IP of each node (vs public IP)
 
 Kubernetes options:
   --kubernetes-namespace KUBERNETES_NAMESPACE

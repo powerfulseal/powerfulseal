@@ -63,11 +63,6 @@ def add_ssh_options(parser):
         help='Allow connection to hosts not present in known_hosts',
     )
     args_ssh.add_argument(
-        '--ssh-path-to-private-key',
-        default=os.environ.get("PS_PRIVATE_KEY"),
-        help='Path to ssh private key',
-    )
-    args_ssh.add_argument(
         '--override-ssh-host',
         help=(
             'If you\'d like to execute all commands on a different host '
@@ -79,6 +74,17 @@ def add_ssh_options(parser):
         default=False,
         action='store_true',
         help='Use the private IP of each node (vs public IP)',
+    )
+    ssh_options = args_ssh.add_mutually_exclusive_group()
+    ssh_options.add_argument(
+        '--ssh-path-to-private-key',
+        default=os.environ.get("PS_PRIVATE_KEY"),
+        help='Path to ssh private key',
+    )
+    ssh_options.add_argument(
+        '--ssh-password',
+        default=os.environ.get("PS_SSH_PASSWORD"),
+        help='ssh password',
     )
 
 def add_inventory_options(parser):
@@ -204,7 +210,6 @@ def check_valid_port(value):
     if parsed < min_port or parsed > max_port:
         raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
     return parsed
-
 
 
 def parse_args(args):
@@ -457,6 +462,7 @@ def main(argv):
         ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
         ssh_path_to_private_key=args.ssh_path_to_private_key,
         override_host=args.override_ssh_host,
+        ssh_password=args.ssh_password,
         use_private_ip=args.use_private_ip,
     )
     

@@ -475,6 +475,9 @@ def main(argv):
         while True:
             try:
                 cmd.cmdloop()
+            except GeneratorExit:
+                print("Exiting")
+                sys.exit(0)
             except KeyboardInterrupt:
                 print()
                 print("Ctrl-c again to quit")

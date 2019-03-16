@@ -51,10 +51,12 @@ def server_status_to_state(status):
 
 def create_node_from_server(server):
     """ Translate OpenStack server representation into a Node object.
+        Same IP for private (ip) and public IPs (extIp)
     """
     return Node(
         id=server.id,
         ip=get_all_ips(server)[-1],
+        extIp=get_all_ips(server)[-1],
         az=server.availability_zone,
         name=server.name,
         state=server_status_to_state(server.status),

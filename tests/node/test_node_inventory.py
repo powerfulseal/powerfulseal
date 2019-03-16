@@ -24,9 +24,9 @@ from powerfulseal.node import Node, NodeInventory
 @pytest.fixture
 def nodes():
     return [
-        Node(id="id1", ip="198.168.1.1", az="AZ1", no=1, name="node1"),
-        Node(id="id2", ip="198.168.2.1", az="AZ2", no=2, name="node2"),
-        Node(id="id3", ip="198.168.3.1", az="AZ2", no=3, name="node3"),
+        Node(id="id1", ip="198.168.1.1", extIp="10.22.66.1", az="AZ1", no=1, name="node1"),
+        Node(id="id2", ip="198.168.2.1", extIp="10.22.66.2", az="AZ2", no=2, name="node2"),
+        Node(id="id3", ip="198.168.3.1", extIp="10.22.66.3", az="AZ2", no=3, name="node3"),
     ]
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def mock_driver(nodes):
     mock.nodes = nodes
     def get_by_ip(ip):
         for node in mock.nodes:
-            if node.ip == ip:
+            if (node.ip == ip) or (node.extIp == ip):
                 return node
     mock.get_by_ip = get_by_ip
     return mock
@@ -63,6 +63,8 @@ def test_sync(nodes, mock_driver):
     ("id1", [0]),
     ("id2", [1]),
     ("198.168.1.1", [0]),
+    ("10.22.66.2", [1]),
+    ("10.22.66.4", []),
     ("AZ2", [1]),
     ("2", [1]),
     ("node2", [1]),

@@ -46,6 +46,7 @@ class NoCloudDriver(AbstractDriver):
         return Node(
             id="fake-{ip}".format(ip=ip),
             ip=ip,
+            extIp=ip,
             az="nope",
             name="local-{ip}".format(ip=ip),
             state=NodeState.UNKNOWN

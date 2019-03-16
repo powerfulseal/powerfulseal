@@ -24,7 +24,7 @@ class RemoteExecutor(object):
         Assumes password-less setup.
     """
 
-    PREFIX = ["bash", "-c"]
+    PREFIX = ["sh", "-c"]
 
     def __init__(self, nodes=None, user="cloud-user",
                  ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None,

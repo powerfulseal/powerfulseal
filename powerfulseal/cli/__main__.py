@@ -469,8 +469,9 @@ def main(argv):
         override_host=args.override_ssh_host,
         ssh_password=args.ssh_password,
         use_private_ip=args.use_private_ip,
+        ssh_kill_command=args.ssh_kill_command,
     )
-    
+
     ##########################################################################
     # INTERACTIVE MODE
     ##########################################################################

@@ -25,10 +25,12 @@ class RemoteExecutor(object):
     """
 
     PREFIX = ["sh", "-c"]
+    DEFAULT_KILL_COMMAND = "sudo docker kill -s {signal} {container_id}"
 
     def __init__(self, nodes=None, user="cloud-user",
                  ssh_allow_missing_host_keys=False, ssh_path_to_private_key=None,
-                 ssh_password=None, override_host=None, use_private_ip=False, logger=None):
+                 ssh_password=None, ssh_kill_command=None, override_host=None,
+                 use_private_ip=False, logger=None):
         self.nodes = nodes or []
         self.user = user
         self.missing_host_key = (spur.ssh.MissingHostKey.accept
@@ -36,6 +38,7 @@ class RemoteExecutor(object):
                                  else spur.ssh.MissingHostKey.raise_error)
         self.ssh_path_to_private_key = ssh_path_to_private_key
         self.ssh_password = ssh_password
+        self.ssh_kill_command = ssh_kill_command or self.DEFAULT_KILL_COMMAND
         self.override_host = override_host
         self.use_private_ip = use_private_ip
         self.logger = logger or logging.getLogger(__name__)

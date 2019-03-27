@@ -15,8 +15,6 @@ import logging
 import random
 import time
 
-from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE
-
 MIN_AGGRESSIVENESS = 1
 MAX_AGGRESSIVENESS = 5
 
@@ -83,7 +81,7 @@ class DemoRunner:
 
         # Format command
         container_id = random.choice(pod.container_ids)
-        cmd = POD_KILL_CMD_TEMPLATE.format(
+        cmd = self.executor.get_kill_command(
             signal="SIGTERM",
             container_id=container_id.replace("docker://", ""),
         )

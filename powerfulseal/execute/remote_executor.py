@@ -88,3 +88,7 @@ class RemoteExecutor(object):
                 }
                 self.logger.info("Executing '%s' on %s failed with error: %s" % (cmd_full, node.name, str(e)))
         return results
+
+    def get_kill_command(self, container_id, signal="SIGKILL"):
+        """ Produces a templated command to execute """
+        return self.ssh_kill_command.format(signal=str(signal), container_id=str(container_id))

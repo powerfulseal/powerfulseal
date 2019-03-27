@@ -44,6 +44,9 @@ class RemoteExecutor(object):
         self.logger = logger or logging.getLogger(__name__)
 
     def execute(self, cmd, nodes=None, use_private_ip=None, debug=False):
+        """
+            Executes an arbitrary command, prefixed with sh -c, on each node
+        """
         nodes = nodes or self.nodes
         use_private_ip = use_private_ip or self.use_private_ip
         results = dict()

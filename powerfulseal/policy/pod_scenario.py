@@ -19,8 +19,6 @@ import random
 from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .scenario import Scenario
 
-POD_KILL_CMD_TEMPLATE = "sudo docker kill -s {signal} {container_id}"
-
 
 class PodScenario(Scenario):
     """ Pod scenario handler.
@@ -34,7 +32,6 @@ class PodScenario(Scenario):
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor
-        self.cmd_template = POD_KILL_CMD_TEMPLATE
 
     def match(self):
         """ Makes a union of all the pods matching any of the policy criteria.
@@ -105,7 +102,7 @@ class PodScenario(Scenario):
         force = params.get("force", True)
         signal = "SIGKILL" if force else "SIGTERM"
         container_id = random.choice(item.container_ids)
-        cmd = self.cmd_template.format(
+        cmd = self.executor.get_kill_command(
             signal=signal,
             container_id=container_id.replace("docker://",""),
         )

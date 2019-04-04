@@ -86,6 +86,11 @@ def add_ssh_options(parser):
         default=os.environ.get("PS_SSH_PASSWORD"),
         help='ssh password',
     )
+    args_ssh.add_argument(
+        '--ssh-kill-command',
+        default=os.environ.get("PS_SSH_KILL_COMMAND", "sudo docker kill -s {signal} {container_id}"),
+        help='The command to execute on remote host to kill the {container_id}',
+    )
 
 def add_inventory_options(parser):
     # Inventory
@@ -464,8 +469,9 @@ def main(argv):
         override_host=args.override_ssh_host,
         ssh_password=args.ssh_password,
         use_private_ip=args.use_private_ip,
+        ssh_kill_command=args.ssh_kill_command,
     )
-    
+
     ##########################################################################
     # INTERACTIVE MODE
     ##########################################################################

@@ -434,9 +434,8 @@ class PSCmd(cmd.Cmd):
             return print("Node not found")
 
         # execute docker of the pod on the node
-        cmd_template = "sudo docker kill %s"
         for container_id in pod.container_ids:
-            cmd = cmd_template % container_id.replace("docker://","")
+            cmd = self.executor.get_kill_command(container_id.replace("docker://",""))
             ans = False
             while ans not in ("y", "n"):
                 print("Will execute '%s' on %s. Continue ? [y/n]: " % (cmd, node))

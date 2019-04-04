@@ -16,8 +16,6 @@ import random
 import time
 from datetime import datetime
 
-from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE
-
 
 class LabelRunner:
     """
@@ -82,7 +80,7 @@ class LabelRunner:
         # Format command
         signal = "SIGKILL" if pod.labels.get("seal/force-kill", "false") == "true" else "SIGTERM"
         container_id = random.choice(pod.container_ids)
-        cmd = POD_KILL_CMD_TEMPLATE.format(
+        cmd = self.executor.get_kill_command(
             signal=signal,
             container_id=container_id.replace("docker://", ""),
         )

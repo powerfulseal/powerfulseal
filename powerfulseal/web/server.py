@@ -25,7 +25,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.node_scenario import NodeScenario
-from powerfulseal.policy.pod_scenario import POD_KILL_CMD_TEMPLATE, PodScenario
+from powerfulseal.policy.pod_scenario import PodScenario
 from powerfulseal.web.formatter import PolicyFormatter
 
 # Flask instance and routes
@@ -420,7 +420,7 @@ class ServerState:
         # Format kill command
         signal = "SIGKILL" if is_forced else "SIGTERM"
         container_id = random.choice(pod.container_ids)
-        cmd = POD_KILL_CMD_TEMPLATE.format(
+        cmd = self.executor.get_kill_command(
             signal=signal,
             container_id=container_id.replace("docker://", ""),
         )

@@ -16,7 +16,7 @@ setup(
     long_description=read('README.md'),
     install_requires=[
         'ConfigArgParse>=0.11.0,<1',
-        'Flask>=0.12.2,<0.13',
+        'Flask>=1.0.0,<2',
         'termcolor>=1.1.0,<2',
         'openstacksdk>=0.10.0,<1',
         'spur>=0.3.20,<1',

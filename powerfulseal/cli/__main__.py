@@ -23,6 +23,7 @@ import textwrap
 import sys
 import os
 
+import powerfulseal.version
 from powerfulseal.k8s.heapster_client import HeapsterClient
 from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
@@ -239,6 +240,12 @@ def parse_args(args):
     parser.add_argument('-v', '--verbose',
         action='count',
         help='Verbose logging.'
+    )
+    parser.add_argument(
+        '-V', '--version',
+        action='version',
+        version='%(prog)s {version}'.format(version=powerfulseal.version.__version__),
+        help='Version.',
     )
     # subparsers
     subparsers = parser.add_subparsers(

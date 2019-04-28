@@ -245,7 +245,6 @@ def parse_args(args):
         action='version',
         version='%(prog)s {version}'.format(version=powerfulseal.version.__version__),
         help='Version.',
-        
     )
     
     # subparsers

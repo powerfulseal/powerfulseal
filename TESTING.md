@@ -11,7 +11,7 @@ The recommended installation steps are:
 1. Install pyenv using the [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout) method
 2. Run `pyenv install --list`
 3. For every version specified in `tox.ini`, find the latest patch version corresponding to the version (e.g., `2.7` -> `2.7.15`) and run `pyenv install [version]`
-4. In this project's root directory, run `pyenv local [versions]`, where `[versions]` is a space-separated list of every version you just installed (e.g., `pyenv install 2.7.15 3.4.8 3.6.5 3.7.0`)
+4. In this project's root directory, run `pyenv local [versions]`, where `[versions]` is a space-separated list of every version you just installed (e.g., `pyenv local 2.7.15 3.4.8 3.6.5 3.7.0`)
 5. Run `pyenv which 2.7`, `pyenv which 3.4`, etc. and ensure there are no errors and the output path is a `.pyenv` directory
 
 ## Usage

@@ -23,6 +23,7 @@ import textwrap
 import sys
 import os
 
+import powerfulseal.version
 from powerfulseal.k8s.heapster_client import HeapsterClient
 from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
@@ -36,7 +37,6 @@ from ..execute import RemoteExecutor
 from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
-
 
 def add_kubernetes_options(parser):
     # Kubernetes
@@ -240,6 +240,14 @@ def parse_args(args):
         action='count',
         help='Verbose logging.'
     )
+    parser.add_argument(
+        '-V', '--version',
+        action='version',
+        version='%(prog)s {version}'.format(version=powerfulseal.version.__version__),
+        help='Version.',
+        
+    )
+    
     # subparsers
     subparsers = parser.add_subparsers(
         title='MODES OF OPERATION',

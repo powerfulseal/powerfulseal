@@ -206,7 +206,7 @@ class PSCmd(cmd.Cmd):
             answer = None
             while answer not in ("yes", "no"):
                 sys.stdout.write("Proceed ? (yes|no): ")
-                answer = input()
+                answer = six.moves.input()
             if answer == "yes":
                 print("Deleting")
                 self.driver.delete(node)

@@ -494,7 +494,7 @@ def main(argv):
                 print()
                 print("Ctrl-c again to quit")
             try:
-                input()
+                six.moves.input()
             except KeyboardInterrupt:
                 sys.exit(0)
         return

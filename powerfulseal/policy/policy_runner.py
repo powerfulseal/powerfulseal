@@ -36,12 +36,12 @@ class PolicyRunner():
         """ Reads the schema from the file
         """
         data = pkgutil.get_data(__name__, "ps-schema.json")
-        return yaml.load(data)
+        return yaml.safe_load(data)
 
     @classmethod
     def load_file(cls, filename):
         with open(filename, "r") as f:
-            return yaml.load(f.read())
+            return yaml.safe_load(f.read())
 
     @classmethod
     def is_policy_valid(cls, policy, schema=None):

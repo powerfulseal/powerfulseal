@@ -94,6 +94,7 @@ class NodeInventory():
         """
             Update the nodes based on the values returned from the driver
         """
+        self.logger.info("Sync Nodes")
         driver = driver or self.driver
         driver.sync()
         counter = 0
@@ -120,9 +121,9 @@ class NodeInventory():
                     try:
                         # validate that this is an IP or not
                         ipaddress.ip_address(ip)
-                        self.logger.info("Couldn't match IP to cloud node: %s", ip)
+                        self.logger.debug("Couldn't match IP to any cloud node: %s", ip)
                     except:
-                        self.logger.debug("Couldn't match to cloud node: %s", ip)
+                        self.logger.debug("Couldn't match to any cloud node: %s", ip)
                     continue
 
                 self.nodes_by_id[node.id] = node

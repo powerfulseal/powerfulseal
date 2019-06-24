@@ -16,4 +16,5 @@
 from .driver import AbstractDriver
 from .open_stack_driver import OpenStackDriver
 from .aws_driver import AWSDriver
+from .azure_driver import AzureDriver
 from .no_cloud_driver import NoCloudDriver

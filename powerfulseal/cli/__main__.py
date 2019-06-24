@@ -32,7 +32,7 @@ from powerfulseal.policy.label_runner import LabelRunner
 from powerfulseal.web.server import ServerState, start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
-from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver
+from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver
 from ..execute import RemoteExecutor
 from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
@@ -122,6 +122,11 @@ def add_cloud_options(parser):
         action='store_true',
         help="use AWS cloud provider",
     )
+    cloud_options.add_argument('--azure',
+        default=os.environ.get("AZURE_CLOUD"),
+        action='store_true',
+        help="use Azure cloud provider",
+    )
     cloud_options.add_argument('--no-cloud',
         default=os.environ.get("NO_CLOUD"),
         action='store_true',
@@ -131,6 +136,14 @@ def add_cloud_options(parser):
     args.add_argument('--openstack-cloud-name',
         default=os.environ.get("OPENSTACK_CLOUD_NAME"),
         help="optional name of the open stack cloud from your config file to use",
+    )
+    args.add_argument('--azure-resource-group-name',
+        default=os.environ.get("AZURE_RESORUCE_GROUP_NAME"),
+        help="optional name of the Azure vm cluster resource group. Used to determine azure-node-resource-group-name.",
+    )
+    args.add_argument('--azure-node-resource-group-name',
+        default=os.environ.get("AZURE_NODE_RESORUCE_GROUP_NAME"),
+        help="name of the Azure vm cluster node resource group",
     )
 
 def add_namespace_options(parser):
@@ -440,6 +453,12 @@ def main(argv):
     elif args.aws:
         logger.info("Building AWS driver")
         driver = AWSDriver()
+    elif args.azure:
+        logger.info("Building Azure driver")
+        driver = AzureDriver(
+            cluster_rg_name=args.azure_resource_group_name,
+            cluster_node_rg_name=args.azure_node_resource_group_name,
+        )
     else:
         logger.info("No driver - some functionality disabled")
         driver = NoCloudDriver()

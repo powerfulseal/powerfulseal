@@ -31,7 +31,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 
 ## Highlights
 
-- works with `OpenStack`, `AWS` and local machines
+- works with `OpenStack`, `AWS`, `Azure`, and local machines
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
 - web interface to interact with PowerfulSeal
@@ -59,11 +59,14 @@ __PowerfulSeal__ works in several modes:
 ```sh
 $ seal interactive --help
 usage: seal interactive [-h] --kubeconfig KUBECONFIG
-                        (--openstack | --aws | --no-cloud)
+                        (--openstack | --aws | --azure | --no-cloud)
                         [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                        [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
+                        [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
                         (-i INVENTORY_FILE | --inventory-kubernetes)
                         [--remote-user REMOTE_USER]
                         [--ssh-allow-missing-host-keys]
+                        [--override-ssh-host OVERRIDE_SSH_HOST]
                         [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
                         [--ssh-password SSH_PASSWORD]
                         [--use-private-ip]
@@ -78,10 +81,18 @@ Kubernetes settings:
 Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
+  --azure               use Azure cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
                         file to use
+  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
+                        optional name of the Azure VM cluster resource group.
+                        Used to determine azure-node-resource-group-name if 
+                        that is not provided.  
+  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
+                        name of the Azure VM cluster node resource group
+                        Required when using Azure cloud provider.
 
 Inventory settings:
    -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -95,6 +106,10 @@ SSH settings:
                         the of the user for the ssh connections
   --ssh-allow-missing-host-keys
                         Allow connection to hosts not present in known_hosts
+  --override-ssh-host OVERRIDE_SSH_HOST
+                        If you'd like to execute all commands on a different
+                        host (for example for minikube) you can override it
+                        here
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
   --ssh-password SSH_PASSWORD
@@ -122,11 +137,14 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 ```sh
 $ seal autonomous --help
 usage: seal autonomous [-h] --kubeconfig KUBECONFIG
-                       (--openstack | --aws | --no-cloud)
+                       (--openstack | --aws | --azure | --no-cloud)
                        [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                       [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
+                       [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
                        (-i INVENTORY_FILE | --inventory-kubernetes)
                        [--remote-user REMOTE_USER]
                        [--ssh-allow-missing-host-keys]
+                       [--override-ssh-host OVERRIDE_SSH_HOST]
                        [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
                        [--ssh-password SSH_PASSWORD]
                        [--use-private-ip]
@@ -146,10 +164,18 @@ Kubernetes settings:
 Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
+  --azure               use Azure cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
                         file to use
+  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
+                        optional name of the Azure VM cluster resource group.
+                        Used to determine azure-node-resource-group-name if 
+                        that is not provided.  
+  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
+                        name of the Azure VM cluster node resource group
+                        Required when using Azure cloud provider.
 
 Inventory settings:
   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -162,6 +188,10 @@ SSH settings:
                         the of the user for the ssh connections
   --ssh-allow-missing-host-keys
                         Allow connection to hosts not present in known_hosts
+  --override-ssh-host OVERRIDE_SSH_HOST
+                        If you'd like to execute all commands on a different
+                        host (for example for minikube) you can override it
+                        here
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
   --ssh-password SSH_PASSWORD
@@ -264,10 +294,13 @@ Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 ```sh
 $ seal label --help
 usage: seal label [-h] --kubeconfig KUBECONFIG
-                  (--openstack | --aws | --no-cloud)
+                  (--openstack | --aws | --azure | --no-cloud)
                   [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                  [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
+                  [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
                   (-i INVENTORY_FILE | --inventory-kubernetes)
                   [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
+                  [--override-ssh-host OVERRIDE_SSH_HOST]
                   [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
                   [--ssh-password SSH_PASSWORD]
                   [--use-private-ip]
@@ -288,10 +321,18 @@ Kubernetes settings:
 Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
+  --azure               use Azure cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
                         file to use
+  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
+                        optional name of the Azure VM cluster resource group.
+                        Used to determine azure-node-resource-group-name if 
+                        that is not provided.  
+  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
+                        name of the Azure VM cluster node resource group
+                        Required when using Azure cloud provider.
 
 Inventory settings:
   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -304,6 +345,10 @@ SSH settings:
                         the of the user for the ssh connections
   --ssh-allow-missing-host-keys
                         Allow connection to hosts not present in known_hosts
+  --override-ssh-host OVERRIDE_SSH_HOST
+                        If you'd like to execute all commands on a different
+                        host (for example for minikube) you can override it
+                        here
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
   --ssh-password SSH_PASSWORD
@@ -346,10 +391,13 @@ Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run de
 ```sh
 $ seal demo --help
 usage: seal demo [-h] --kubeconfig KUBECONFIG
-                 (--openstack | --aws | --no-cloud)
+                 (--openstack | --aws | --azure | --no-cloud)
                  [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
+                 [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
+                 [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
                  (-i INVENTORY_FILE | --inventory-kubernetes)
                  [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
+                 [--override-ssh-host OVERRIDE_SSH_HOST]
                  [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
                  [--ssh-password SSH_PASSWORD]
                  [--use-private-ip]
@@ -371,10 +419,18 @@ Kubernetes settings:
 Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
+  --azure               use Azure cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
                         file to use
+  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
+                        optional name of the Azure VM cluster resource group.
+                        Used to determine azure-node-resource-group-name if 
+                        that is not provided.  
+  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
+                        name of the Azure VM cluster node resource group
+                        Required when using Azure cloud provider.
 
 Inventory settings:
   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -387,6 +443,10 @@ SSH settings:
                         the of the user for the ssh connections
   --ssh-allow-missing-host-keys
                         Allow connection to hosts not present in known_hosts
+  --override-ssh-host OVERRIDE_SSH_HOST
+                        If you'd like to execute all commands on a different
+                        host (for example for minikube) you can override it
+                        here
   --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
                         Path to ssh private key
   --ssh-password SSH_PASSWORD
@@ -528,6 +588,33 @@ myhost02
 myhost01
 myhost02
 ```
+
+## Cloud Provider Requirements
+
+### SSH
+
+In all cases, the SSH Keys must be set up for SSH Client access of the nodes.  
+
+### Azure
+
+The credentials to connect to Azure may be specified in one of two ways:
+
+1. Supply the full path to an Azure credentials file in the environment variable `AZURE_AUTH_LOCATION`.  
+This is the easiest method.  The credentials file can be generated via `az aks get-credentials -n <cluster name> -g <resouce group> -a -f <desitnation credentials file>`
+2. Supply the individual credentials in the environment variables: `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`
+
+### AWS
+
+The credentials to connect to AWS are specified the same as for the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+
+### OpenStack
+
+TBD
+
+### Bare Metal
+
+TBD
+
 
 ## Testing
 

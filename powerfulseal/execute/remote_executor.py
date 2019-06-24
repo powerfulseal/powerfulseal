@@ -78,8 +78,8 @@ class RemoteExecutor(object):
                     output = shell.run(cmd_full)
                     results[hostip] = {
                         "ret_code": output.return_code,
-                        "stdout": output.output.decode(),
-                        "stderr": output.stderr_output.decode(),
+                        "stdout": output.output.decode('utf-8'),
+                        "stderr": output.stderr_output.decode('utf-8'),
                     }
             except Exception as e:
                 results[hostip] = {

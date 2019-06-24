@@ -16,7 +16,7 @@ setup(
     long_description=read('README.md'),
     install_requires=[
         'ConfigArgParse>=0.11.0,<1',
-        'Flask>=0.12.2,<0.13',
+        'Flask>=1.0.0,<2',
         'termcolor>=1.1.0,<2',
         'openstacksdk>=0.10.0,<1',
         'spur>=0.3.20,<1',
@@ -26,7 +26,7 @@ setup(
         'boto3>=1.5.15,<2.0.0',
         'azure>=4.0.0,<5.0.0',
         'future>=0.16.0,<1',
-        'requests>=2.19.1,<3',
+        'requests>=2.21.0,<3',
         'prometheus_client>=0.3.0,<0.4.0',
         'flask-cors>=3.0.6,<4',
         'flask-swagger-ui>=3.18.0<4',

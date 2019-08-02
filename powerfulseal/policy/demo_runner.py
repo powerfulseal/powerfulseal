@@ -24,7 +24,7 @@ class DemoRunner:
     Kills pods based on CPU core usage and memory usage to demonstrate how chaos
     can be created by killing pods which are busy.
 
-    The CPU and memory information is retrieved from Heapster. Then, pods are
+    The CPU and memory information is retrieved from metrics-server. Then, pods are
     first sorted by their CPU usage and memory and killed based on filters.
 
     - Pods are first filtered based on what quintile they in: an aggressiveness of
@@ -101,7 +101,7 @@ class DemoRunner:
     def fill_metrics(self, pods):
         """
         Adds a metrics variable to each Pod variable in a list of pods. Retrieves
-        the metrics from Heapster.
+        the metrics from metrics-server.
         """
         metrics = self.metric_client.get_pod_metrics()
         filled_pods = []

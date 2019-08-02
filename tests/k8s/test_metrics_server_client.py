@@ -16,11 +16,11 @@ import json
 import mock
 import pytest
 
-from powerfulseal.k8s.heapster_client import HeapsterClient
+from powerfulseal.k8s.metrics_server_client import MetricsServerClient
 
 
 def test_get_pod_metrics():
-    heapster = HeapsterClient(None)
+    metrics_server = MetricsServerClient(None)
 
     def mocked_response(*args):
         mocked = mock.MagicMock()
@@ -38,14 +38,14 @@ def test_get_pod_metrics():
         {
           "name": "container-1a",
           "usage": {
-            "cpu": "1m",
+            "cpu": "2000n",
             "memory": "68896Ki"
           }
         },
         {
           "name": "container-1b",
           "usage": {
-            "cpu": "1m",
+            "cpu": "300n",
             "memory": "2Ki"
           }
         }
@@ -60,7 +60,7 @@ def test_get_pod_metrics():
         {
           "name": "container-2a",
           "usage": {
-            "cpu": "3m",
+            "cpu": "207691n",
             "memory": "36840Ki"
           }
         }
@@ -71,19 +71,19 @@ def test_get_pod_metrics():
           """)
         return mocked
 
-    with mock.patch('powerfulseal.k8s.heapster_client.requests.get',
+    with mock.patch('powerfulseal.k8s.metrics_server_client.requests.get',
                     side_effect=mocked_response):
-        result = heapster.get_pod_metrics()
+        result = metrics_server.get_pod_metrics()
         assert len(result) == 1 and 'default' in result
         assert len(result['default']) == 2
         assert result == {
             'default': {
                 'abc': {
-                    'cpu': 0.002,
+                    'cpu': 0.0000023,
                     'memory': 68898000
                 },
                 'def': {
-                    'cpu': 0.003,
+                    'cpu': 0.000207691,
                     'memory': 36840000
                 }
             }
@@ -91,29 +91,29 @@ def test_get_pod_metrics():
 
 
 def test_parse_cpu_string():
-    heapster = HeapsterClient(None)
-    assert heapster.parse_cpu_string('1') == pytest.approx(1)
-    assert heapster.parse_cpu_string('100') == pytest.approx(100)
-    assert heapster.parse_cpu_string('1m') == pytest.approx(0.001)
-    assert heapster.parse_cpu_string('10m') == pytest.approx(0.01)
+    metrics_server = MetricsServerClient(None)
+    assert metrics_server.parse_cpu_string('1') == pytest.approx(1)
+    assert metrics_server.parse_cpu_string('100') == pytest.approx(100)
+    assert metrics_server.parse_cpu_string('1n') == pytest.approx(0.000000001)
+    assert metrics_server.parse_cpu_string('10n') == pytest.approx(0.00000001)
 
 
 def test_parse_memory_string():
-    heapster = HeapsterClient(None)
-    assert heapster.parse_memory_string('68896') == 68896
-    assert heapster.parse_memory_string('68896Mi') == 68896000000
-    assert heapster.parse_memory_string('68896Ki') == 68896000
-    assert heapster.parse_memory_string('68Gi') == 68000000000
-    assert heapster.parse_memory_string('2Ti') == 2000000000000
-    assert heapster.parse_memory_string('1') == 1
-    assert heapster.parse_memory_string('0') == 0
-    assert heapster.parse_memory_string('16') == 16
+    metrics_server = MetricsServerClient(None)
+    assert metrics_server.parse_memory_string('68896') == 68896
+    assert metrics_server.parse_memory_string('68896Mi') == 68896000000
+    assert metrics_server.parse_memory_string('68896Ki') == 68896000
+    assert metrics_server.parse_memory_string('68Gi') == 68000000000
+    assert metrics_server.parse_memory_string('2Ti') == 2000000000000
+    assert metrics_server.parse_memory_string('1') == 1
+    assert metrics_server.parse_memory_string('0') == 0
+    assert metrics_server.parse_memory_string('16') == 16
 
     with pytest.raises(NotImplementedError) as _:
-        heapster.parse_memory_string('6889M')
+        metrics_server.parse_memory_string('6889N')
 
     with pytest.raises(ValueError) as _:
-        heapster.parse_memory_string('688M9')
+        metrics_server.parse_memory_string('688N9')
 
     with pytest.raises(KeyError) as _:
-        heapster.parse_memory_string('688Ei')
+        metrics_server.parse_memory_string('688Ei')

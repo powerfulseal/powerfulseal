@@ -1,7 +1,7 @@
 INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
 NPM_CALL ?= cd powerfulseal/web/ui && npm install && npm run build
 TOX_CALL ?= tox -r
-HEAPSTER_URL ?= http://heapster.kube-system.svc.kubernetes.cluster/
+METRICS_SERVER_URL ?= http://metrics-server.kube-system.svc.kubernetes.cluster/
 CLOUD_OPTION ?= --openstack
 
 test:
@@ -18,6 +18,10 @@ upload:
 	rm -rfv powerfulseal.egg-info
 	python setup.py sdist
 	twine upload dist/*
+
+clean:
+	find -name '*.pyc' -delete
+	find -name '__pycache__' -delete
 
 
 # EXAMPLES OF RUNNING THE SEAL
@@ -89,7 +93,7 @@ demo:
 			--prometheus-host 0.0.0.0 \
 			--prometheus-port 9999 \
 			--ssh-allow-missing-host-keys \
-			--heapster-path $(HEAPSTER_URL)
+			--metrics-server-path $(METRICS_SERVER_URL)
 
 
 # THE EXAMPLES BELOW SHOULD WORK FOR MINIKUBE
@@ -138,4 +142,4 @@ minikube-interactive:
 			--override-ssh-host `minikube ip`
 
 
-.PHONY: test watch web run run-headless validate label demo
+.PHONY: test watch web run run-headless validate label demo clean

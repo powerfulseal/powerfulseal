@@ -20,17 +20,17 @@ try:
 except ImportError:
     JSONDecodeError = ValueError
 
-POD_METRICS_PATH = "/apis/metrics/v1alpha1/pods"
+POD_METRICS_PATH = "/apis/metrics.k8s.io/v1beta1/pods"
 
-# Value is a fraction of a single CPU core (e.g., 1m = 1 / 1000 => 0.001)
-CPU_UNITS = {'m': 1000}
+# Value is a fraction of a single CPU core (e.g., 1n = 1 / 1000000000 => 0.000000001)
+CPU_UNITS = {'n': 1000000000}
 # Value is a multiple of a byte (e.g., 1Ki => 1000)
 MEMORY_UNITS = {'Ki': 1000, 'Mi': 1000000, 'Gi': 1000000000, 'Ti': 1000000000000, 'Pi': 1000000000000000}
 
 
-class HeapsterClient:
+class MetricsServerClient:
     """
-    Retrieves CPU and memory metrics from Heapster
+    Retrieves CPU and memory metrics from metrics-server
     """
 
     def __init__(self, base_path, logger=None):
@@ -69,8 +69,9 @@ class HeapsterClient:
 
     def parse_cpu_string(self, cpu):
         """
-        Returns CPU in number of cores (e.g., "120m" => 0.12)
+        Returns CPU in number of cores (e.g., "120n" => 0.0000012)
         """
+        print(cpu)
         if len(cpu) < 2 or is_numeric(cpu[-1]):
             return float(cpu)
 
@@ -93,7 +94,7 @@ class HeapsterClient:
             raise ValueError("Memory is malformed")
         elif is_penultimate_numeric and not is_last_numeric:
             # Unimplemented case of single-character suffixes (it is unknown
-            # whether Heapster implements this). Currently, memory is handled
+            # whether metric-server implements this). Currently, memory is handled
             # with power-of-two suffixes (e.g., Ki, Mi, etc.)
             raise NotImplementedError("Single character units are not implemented")
         else:

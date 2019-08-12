@@ -32,7 +32,7 @@ def get_all_ips(instance):
     try:
         ip_list.append(instance["networkInterfaces"][0]
                        ["accessConfigs"][0]["natIP"])  # Public
-    except ValueError:
+    except Exception as e:
         pass
 
     ip_list.append(instance["networkInterfaces"][0]["networkIP"])  # Private
@@ -58,7 +58,7 @@ def create_node_from_server(server):
     # temporal workaround
     try:
         public_ip = server["networkInterfaces"][0]["accessConfigs"][0]["natIP"]
-    except ValueError:
+    except Exception as e:
         public_ip = 'None'
 
     return Node(

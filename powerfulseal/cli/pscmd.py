@@ -40,6 +40,11 @@ DEFAULT_COLOR_KEYWORDS = {
     "pod": "blue",
     "ip": "yellow",
     "extIp": "yellow",
+    "Running": "green",
+    "Succeeded": "green",
+    "Pending": "grey",
+    "Failed": "red",
+    "Unknown": "red"
 }
 # couple of helpers
 def colour_output(output, extras=None):
@@ -427,6 +432,8 @@ class PSCmd(cmd.Cmd):
                 break
         if pod is None:
             return print("Pod number not found.")
+        if pod.state == 'Pending':
+            return print("Can't kill pod on pending state")
 
         # find the node
         node = self.inventory.get_node_by_ip(pod.host_ip)

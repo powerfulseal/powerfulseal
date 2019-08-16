@@ -24,7 +24,7 @@ import sys
 import os
 
 import powerfulseal.version
-from powerfulseal.k8s.heapster_client import HeapsterClient
+from powerfulseal.k8s.metrics_server_client import MetricsServerClient
 from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
@@ -358,7 +358,7 @@ def parse_args(args):
         help=(
             'Starts in demo mode. '
             'It reads Kubernetes pods in specified namespaces, and reads '
-            'HEAPSTER metrics to guess what\'s worth killing. '
+            'metrics-server metrics to guess what\'s worth killing. '
             'This is a DAEMONLESS mode of operation. '
         ),
     )
@@ -368,10 +368,10 @@ def parse_args(args):
     add_metrics_options(parser_demo)
 
     demo_options = parser_demo.add_argument_group(
-        title='Heapster settings'
+        title='metrics-server settings'
     )
-    demo_options.add_argument('--heapster-path',
-        help='Base path of Heapster without trailing slash',
+    demo_options.add_argument('--metrics-server-path',
+        help='Base path of metrics-server without trailing slash',
         required=True
     )
     demo_options.add_argument('--aggressiveness',
@@ -620,13 +620,13 @@ def main(argv):
             print("Aggressiveness must be between 1 and 5 inclusive")
             os.exit(1)
 
-        heapster_client = HeapsterClient(args.heapster_path)
+        metrics_server_client = MetricsServerClient(args.metrics_server_path)
         demo_runner = DemoRunner(
             inventory,
             k8s_inventory,
             driver,
             executor,
-            heapster_client,
+            metrics_server_client,
             aggressiveness=aggressiveness,
             min_seconds_between_runs=args.min_seconds_between_runs,
             max_seconds_between_runs=args.max_seconds_between_runs,

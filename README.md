@@ -50,7 +50,7 @@ __PowerfulSeal__ works in several modes:
 
 - __Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
 
-- __Demo__ mode allows you to point the Seal at a cluster and a `heapster` server and let it try to figure out what to kill based on the resource utilization.
+- __Demo__ mode allows you to point the Seal at a cluster and a `metrics-server` server and let it try to figure out what to kill, based on the resource utilization.
 
 ## Modes of operation
 
@@ -401,7 +401,7 @@ Prometheus settings:
 
 The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
 
-Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run demo mode, use the `demo` subcommand along with `--heapster-path` (path to heapster without a trailing slash, e.g., `http://localhost:8001/api/v1/namespaces-kube-system/services/heapster/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
+Demo mode requires [metrics-server](https://github.com/kubernetes-incubator/metrics-server). To run demo mode, use the `demo` subcommand along with `--metrics-server-path` (path to metrics-server without a trailing slash, e.g., `http://localhost:8080/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
 
 ```sh
 $ seal demo --help
@@ -422,8 +422,8 @@ usage: seal demo [-h] --kubeconfig KUBECONFIG
                  [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
                  [--stdout-collector | --prometheus-collector]
                  [--prometheus-host PROMETHEUS_HOST]
-                 [--prometheus-port PROMETHEUS_PORT] --heapster-path
-                 HEAPSTER_PATH [--aggressiveness AGGRESSIVENESS]
+                 [--prometheus-port PROMETHEUS_PORT] --metrics-server-path
+                 METRICS_SERVER_PATH [--aggressiveness AGGRESSIVENESS]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -498,9 +498,9 @@ Prometheus settings:
                         Port to expose Prometheus metrics via the HTTP server
                         when using the --prometheus-collector flag
 
-Heapster settings:
-  --heapster-path HEAPSTER_PATH
-                        Base path of Heapster without trailing slash
+metrics-server settings:
+  --metrics-server-path METRICS_SERVER_PATH
+                        Base path of metrics-server without trailing slash
   --aggressiveness AGGRESSIVENESS
                         Aggressiveness of demo mode (default: 3)
 ```

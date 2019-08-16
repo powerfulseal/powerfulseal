@@ -31,7 +31,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 
 ## Highlights
 
-- works with `OpenStack`, `AWS`, `Azure`, and local machines
+- works with `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
 - web interface to interact with PowerfulSeal
@@ -50,7 +50,7 @@ __PowerfulSeal__ works in several modes:
 
 - __Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
 
-- __Demo__ mode allows you to point the Seal at a cluster and a `heapster` server and let it try to figure out what to kill based on the resource utilisation.
+- __Demo__ mode allows you to point the Seal at a cluster and a `heapster` server and let it try to figure out what to kill based on the resource utilization.
 
 ## Modes of operation
 
@@ -59,10 +59,11 @@ __PowerfulSeal__ works in several modes:
 ```sh
 $ seal interactive --help
 usage: seal interactive [-h] --kubeconfig KUBECONFIG
-                        (--openstack | --aws | --azure | --no-cloud)
+                        (--openstack | --aws | --azure | --gcp |--no-cloud)
                         [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
                         [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
                         [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
+                        [--gcp-config-file GCP_CONFIG_FILE]
                         (-i INVENTORY_FILE | --inventory-kubernetes)
                         [--remote-user REMOTE_USER]
                         [--ssh-allow-missing-host-keys]
@@ -82,6 +83,7 @@ Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
   --azure               use Azure cloud provider
+  --gcp                 use GCP cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
@@ -93,6 +95,9 @@ Cloud settings:
   --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
                         name of the Azure VM cluster node resource group
                         Required when using Azure cloud provider.
+  --gcp-config-file GCP_CONFIG_FILE
+                        name of the gcloud config file (in json) to use
+                        instead of the default one
 
 Inventory settings:
    -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -137,10 +142,11 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 ```sh
 $ seal autonomous --help
 usage: seal autonomous [-h] --kubeconfig KUBECONFIG
-                       (--openstack | --aws | --azure | --no-cloud)
+                       (--openstack | --aws | --azure | --gcp |--no-cloud)
                        [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
                        [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
                        [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
+                       [--gcp-config-file GCP_CONFIG_FILE]
                        (-i INVENTORY_FILE | --inventory-kubernetes)
                        [--remote-user REMOTE_USER]
                        [--ssh-allow-missing-host-keys]
@@ -165,6 +171,7 @@ Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
   --azure               use Azure cloud provider
+  --gcp                 use GCP cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
@@ -176,6 +183,9 @@ Cloud settings:
   --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
                         name of the Azure VM cluster node resource group
                         Required when using Azure cloud provider.
+  --gcp-config-file GCP_CONFIG_FILE
+                        name of the gcloud config file (in json) to use
+                        instead of the default one
 
 Inventory settings:
   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -294,10 +304,11 @@ Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 ```sh
 $ seal label --help
 usage: seal label [-h] --kubeconfig KUBECONFIG
-                  (--openstack | --aws | --azure | --no-cloud)
+                  (--openstack | --aws | --azure | --gcp |--no-cloud)
                   [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
                   [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
                   [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
+                  [--gcp-config-file GCP_CONFIG_FILE]
                   (-i INVENTORY_FILE | --inventory-kubernetes)
                   [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
                   [--override-ssh-host OVERRIDE_SSH_HOST]
@@ -322,6 +333,7 @@ Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
   --azure               use Azure cloud provider
+  --gcp                 use GCP cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
@@ -333,6 +345,9 @@ Cloud settings:
   --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
                         name of the Azure VM cluster node resource group
                         Required when using Azure cloud provider.
+  --gcp-config-file GCP_CONFIG_FILE
+                        name of the gcloud config file (in json) to use
+                        instead of the default one
 
 Inventory settings:
   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -391,10 +406,11 @@ Demo mode requires [Heapster](https://github.com/kubernetes/heapster). To run de
 ```sh
 $ seal demo --help
 usage: seal demo [-h] --kubeconfig KUBECONFIG
-                 (--openstack | --aws | --azure | --no-cloud)
+                 (--openstack | --aws | --azure | --gcp |--no-cloud)
                  [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
                  [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
                  [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
+                 [--gcp-config-file GCP_CONFIG_FILE]
                  (-i INVENTORY_FILE | --inventory-kubernetes)
                  [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
                  [--override-ssh-host OVERRIDE_SSH_HOST]
@@ -420,6 +436,7 @@ Cloud settings:
   --openstack           use OpenStack cloud provider
   --aws                 use AWS cloud provider
   --azure               use Azure cloud provider
+  --gcp                 use GCP cloud provider
   --no-cloud            don't use cloud provider
   --openstack-cloud-name OPENSTACK_CLOUD_NAME
                         optional name of the open stack cloud from your config
@@ -431,6 +448,9 @@ Cloud settings:
   --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
                         name of the Azure VM cluster node resource group
                         Required when using Azure cloud provider.
+  --gcp-config-file GCP_CONFIG_FILE
+                        name of the gcloud config file (in json) to use
+                        instead of the default one
 
 Inventory settings:
   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
@@ -595,12 +615,15 @@ myhost02
 
 In all cases, the SSH Keys must be set up for SSH Client access of the nodes.  
 
+> Note: With GCP, running ```gcloud compute config-ssh``` makes SSHing to node instances easier by adding an alias for each instance to the user SSH configuration (~/.ssh/config) file and then being able to use the generated file with ```--ssh-path-to-private-key``` argument.
+
+
 ### Azure
 
 The credentials to connect to Azure may be specified in one of two ways:
 
 1. Supply the full path to an Azure credentials file in the environment variable `AZURE_AUTH_LOCATION`.  
-This is the easiest method.  The credentials file can be generated via `az aks get-credentials -n <cluster name> -g <resouce group> -a -f <desitnation credentials file>`
+This is the easiest method.  The credentials file can be generated via `az aks get-credentials -n <cluster name> -g <resource group> -a -f <destination credentials file>`
 2. Supply the individual credentials in the environment variables: `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`
 
 ### AWS
@@ -614,6 +637,23 @@ TBD
 ### Bare Metal
 
 TBD
+
+### GCP
+>Google Cloud SDK and kubectl are required
+
+The GCP cloud driver supports managed (GKE) and custom Kubernetes clusters running on top of Google Cloud Compute.
+
+For setting up ```PowerfulSeal```, the first step is configuring gcloud SDK (as ```PowerfulSeal``` will work with your configured [project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) and [region](https://cloud.google.com/compute/docs/regions-zones/changing-default-zone-region)) and pointing kubectl to your cluster. Both can be configured easily following [this](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl) tutorial (For GKE!). In case you don't want to use the default project/region of gcloud SDK, you can point ```PowerfulSeal``` to the correct one (in json) with ```--gcp-config-file``` argument.
+
+For being able to run node related commands, credentials have to be specified in one of these [ways](https://cloud.google.com/docs/authentication/):
+
+1. Service account (Recommended): a Google account that is associated with your GCP project, as opposed to a specific user. ```PowerfulSeal``` uses the environment variable and is pretty straightforward to set up using [this](https://cloud.google.com/docs/authentication/getting-started) tutorial.
+2. User account: Not recommended as you can reach easily reach a "quota exceeded" or "API not enabled" error. ```PowerfulSeal``` uses auto-discovery and to get it working just follow [this](https://cloud.google.com/docs/authentication/end-user).
+
+Having configuration ready and ssh connection to the node instances working, you can start playing with ```PowerfulSeal``` with this example:
+```powerfulseal interactive --kubeconfig ~/.kube/config --gcp --inventory-kubernetes --ssh-allow-missing-host-keys --ssh-path-to-private-key ~/.ssh/google_compute_engine --remote-user myuser```
+
+> Note: In case of running inside Pyenv and getting ```python2 command not found``` error when running gcloud (and you want to run ```PowerfulSeal``` with Python 3+), [this](https://github.com/pyenv/pyenv/issues/1159#issuecomment-453906182) might be useful, as gcloud requires Python2.
 
 
 ## Testing

@@ -295,13 +295,13 @@ The credentials to connect to AWS are specified the same as for the [AWS CLI](ht
 
 ### OpenStack
 
-TBD
+The easiest way to use PowerfulSeal, is to download and source the OpenRC file you can get from Horizon. It should ask you for your password, and it should set all the `OS_*` variables for you. Alternatively, you can set them yourself.
 
-### Bare Metal
+Both approaches are detailed in [the official documentation](https://docs.openstack.org/mitaka/user-guide/common/cli_set_environment_variables_using_openstack_rc.html).
 
-TBD
 
 ### GCP
+
 >Google Cloud SDK and kubectl are required
 
 The GCP cloud driver supports managed (GKE) and custom Kubernetes clusters running on top of Google Cloud Compute.

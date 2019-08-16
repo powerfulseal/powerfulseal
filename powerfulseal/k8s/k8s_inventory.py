@@ -80,27 +80,29 @@ class K8sInventory():
             selector=selector,
             deployment_name=deployment_name,
         )
-        pod_objects = [
-            Pod(
-                num=i,
-                name=item.metadata.name,
-                namespace=item.metadata.namespace,
-                uid=item.metadata.uid,
-                host_ip=item.status.host_ip,
-                ip=item.status.pod_ip,
-                container_ids=[
-                    status.container_id
-                    for status in item.status.container_statuses
-                ] if item.status.container_statuses else [],
-                restart_count=sum([
-                    status.restart_count
-                    for status in item.status.container_statuses
-                ]),
-                state=item.status.phase,
-                labels=item.metadata.labels,
-                meta=item,
-            ) for i, item in enumerate(pods)
-        ] if pods else []
+        pod_objects = []
+        if pods is not None:
+            for i, item in enumerate(pods):
+                        container_ids = []
+                        restart_count = []
+                        if item.status.container_statuses:
+                            for status in item.status.container_statuses:
+                                container_ids.append(status.container_id)
+                                restart_count.append(status.restart_count)
+                        
+                        pod_objects.append(Pod(
+                            num=i,
+                            name=item.metadata.name,
+                            namespace=item.metadata.namespace,
+                            uid=item.metadata.uid,
+                            host_ip=item.status.host_ip,
+                            ip=item.status.pod_ip,
+                            container_ids=container_ids,
+                            restart_count=sum(restart_count),
+                            state=item.status.phase,
+                            labels=item.metadata.labels,
+                            meta=item,
+                        ))
         self.last_pods = pod_objects
         return pod_objects
 

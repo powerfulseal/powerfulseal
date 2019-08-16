@@ -32,7 +32,7 @@ from powerfulseal.policy.label_runner import LabelRunner
 from powerfulseal.web.server import ServerState, start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
-from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver
+from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver, GCPDriver
 from ..execute import RemoteExecutor
 from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
@@ -127,6 +127,11 @@ def add_cloud_options(parser):
         action='store_true',
         help="use Azure cloud provider",
     )
+    cloud_options.add_argument('--gcp',
+        default=os.environ.get("GCP_CLOUD"),
+        action='store_true',
+        help="use GCP cloud provider",
+    )
     cloud_options.add_argument('--no-cloud',
         default=os.environ.get("NO_CLOUD"),
         action='store_true',
@@ -144,6 +149,10 @@ def add_cloud_options(parser):
     args.add_argument('--azure-node-resource-group-name',
         default=os.environ.get("AZURE_NODE_RESORUCE_GROUP_NAME"),
         help="name of the Azure vm cluster node resource group",
+    )
+    args.add_argument('--gcp-config-file',
+        default=os.environ.get("GCP_CONFIG_FILE"),
+        help="name of the gcloud config file (in json) to use instead of the default one",
     )
 
 def add_namespace_options(parser):
@@ -459,6 +468,9 @@ def main(argv):
             cluster_rg_name=args.azure_resource_group_name,
             cluster_node_rg_name=args.azure_node_resource_group_name,
         )
+    elif args.gcp:
+        logger.info("Building GCP driver")
+        driver = GCPDriver(config=args.gcp_config_file)
     else:
         logger.info("No driver - some functionality disabled")
         driver = NoCloudDriver()

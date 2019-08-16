@@ -58,71 +58,9 @@ __PowerfulSeal__ works in several modes:
 
 ```sh
 $ seal interactive --help
-usage: seal interactive [-h] --kubeconfig KUBECONFIG
-                        (--openstack | --aws | --azure | --gcp |--no-cloud)
-                        [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
-                        [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
-                        [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
-                        [--gcp-config-file GCP_CONFIG_FILE]
-                        (-i INVENTORY_FILE | --inventory-kubernetes)
-                        [--remote-user REMOTE_USER]
-                        [--ssh-allow-missing-host-keys]
-                        [--override-ssh-host OVERRIDE_SSH_HOST]
-                        [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
-                        [--ssh-password SSH_PASSWORD]
-                        [--use-private-ip]
-
-optional arguments:
-  -h, --help            show this help message and exit
-
-Kubernetes settings:
-  --kubeconfig KUBECONFIG
-                        Location of kube-config file
-
-Cloud settings:
-  --openstack           use OpenStack cloud provider
-  --aws                 use AWS cloud provider
-  --azure               use Azure cloud provider
-  --gcp                 use GCP cloud provider
-  --no-cloud            don't use cloud provider
-  --openstack-cloud-name OPENSTACK_CLOUD_NAME
-                        optional name of the open stack cloud from your config
-                        file to use
-  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
-                        optional name of the Azure VM cluster resource group.
-                        Used to determine azure-node-resource-group-name if 
-                        that is not provided.  
-  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
-                        name of the Azure VM cluster node resource group
-                        Required when using Azure cloud provider.
-  --gcp-config-file GCP_CONFIG_FILE
-                        name of the gcloud config file (in json) to use
-                        instead of the default one
-
-Inventory settings:
-   -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
-                        the inventory file (in ini format) of groups of hosts
-                                                    to work with
-  --inventory-kubernetes
-                        reads all kubernetes cluster nodes as inventory
-
-SSH settings:
-  --remote-user REMOTE_USER
-                        the of the user for the ssh connections
-  --ssh-allow-missing-host-keys
-                        Allow connection to hosts not present in known_hosts
-  --override-ssh-host OVERRIDE_SSH_HOST
-                        If you'd like to execute all commands on a different
-                        host (for example for minikube) you can override it
-                        here
-  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
-                        Path to ssh private key
-  --ssh-password SSH_PASSWORD
-                        ssh password
-  --use-private-ip      Use the private IP of each node (vs public IP)
 ```
 
-
+Make sure you hit __<tab>__ for autocompletion - that's what makes really makes the seal easy to use.
 
 Here's a sneak peek of what you can do in the interactive mode:
 
@@ -141,114 +79,7 @@ Autonomous reads the scenarios to execute from the policy file, and runs them:
 
 ```sh
 $ seal autonomous --help
-usage: seal autonomous [-h] --kubeconfig KUBECONFIG
-                       (--openstack | --aws | --azure | --gcp |--no-cloud)
-                       [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
-                       [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
-                       [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
-                       [--gcp-config-file GCP_CONFIG_FILE]
-                       (-i INVENTORY_FILE | --inventory-kubernetes)
-                       [--remote-user REMOTE_USER]
-                       [--ssh-allow-missing-host-keys]
-                       [--override-ssh-host OVERRIDE_SSH_HOST]
-                       [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
-                       [--ssh-password SSH_PASSWORD]
-                       [--use-private-ip]
-                       --policy-file POLICY_FILE
-                       [--stdout-collector | --prometheus-collector]
-                       [--prometheus-host PROMETHEUS_HOST]
-                       [--prometheus-port PROMETHEUS_PORT] [--headless]
-                       [--host HOST] [--port PORT]
-
-optional arguments:
-  -h, --help            show this help message and exit
-
-Kubernetes settings:
-  --kubeconfig KUBECONFIG
-                        Location of kube-config file
-
-Cloud settings:
-  --openstack           use OpenStack cloud provider
-  --aws                 use AWS cloud provider
-  --azure               use Azure cloud provider
-  --gcp                 use GCP cloud provider
-  --no-cloud            don't use cloud provider
-  --openstack-cloud-name OPENSTACK_CLOUD_NAME
-                        optional name of the open stack cloud from your config
-                        file to use
-  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
-                        optional name of the Azure VM cluster resource group.
-                        Used to determine azure-node-resource-group-name if 
-                        that is not provided.  
-  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
-                        name of the Azure VM cluster node resource group
-                        Required when using Azure cloud provider.
-  --gcp-config-file GCP_CONFIG_FILE
-                        name of the gcloud config file (in json) to use
-                        instead of the default one
-
-Inventory settings:
-  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
-                        the inventory file of groups of hosts to work with
-  --inventory-kubernetes
-                        reads all kubernetes cluster nodes as inventory
-
-SSH settings:
-  --remote-user REMOTE_USER
-                        the of the user for the ssh connections
-  --ssh-allow-missing-host-keys
-                        Allow connection to hosts not present in known_hosts
-  --override-ssh-host OVERRIDE_SSH_HOST
-                        If you'd like to execute all commands on a different
-                        host (for example for minikube) you can override it
-                        here
-  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
-                        Path to ssh private key
-  --ssh-password SSH_PASSWORD
-                        ssh password
-  --use-private-ip      Use the private IP of each node (vs public IP)
-
-Policy settings:
-  --policy-file POLICY_FILE
-                        the policy file to run
-
-Metrics settings:
-  --stdout-collector    print metrics collected to stdout
-  --prometheus-collector
-                        store metrics in Prometheus and expose metrics over a
-                        HTTP server
-
-Prometheus settings:
-  --prometheus-host PROMETHEUS_HOST
-                        Host to expose Prometheus metrics via the HTTP server
-                        when using the --prometheus-collector flag
-  --prometheus-port PROMETHEUS_PORT
-                        Port to expose Prometheus metrics via the HTTP server
-                        when using the --prometheus-collector flag
-
-Web UI settings:
-  --headless            Doesn't start the UI, just runs the policy
-  --host HOST           Specify host for the PowerfulSeal web server
-  --port PORT           Specify port for the PowerfulSeal web server
 ```
-
-### Metrics collection
-
-Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
-
-### Web User Interface
-
-#### If you're not going to use the UI, use the flag `--headless` to disable it
-
-PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
-
-- starting/stopping autonomous mode
-- viewing and filtering logs
-- changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
-- stopping/killing individual nodes and pods
-
-
-![web interface](./media/web.png)
 
 ### Writing policies
 
@@ -293,107 +124,37 @@ A [full featured example](./tests/policy/example_config.yml) listing most of the
 
 The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json).
 
+
+### Metrics collection
+
+Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout` and Prometheus collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
+
+
+### Web User Interface
+
+:warning: If you're not going to use the UI, use the flag `--headless` to disable it
+
+PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
+
+- starting/stopping autonomous mode
+- viewing and filtering logs
+- changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
+- stopping/killing individual nodes and pods
+
+
+![web interface](./media/web.png)
+
+
 ## Label mode
 
 Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
 
 To mark a pod for attack, do `kubectl label pods my-app-1 seal/enabled=true`, and the `Seal` will start attacking it, but only during working hours (defaults).
 
-Instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
+Detailed instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
 
 ```sh
 $ seal label --help
-usage: seal label [-h] --kubeconfig KUBECONFIG
-                  (--openstack | --aws | --azure | --gcp |--no-cloud)
-                  [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
-                  [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
-                  [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
-                  [--gcp-config-file GCP_CONFIG_FILE]
-                  (-i INVENTORY_FILE | --inventory-kubernetes)
-                  [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
-                  [--override-ssh-host OVERRIDE_SSH_HOST]
-                  [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
-                  [--ssh-password SSH_PASSWORD]
-                  [--use-private-ip]
-                  [--kubernetes-namespace KUBERNETES_NAMESPACE]
-                  [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
-                  [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
-                  [--stdout-collector | --prometheus-collector]
-                  [--prometheus-host PROMETHEUS_HOST]
-                  [--prometheus-port PROMETHEUS_PORT]
-
-optional arguments:
-  -h, --help            show this help message and exit
-
-Kubernetes settings:
-  --kubeconfig KUBECONFIG
-                        Location of kube-config file
-
-Cloud settings:
-  --openstack           use OpenStack cloud provider
-  --aws                 use AWS cloud provider
-  --azure               use Azure cloud provider
-  --gcp                 use GCP cloud provider
-  --no-cloud            don't use cloud provider
-  --openstack-cloud-name OPENSTACK_CLOUD_NAME
-                        optional name of the open stack cloud from your config
-                        file to use
-  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
-                        optional name of the Azure VM cluster resource group.
-                        Used to determine azure-node-resource-group-name if 
-                        that is not provided.  
-  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
-                        name of the Azure VM cluster node resource group
-                        Required when using Azure cloud provider.
-  --gcp-config-file GCP_CONFIG_FILE
-                        name of the gcloud config file (in json) to use
-                        instead of the default one
-
-Inventory settings:
-  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
-                        the inventory file of groups of hosts to work with
-  --inventory-kubernetes
-                        reads all kubernetes cluster nodes as inventory
-
-SSH settings:
-  --remote-user REMOTE_USER
-                        the of the user for the ssh connections
-  --ssh-allow-missing-host-keys
-                        Allow connection to hosts not present in known_hosts
-  --override-ssh-host OVERRIDE_SSH_HOST
-                        If you'd like to execute all commands on a different
-                        host (for example for minikube) you can override it
-                        here
-  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
-                        Path to ssh private key
-  --ssh-password SSH_PASSWORD
-                        ssh password
-  --use-private-ip      Use the private IP of each node (vs public IP)
-
-Kubernetes options:
-  --kubernetes-namespace KUBERNETES_NAMESPACE
-                        Namespace to use for label and demo mode (set to blank
-                        for all namespaces)
-
-Policy settings:
-  --min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS
-                        Minimum number of seconds between runs
-  --max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS
-                        Maximum number of seconds between runs
-
-Metrics settings:
-  --stdout-collector    print metrics collected to stdout
-  --prometheus-collector
-                        store metrics in Prometheus and expose metrics over a
-                        HTTP server
-
-Prometheus settings:
-  --prometheus-host PROMETHEUS_HOST
-                        Host to expose Prometheus metrics via the HTTP server
-                        when using the --prometheus-collector flag
-  --prometheus-port PROMETHEUS_PORT
-                        Port to expose Prometheus metrics via the HTTP server
-                        when using the --prometheus-collector flag
 ```
 
 
@@ -405,104 +166,6 @@ Demo mode requires [metrics-server](https://github.com/kubernetes-incubator/metr
 
 ```sh
 $ seal demo --help
-usage: seal demo [-h] --kubeconfig KUBECONFIG
-                 (--openstack | --aws | --azure | --gcp |--no-cloud)
-                 [--openstack-cloud-name OPENSTACK_CLOUD_NAME]
-                 [--azure-resource-group-name AZURE_RESOURCE_GROUP_NAME]
-                 [--azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME]
-                 [--gcp-config-file GCP_CONFIG_FILE]
-                 (-i INVENTORY_FILE | --inventory-kubernetes)
-                 [--remote-user REMOTE_USER] [--ssh-allow-missing-host-keys]
-                 [--override-ssh-host OVERRIDE_SSH_HOST]
-                 [--ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY]
-                 [--ssh-password SSH_PASSWORD]
-                 [--use-private-ip]
-                 [--kubernetes-namespace KUBERNETES_NAMESPACE]
-                 [--min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS]
-                 [--max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS]
-                 [--stdout-collector | --prometheus-collector]
-                 [--prometheus-host PROMETHEUS_HOST]
-                 [--prometheus-port PROMETHEUS_PORT] --metrics-server-path
-                 METRICS_SERVER_PATH [--aggressiveness AGGRESSIVENESS]
-
-optional arguments:
-  -h, --help            show this help message and exit
-
-Kubernetes settings:
-  --kubeconfig KUBECONFIG
-                        Location of kube-config file
-
-Cloud settings:
-  --openstack           use OpenStack cloud provider
-  --aws                 use AWS cloud provider
-  --azure               use Azure cloud provider
-  --gcp                 use GCP cloud provider
-  --no-cloud            don't use cloud provider
-  --openstack-cloud-name OPENSTACK_CLOUD_NAME
-                        optional name of the open stack cloud from your config
-                        file to use
-  --azure-resource-group-name AZURE_RESOURCE_GROUP_NAME
-                        optional name of the Azure VM cluster resource group.
-                        Used to determine azure-node-resource-group-name if 
-                        that is not provided.  
-  --azure-node-resource-group-name AZURE_NODE_RESOURCE_GROUP_NAME
-                        name of the Azure VM cluster node resource group
-                        Required when using Azure cloud provider.
-  --gcp-config-file GCP_CONFIG_FILE
-                        name of the gcloud config file (in json) to use
-                        instead of the default one
-
-Inventory settings:
-  -i INVENTORY_FILE, --inventory-file INVENTORY_FILE
-                        the inventory file of groups of hosts to work with
-  --inventory-kubernetes
-                        reads all kubernetes cluster nodes as inventory
-
-SSH settings:
-  --remote-user REMOTE_USER
-                        the of the user for the ssh connections
-  --ssh-allow-missing-host-keys
-                        Allow connection to hosts not present in known_hosts
-  --override-ssh-host OVERRIDE_SSH_HOST
-                        If you'd like to execute all commands on a different
-                        host (for example for minikube) you can override it
-                        here
-  --ssh-path-to-private-key SSH_PATH_TO_PRIVATE_KEY
-                        Path to ssh private key
-  --ssh-password SSH_PASSWORD
-                        ssh password
-  --use-private-ip      Use the private IP of each node (vs public IP)
-
-Kubernetes options:
-  --kubernetes-namespace KUBERNETES_NAMESPACE
-                        Namespace to use for label and demo mode (set to blank
-                        for all namespaces)
-
-Policy settings:
-  --min-seconds-between-runs MIN_SECONDS_BETWEEN_RUNS
-                        Minimum number of seconds between runs
-  --max-seconds-between-runs MAX_SECONDS_BETWEEN_RUNS
-                        Maximum number of seconds between runs
-
-Metrics settings:
-  --stdout-collector    print metrics collected to stdout
-  --prometheus-collector
-                        store metrics in Prometheus and expose metrics over a
-                        HTTP server
-
-Prometheus settings:
-  --prometheus-host PROMETHEUS_HOST
-                        Host to expose Prometheus metrics via the HTTP server
-                        when using the --prometheus-collector flag
-  --prometheus-port PROMETHEUS_PORT
-                        Port to expose Prometheus metrics via the HTTP server
-                        when using the --prometheus-collector flag
-
-metrics-server settings:
-  --metrics-server-path METRICS_SERVER_PATH
-                        Base path of metrics-server without trailing slash
-  --aggressiveness AGGRESSIVENESS
-                        Aggressiveness of demo mode (default: 3)
 ```
 
 

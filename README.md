@@ -50,7 +50,7 @@ __PowerfulSeal__ works in several modes:
 
 - __Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
 
-- __Demo__ mode allows you to point the Seal at a cluster and a `metrics-server` server and let it try to figure out what to kill based on the resource utilization.
+- __Demo__ mode allows you to point the Seal at a cluster and a `metrics-server` server and let it try to figure out what to kill, based on the resource utilization.
 
 ## Modes of operation
 

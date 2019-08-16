@@ -60,7 +60,7 @@ __PowerfulSeal__ works in several modes:
 $ seal interactive --help
 ```
 
-Make sure you hit __<tab>__ for autocompletion - that's what makes really makes the seal easy to use.
+Make sure you hit __tab__ for autocompletion - that's what really makes the seal easy to use.
 
 Here's a sneak peek of what you can do in the interactive mode:
 
@@ -363,7 +363,7 @@ The Seal doesn't:
 
 We would love you to. In particular, it would be great to get help with:
 
-- get more [cloud drivers](./powerfulseal/clouddrivers/driver.py) (currently `OpenStack` and `AWS`)
+- get more [cloud drivers](./powerfulseal/clouddrivers/driver.py)
 - get more [awesome filters](./powerfulseal/policy/scenario.py)
 - <del>__get an amazing logo__</del>
 - make the PowerfulSeal more powerful

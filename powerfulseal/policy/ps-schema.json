@@ -36,8 +36,7 @@
                 "maxSecondsBetweenRuns": {
                     "type": "number"
                 }
-            },
-            "required": []
+            }
         },
 
         "nodeScenario": {

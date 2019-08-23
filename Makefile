@@ -155,3 +155,5 @@ minikube-interactive:
 			--remote-user docker \
 			--ssh-path-to-private-key `minikube ssh-key` \
 			--override-ssh-host `minikube ip`
+
+.PHONY: test watch web upload clean build tag push version autonomous autonomous-headless interactive validate label demo minikube-autonomous minikube-label minikube-interactive

@@ -1,4 +1,5 @@
 config:
+  loopsNumber: 1000
   minSecondsBetweenRuns: 77
   maxSecondsBetweenRuns: 100
 

@@ -40,11 +40,11 @@ def test_parses_a_whole_config_correctly(monkeypatch):
     k8s_inventory = MagicMock()
     driver = MagicMock()
     executor = MagicMock()
-    LOOPS = 1000
-    nodes, pods = PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor, loops=LOOPS)
+    LOOPS = policy.get("config").get("loopsNumber")
+    nodes, pods = PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
     assert sleep_mock.call_count == LOOPS
     for call in sleep_mock.call_args_list:
-        args, kwargs = call
+        args, _ = call
         assert 77 <= args[0] <= 100
     assert inventory.sync.call_count == LOOPS
     assert len(nodes) == 2

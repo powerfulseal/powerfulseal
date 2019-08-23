@@ -54,13 +54,14 @@ class PolicyRunner():
         return True
 
     @classmethod
-    def run(cls, policy, inventory, k8s_inventory, driver, executor, loops=None,
+    def run(cls, policy, inventory, k8s_inventory, driver, executor,
             metric_collector=None):
         """ Runs a policy forever
         """
         config = policy.get("config", {})
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
+        loops = int(config.get("loopsNumber", -1))
         node_scenarios = [
             NodeScenario(
                 name=item.get("name"),
@@ -83,7 +84,7 @@ class PolicyRunner():
             )
             for item in policy.get("podScenarios", [])
         ]
-        while loops is None or loops > 0:
+        for _ in range(0, loops):
             for scenario in node_scenarios:
                 scenario.execute()
             for scenario in pod_scenarios:
@@ -92,6 +93,4 @@ class PolicyRunner():
             logger.info("Sleeping for %s seconds", sleep_time)
             time.sleep(sleep_time)
             inventory.sync()
-            if loops is not None:
-                loops -= 1
         return node_scenarios, pod_scenarios

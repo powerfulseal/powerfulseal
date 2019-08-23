@@ -4,6 +4,10 @@ TOX_CALL ?= tox -r
 METRICS_SERVER_URL ?= http://metrics-server.kube-system.svc.kubernetes.cluster/
 CLOUD_OPTION ?= --openstack
 
+name ?= powerfulseal
+version ?= 2.4.0
+tag = $(name):$(version)
+
 test:
 	$(TOX_CALL)
 
@@ -23,9 +27,13 @@ clean:
 	find -name '*.pyc' -delete
 	find -name '__pycache__' -delete
 
+build:
+	docker build -t $(tag) -f ./build/Dockerfile .
+
+version:
+	@echo $(tag)
 
 # EXAMPLES OF RUNNING THE SEAL
-# THE EXAMPLES BELOW SHOULD WORK FOR CLOUD PROVIDERS
 autonomous:
 	seal \
 		-vv \
@@ -142,4 +150,4 @@ minikube-interactive:
 			--override-ssh-host `minikube ip`
 
 
-.PHONY: test watch web run run-headless validate label demo clean
+.PHONY: test watch web run build version run-headless validate label demo clean

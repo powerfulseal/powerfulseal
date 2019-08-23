@@ -5,6 +5,10 @@ python:
   - "3.5"
   - "3.6"
 
+# enable docker in Travis
+services:
+  - docker
+
 # command to install dependencies
 install:
   - pip install tox-travis
@@ -12,3 +16,7 @@ install:
 # command to run tests
 script:
   - tox
+  - docker --version
+  - make build
+  - docker images
+  - docker run `make version` --help

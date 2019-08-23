@@ -11,6 +11,6 @@ RUN apt-get update && \
 
 COPY Makefile LICENSE README.md setup.py /powerfulseal/
 COPY powerfulseal/ /powerfulseal/powerfulseal/
-RUN python -m pip --no-cache-dir install . && python -m pip list .
+RUN pip --no-cache-dir install . && pip list .
 
-ENTRYPOINT ["python", "-m", "powerfulseal.cli.__main__"]
+ENTRYPOINT ["powerfulseal"]

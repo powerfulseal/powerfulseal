@@ -7,6 +7,7 @@ CLOUD_OPTION ?= --openstack
 name ?= powerfulseal
 version ?= 2.4.0
 tag = $(name):$(version)
+namespace ?= "bloomberg/"
 
 test:
 	$(TOX_CALL)
@@ -29,6 +30,9 @@ clean:
 
 build:
 	docker build -t $(tag) -f ./build/Dockerfile .
+
+tag:
+	docker tag $(tag) $(namespace)$(tag)
 
 version:
 	@echo $(tag)
@@ -150,4 +154,4 @@ minikube-interactive:
 			--override-ssh-host `minikube ip`
 
 
-.PHONY: test watch web run build version run-headless validate label demo clean
+.PHONY: test watch web run build tag version run-headless validate label demo clean

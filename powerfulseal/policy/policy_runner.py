@@ -61,7 +61,7 @@ class PolicyRunner():
         config = policy.get("config", {})
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
-        loops = config.get("loopsNumber", -1)
+        loops = int(config.get("loopsNumber", -1))
         node_scenarios = [
             NodeScenario(
                 name=item.get("name"),

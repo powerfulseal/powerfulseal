@@ -34,6 +34,9 @@ build:
 tag:
 	docker tag $(tag) $(namespace)$(tag)
 
+push:
+	docker push $(namespace)$(tag)
+
 version:
 	@echo $(tag)
 
@@ -152,6 +155,3 @@ minikube-interactive:
 			--remote-user docker \
 			--ssh-path-to-private-key `minikube ssh-key` \
 			--override-ssh-host `minikube ip`
-
-
-.PHONY: test watch web run build tag version run-headless validate label demo clean

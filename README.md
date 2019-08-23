@@ -87,8 +87,7 @@ A minimal policy file, doing nothing, looks like this:
 
 ```yaml
 config:
-  minSecondsBetweenRuns: 77
-  maxSecondsBetweenRuns: 100
+  loopsNumber: 1 # will execute the provided scenarios once and then exit
 
 nodeScenarios: []
 

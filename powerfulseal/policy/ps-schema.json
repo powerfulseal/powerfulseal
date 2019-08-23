@@ -27,14 +27,16 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "loopsNumber": {
+                    "type": "number"
+                },
                 "minSecondsBetweenRuns": {
                     "type": "number"
                 },
                 "maxSecondsBetweenRuns": {
                     "type": "number"
                 }
-            },
-            "required": ["minSecondsBetweenRuns"]
+            }
         },
 
         "nodeScenario": {

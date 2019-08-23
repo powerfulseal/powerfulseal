@@ -87,8 +87,7 @@ A minimal policy file, doing nothing, looks like this:
 
 ```yaml
 config:
-  minSecondsBetweenRuns: 77
-  maxSecondsBetweenRuns: 100
+  loopsNumber: 1 # will execute the provided scenarios once and then exit
 
 nodeScenarios: []
 
@@ -99,6 +98,7 @@ A more interesting schema, that kills a random pod in `default` namespace every 
 
 ```yaml
 config:
+  # we don't set loopsNumber, so it will loop indefinitely
   minSecondsBetweenRuns: 1
   maxSecondsBetweenRuns: 30
 

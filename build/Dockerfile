@@ -9,7 +9,8 @@ RUN apt-get update && \
     apt-get autoclean && \
     apt-get autoremove
 
-COPY powerfulseal Makefile LICENSE README.md setup.py /powerfulseal/
+COPY Makefile LICENSE README.md setup.py /powerfulseal/
+COPY powerfulseal/ /powerfulseal/powerfulseal/
 RUN python -m pip --no-cache-dir install . && python -m pip list .
 
 ENTRYPOINT ["python", "-m", "powerfulseal.cli.__main__"]

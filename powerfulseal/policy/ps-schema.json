@@ -34,7 +34,7 @@
                     "type": "number"
                 }
             },
-            "required": ["minSecondsBetweenRuns"]
+            "required": []
         },
 
         "nodeScenario": {

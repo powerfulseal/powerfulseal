@@ -17,3 +17,4 @@
 from .collector import AbstractCollector
 from .stdout_collector import StdoutCollector
 from .prometheus_collector import PrometheusCollector
+from .datadog_collector import DatadogCollector

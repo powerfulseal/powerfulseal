@@ -36,7 +36,8 @@ setup(
         'google-api-python-client>=1.7.8',
         'google-auth>=1.6.2',
         'google-auth-httplib2>=0.0.3',
-        'oauth2client>=4.1.3'
+        'oauth2client>=4.1.3',
+        'datadog>=0.29.0,<1.0.0'
     ],
     extras_require={
         'testing': [

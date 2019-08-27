@@ -11,6 +11,7 @@ services:
 branches:
   only:
     - master
+    - /^\d+\.\d+\.\d+(-\S*)?$/
 
 # command to install dependencies
 install:

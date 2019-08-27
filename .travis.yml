@@ -1,9 +1,12 @@
 language: python
 python:
   - "2.7"
-  - "3.4"
-  - "3.5"
   - "3.6"
+#  - "3.7"
+
+# enable docker in Travis
+services:
+  - docker
 
 # command to install dependencies
 install:
@@ -12,3 +15,7 @@ install:
 # command to run tests
 script:
   - tox
+  - docker --version
+  - make build
+  - docker images
+  - docker run `make version` --help

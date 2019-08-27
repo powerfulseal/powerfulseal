@@ -23,6 +23,9 @@ LABEL MAINTAINER="Mikolaj Pawlikowski <opensource@bloomberg.net>"
 
 # copy over the site-packages from builder
 COPY --from=builder /usr/local/lib/python3.7/site-packages /usr/local/lib/python3.7/site-packages
+# also copy over the executable helpers
+COPY --from=builder /usr/local/bin/powerfulseal /usr/local/bin/seal /usr/local/bin/
+# list the installed packages and their versions
 RUN pip list
 
 ENTRYPOINT ["powerfulseal"]

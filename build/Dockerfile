@@ -1,5 +1,5 @@
 FROM python:3.7-slim-buster
-LABEL MAINTAINER="Mikolaj Pawlikowski <mikolaj@pawlikowski.pl>"
+LABEL MAINTAINER="Mikolaj Pawlikowski <opensource@bloomberg.net>"
 
 WORKDIR /powerfulseal
 

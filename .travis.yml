@@ -7,6 +7,10 @@ python:
 # enable docker in Travis
 services:
   - docker
+  
+branches:
+  only:
+    - master
 
 # command to install dependencies
 install:
@@ -19,3 +23,12 @@ script:
   - make build
   - docker images
   - docker run `make version` --help
+
+# push an image on tags
+deploy:
+  provider: script
+  script: bash docker_deploy.sh
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: -n "$DOCKER_PASSWORD"

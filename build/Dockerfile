@@ -14,7 +14,7 @@ COPY Makefile LICENSE README.md setup.py /powerfulseal/
 COPY powerfulseal/ /powerfulseal/powerfulseal/
 
 # install it with pip
-RUN pip --no-cache-dir install . && pip list .
+RUN python setup.py sdist && pip install ./dist/* && pip list .
 
 
 # the actual image we will be pushing up

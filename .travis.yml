@@ -25,7 +25,7 @@ script:
   - docker images
   - docker run `make version` --help
 
-# push an image on tags
+# push images to DockerHub on tags
 deploy:
   provider: script
   script: bash docker_deploy.sh
@@ -33,3 +33,13 @@ deploy:
   on:
     tags: true
     condition: -n "$DOCKER_PASSWORD"
+
+# push packages to PyPI on tags
+deploy:
+  provider: pypi
+  user: "$PYPI_USER"
+  password: "$PYPI_PASSWORD"
+  skip_cleanup: true
+  on:
+    tags: true
+    condition: -n "$PYPI_PASSWORD"

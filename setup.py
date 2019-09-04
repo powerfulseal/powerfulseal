@@ -14,6 +14,7 @@ setup(
     license=read('LICENSE'),
     description='PowerfulSeal - a powerful testing tool for Kubernetes clusters',
     long_description=read('README.md'),
+    long_description_content_type="text/markdown",
     install_requires=[
         'ConfigArgParse>=0.11.0,<1',
         'Flask>=1.0.0,<2',

@@ -37,6 +37,7 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      python: "3.6"
       condition: -n "$DOCKER_PASSWORD"
   - provider: pypi
     user: "$PYPI_USER"
@@ -44,4 +45,5 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+      python: "3.6"
       condition: -n "$PYPI_PASSWORD"

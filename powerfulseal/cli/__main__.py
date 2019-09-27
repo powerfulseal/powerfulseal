@@ -49,6 +49,18 @@ def parse_kubeconfig(args):
     """
     logger = logging.getLogger(__name__)
     kube_config = None
+    expanded_home_kube_config_path = os.path.expanduser(KUBECONFIG_DEFAULT_PATH)
+    if args.kubeconfig:
+        kube_config = args.kubeconfig
+        logger.info("Creating kubernetes client with config %s from --kubeconfig flag", kube_config)
+    elif os.environ.get("KUBECONFIG"):
+        kube_config = os.path.expanduser(os.environ.get("KUBECONFIG"))
+        logger.info("Creating kubernetes client with config %s from KUBECONFIG env var", kube_config)
+    elif os.path.exists(expanded_home_kube_config_path):
+        kube_config = expanded_home_kube_config_path
+        logger.info("Creating kubernetes client with config %s (path found for backwards compatibility)", kube_config)
+    else:
+        logger.info("Creating kubernetes client with in-cluster config")
     return kube_config
 
 def add_kubernetes_options(parser):

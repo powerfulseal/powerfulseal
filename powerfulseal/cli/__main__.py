@@ -45,10 +45,8 @@ def add_kubernetes_options(parser):
     args_kubernetes.add_argument(
         '--kubeconfig',
         help='Location of kube-config file',
-        default=os.environ.get('KUBECONFIG', '~/.kube/config'),
-        type=os.path.expanduser,
+        type=os.path.expanduser
     )
-
 def add_ssh_options(parser):
     # SSH
     args_ssh = parser.add_argument_group('SSH settings')

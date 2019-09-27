@@ -67,6 +67,7 @@ EXAMPLE_POD_SCHEMA = {
 def pod_scenario():
     inventory = MagicMock()
     k8s_inventory = MagicMock()
+    k8s_inventory.delete_pods = False
     executor = RemoteExecutor()
     return PodScenario(
         name="test scenario",

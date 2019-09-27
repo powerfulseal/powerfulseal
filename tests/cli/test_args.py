@@ -32,7 +32,7 @@ def test_kubeconfig_default():
         '--inventory-kubernetes',
         '--no-cloud'
     ])
-    assert parser.kubeconfig == HOME + '/.kube/config'
+    assert parser.kubeconfig is None
 
 
 def test_interactive_mode_integration():

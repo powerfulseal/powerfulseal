@@ -27,6 +27,8 @@ class K8sClient():
     def __init__(self, kube_config=None, logger=None):
         if kube_config:
             kubernetes.config.load_kube_config(config_file=kube_config)
+        else:
+            kubernetes.config.load_incluster_config()
         self.client_corev1api = kubernetes.client.CoreV1Api()
         self.client_extensionsv1beta1api = kubernetes.client.ExtensionsV1beta1Api()
 

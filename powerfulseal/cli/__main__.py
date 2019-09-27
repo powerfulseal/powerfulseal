@@ -38,6 +38,30 @@ from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
 
+KUBECONFIG_DEFAULT_PATH = "~/.kube/config"
+
+def parse_kubeconfig(args):
+    """
+        if explicitly set, use the --kubeconfig value
+        otherwise, check if KUBECONFIG is set
+        if not, check if there is `~/.kube/config` available
+        else try to build in-cluster config
+    """
+    logger = logging.getLogger(__name__)
+    kube_config = None
+    expanded_home_kube_config_path = os.path.expanduser(KUBECONFIG_DEFAULT_PATH)
+    if args.kubeconfig:
+        kube_config = args.kubeconfig
+        logger.info("Creating kubernetes client with config %s from --kubeconfig flag", kube_config)
+    elif os.environ.get("KUBECONFIG"):
+        kube_config = os.path.expanduser(os.environ.get("KUBECONFIG"))
+        logger.info("Creating kubernetes client with config %s from KUBECONFIG env var", kube_config)
+    elif os.path.exists(expanded_home_kube_config_path):
+        kube_config = expanded_home_kube_config_path
+        logger.info("Creating kubernetes client with config %s (path found for backwards compatibility)", kube_config)
+    else:
+        logger.info("Creating kubernetes client with in-cluster config")
+    return kube_config
 
 def add_kubernetes_options(parser):
     # Kubernetes
@@ -45,10 +69,8 @@ def add_kubernetes_options(parser):
     args_kubernetes.add_argument(
         '--kubeconfig',
         help='Location of kube-config file',
-        default=os.environ.get('KUBECONFIG', '~/.kube/config'),
-        type=os.path.expanduser,
+        type=os.path.expanduser
     )
-
 def add_ssh_options(parser):
     # SSH
     args_ssh = parser.add_argument_group('SSH settings')
@@ -451,8 +473,7 @@ def main(argv):
     ##########################################################################
     # KUBERNETES
     ##########################################################################
-    kube_config = args.kubeconfig
-    logger.info("Creating kubernetes client with config %s", kube_config)
+    kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
     k8s_inventory = K8sInventory(k8s_client=k8s_client)
 

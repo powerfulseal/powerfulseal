@@ -71,6 +71,13 @@ def add_kubernetes_options(parser):
         help='Location of kube-config file',
         type=os.path.expanduser
     )
+    args_kubernetes.add_argument(
+        '--use-pod-delete-instead-of-ssh-kill',
+        help='If set, will not require SSH (will delete pods instead)',
+        default=False,
+        action='store_true',
+    )
+
 def add_ssh_options(parser):
     # SSH
     args_ssh = parser.add_argument_group('SSH settings')

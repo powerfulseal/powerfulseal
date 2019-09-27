@@ -38,6 +38,18 @@ from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
 
+KUBECONFIG_DEFAULT_PATH = "~/.kube/config"
+
+def parse_kubeconfig(args):
+    """
+        if explicitly set, use the --kubeconfig value
+        otherwise, check if KUBECONFIG is set
+        if not, check if there is `~/.kube/config` available
+        else try to build in-cluster config
+    """
+    logger = logging.getLogger(__name__)
+    kube_config = None
+    return kube_config
 
 def add_kubernetes_options(parser):
     # Kubernetes
@@ -444,8 +456,7 @@ def main(argv):
     ##########################################################################
     # KUBERNETES
     ##########################################################################
-    kube_config = args.kubeconfig
-    logger.info("Creating kubernetes client with config %s", kube_config)
+    kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
     k8s_inventory = K8sInventory(k8s_client=k8s_client)
 

@@ -24,10 +24,11 @@ class K8sInventory():
         Also manages cache.
     """
 
-    def __init__(self, k8s_client, logger=None):
+    def __init__(self, k8s_client, delete_pods=False, logger=None):
         self.k8s_client = k8s_client
         self._cache_namespaces = []
         self._cache_last = None
+        self.delete_pods = delete_pods
         self.logger = logger or logging.getLogger(__name__)
         self.last_pods = []
 

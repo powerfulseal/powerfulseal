@@ -93,8 +93,19 @@ class PodScenario(Scenario):
         return pods
 
     def action_kill(self, item, params):
-        """ Kills a pod by executing a docker kill on one of the containers
+        """ Kills a pod by executing a docker kill on one of the containers or pod delete
         """
+        probability = params.get("probability", 1)
+
+        # In case we are setup to delete pods, instead of SSHing
+        if self.k8s_inventory.delete_pods:
+            if probability >= random.random():
+                self.logger.info("Deleting pod %r", item)
+                self.k8s_inventory.k8s_client.delete_pods([item])
+            else:
+                self.logger.info("Pod got lucky - not deleting")
+            return
+
         node = self.inventory.get_node_by_ip(item.host_ip)
         if node is None:
             self.logger.info("Node not found for pod: %s", item)
@@ -107,7 +118,6 @@ class PodScenario(Scenario):
             container_id=container_id.replace("docker://",""),
         )
 
-        probability = params.get("probability", 1)
         if probability >= random.random():
             self.logger.info("Action execute '%s' on %r", cmd, item)
             for value in self.executor.execute(

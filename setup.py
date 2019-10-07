@@ -12,7 +12,7 @@ Please see the documentation at https://github.com/bloomberg/powerfulseal
 
 setup(
     name='powerfulseal',
-    version='2.6.0',
+    version='2.7.0',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',

@@ -145,3 +145,16 @@ class K8sClient():
             namespace=namespace,
             label_selector=selector,
         ).items
+
+    def delete_pods(self, pods):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#delete_namespaced_pod
+            Delete all pods synchronously
+        """
+        for pod in pods:
+            self.client_corev1api.delete_namespaced_pod(
+                name=pod.name,
+                namespace=pod.namespace,
+                grace_period_seconds=0
+            )

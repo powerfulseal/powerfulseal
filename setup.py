@@ -4,16 +4,22 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+long_description = """
+**PowerfulSeal** adds chaos to your Kubernetes clusters, so that you can detect problems in your systems as early as possible. It kills targeted pods and takes VMs up and down.
+
+Please see the documentation at https://github.com/bloomberg/powerfulseal
+"""
+
 setup(
     name='powerfulseal',
-    version='2.5.0',
+    version='2.6.0',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
     packages=find_packages(),
     license=read('LICENSE'),
     description='PowerfulSeal - a powerful testing tool for Kubernetes clusters',
-    long_description=read('README.md'),
+    long_description=long_description,
     #long_description_content_type="text/markdown",
     install_requires=[
         'ConfigArgParse>=0.11.0,<1',

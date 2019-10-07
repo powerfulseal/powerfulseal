@@ -71,6 +71,13 @@ def add_kubernetes_options(parser):
         help='Location of kube-config file',
         type=os.path.expanduser
     )
+    args_kubernetes.add_argument(
+        '--use-pod-delete-instead-of-ssh-kill',
+        help='If set, will not require SSH (will delete pods instead)',
+        default=False,
+        action='store_true',
+    )
+
 def add_ssh_options(parser):
     # SSH
     args_ssh = parser.add_argument_group('SSH settings')
@@ -475,7 +482,10 @@ def main(argv):
     ##########################################################################
     kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
-    k8s_inventory = K8sInventory(k8s_client=k8s_client)
+    k8s_inventory = K8sInventory(
+        k8s_client=k8s_client,
+        delete_pods=args.use_pod_delete_instead_of_ssh_kill
+    )
 
     ##########################################################################
     # CLOUD DRIVER

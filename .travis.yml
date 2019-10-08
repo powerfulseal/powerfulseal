@@ -12,10 +12,6 @@ branches:
   only:
     - master
     - /^\d+\.\d+\.\d+(-\S*)?$/
-    
-# install pandoc
-before_install:
-  - sudo apt-get install pandoc
 
 # command to install dependencies
 install:
@@ -28,7 +24,6 @@ script:
   - make build
   - docker images
   - docker run `make version` --help
-  - pandoc -s README.md -t rst -o README.md
 
 # push images to DockerHub and PyPI on tags
 deploy:
@@ -39,11 +34,10 @@ deploy:
       tags: true
       python: "3.6"
       condition: -n "$DOCKER_PASSWORD"
-  - provider: pypi
-    user: "$PYPI_USER"
-    password: "$PYPI_PASSWORD"
+  - provider: script
+    script:  python -m pip install tox && tox -vve pypi_publish
     skip_cleanup: true
     on:
       tags: true
       python: "3.6"
-      condition: -n "$PYPI_PASSWORD"
+      condition: -n "$TWINE_PASSWORD"

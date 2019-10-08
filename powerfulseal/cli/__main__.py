@@ -27,7 +27,7 @@ import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient
 from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
-from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector
+from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector, DatadogCollector
 from powerfulseal.policy.label_runner import LabelRunner
 from powerfulseal.web.server import ServerState, start_server, ServerStateLogHandler
 from ..node import NodeInventory
@@ -232,6 +232,11 @@ def add_metrics_options(parser):
         default=os.environ.get("PROMETHEUS_COLLECTOR"),
         action='store_true',
         help="store metrics in Prometheus and expose metrics over a HTTP server"
+    )
+    metric_options.add_argument('--datadog-collector',
+        default=os.environ.get("DATADOG_COLLECTOR"),
+        action='store_true',
+        help="send collected metrics to Datadog using DogStatsD"
     )
 
     args_prometheus = parser.add_argument_group('Prometheus settings')
@@ -576,6 +581,9 @@ def main(argv):
         logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
         start_http_server(args.prometheus_port, args.prometheus_host)
         metric_collector = PrometheusCollector()
+    elif args.datadog_collector:
+        logger.info("Starting datadog collector")
+        metric_collector = DatadogCollector()
     else:
         logger.info("Not starting prometheus collector")
 

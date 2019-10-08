@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    version='2.6.0',
+    version='2.7.0',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',
@@ -40,7 +40,8 @@ setup(
         'google-api-python-client>=1.7.8',
         'google-auth>=1.6.2',
         'google-auth-httplib2>=0.0.3',
-        'oauth2client>=4.1.3'
+        'oauth2client>=4.1.3',
+        'datadog>=0.29.0,<1.0.0'
     ],
     extras_require={
         'testing': [

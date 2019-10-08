@@ -39,11 +39,10 @@ deploy:
       tags: true
       python: "3.6"
       condition: -n "$DOCKER_PASSWORD"
-  - provider: pypi
-    user: "$PYPI_USER"
-    password: "$PYPI_PASSWORD"
+  - provider: script
+    script:  python -m pip install tox && tox -vve pypi_publish
     skip_cleanup: true
     on:
       tags: true
       python: "3.6"
-      condition: -n "$PYPI_PASSWORD"
+      condition: -n "$TWINE_PASSWORD"

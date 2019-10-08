@@ -12,10 +12,6 @@ branches:
   only:
     - master
     - /^\d+\.\d+\.\d+(-\S*)?$/
-    
-# install pandoc
-before_install:
-  - sudo apt-get install pandoc
 
 # command to install dependencies
 install:
@@ -28,7 +24,6 @@ script:
   - make build
   - docker images
   - docker run `make version` --help
-  - pandoc -s README.md -t rst -o README.md
 
 # push images to DockerHub and PyPI on tags
 deploy:

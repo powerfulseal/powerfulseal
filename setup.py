@@ -6,8 +6,7 @@ def read(fname):
 
 setup(
     name='powerfulseal',
-    use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    version='2.7.0',
     author='Mikolaj Pawlikowski',
     author_email='mikolaj@pawlikowski.pl',
     url='https://github.com/bloomberg/powerfulseal',

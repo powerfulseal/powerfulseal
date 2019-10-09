@@ -5,7 +5,7 @@ METRICS_SERVER_URL ?= http://metrics-server.kube-system.svc.kubernetes.cluster/
 CLOUD_OPTION ?= --openstack
 
 name ?= powerfulseal
-version ?= `python setup.py --version`
+version ?= `python setup.py --version | sed "s/\+/./"`
 tag = $(name):$(version)
 namespace ?= "bloomberg/"
 

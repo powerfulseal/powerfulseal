@@ -1,8 +1,7 @@
 language: python
 python:
-  - "2.7"
   - "3.6"
-#  - "3.7"
+  - "3.7"
 
 # enable docker in Travis
 services:
@@ -32,12 +31,12 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-      python: "3.6"
+      python: "3.7"
       condition: -n "$DOCKER_PASSWORD"
   - provider: script
     script:  python -m pip install tox && tox -vve pypi_publish
     skip_cleanup: true
     on:
       tags: true
-      python: "3.6"
+      python: "3.7"
       condition: -n "$TWINE_PASSWORD"

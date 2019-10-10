@@ -14,11 +14,11 @@ branches:
 
 # command to install dependencies
 install:
-  - pip install tox-travis
+  - pip install tox tox-travis -U --force-reinstall
 
 # command to run tests
 script:
-  - tox
+  - tox -vv
   - docker --version
   - make build
   - docker images

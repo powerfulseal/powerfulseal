@@ -10,11 +10,11 @@ RUN apt-get update && \
 
 # copy powerfulseal package
 WORKDIR /powerfulseal
-COPY Makefile LICENSE README.md setup.py MANIFEST.in /powerfulseal/
+COPY Makefile LICENSE README.md setup.py setup.cfg MANIFEST.in /powerfulseal/
 COPY powerfulseal/ /powerfulseal/powerfulseal/
 
 # install it with pip
-RUN python setup.py sdist && pip install ./dist/* && pip list .
+RUN pip install . && pip list .
 
 
 # the actual image we will be pushing up

@@ -100,9 +100,7 @@ If you're running outside of your cluster, the setup will involve:
 - making sure the seal can SSH into the nodes in order to execute `docker kill` command
 - writing a set of policies
 
-It should look something like this:
-
-![pipeline](./media/setup.png)
+It should look something like [this](./media/setup.png).
 
 
 ### Minikube setup

@@ -11,23 +11,39 @@ Embrace the inevitable failure. __Embrace The Seal__.
 
 ## On the menu
 
-- [Highlights](#highlights)
-- [Introduction](#introduction)
-- [Modes of operation](#modes-of-operation)
+- [PowerfulSeal ![Travis](https://travis-ci.com/bloomberg/powerfulseal) ![PyPI](https://pypi.python.org/pypi/powerfulseal)](#powerfulseal-travishttpstravis-cicombloombergpowerfulseal-pypihttpspypipythonorgpypipowerfulseal)
+  - [On the menu](#on-the-menu)
+  - [Highlights](#highlights)
+  - [Introduction](#introduction)
+  - [Setup](#setup)
+    - [Running inside of the cluster](#running-inside-of-the-cluster)
+    - [Running outside of the cluster](#running-outside-of-the-cluster)
+    - [Minikube setup](#minikube-setup)
+  - [Getting started](#getting-started)
+    - [Docker](#docker)
+  - [Modes of operation](#modes-of-operation)
   - [Interactive mode](#interactive-mode)
   - [Autonomous mode](#autonomous-mode)
-    - [Metrics Collection](#metrics-collection)
-    - [Web user interface](#web-user-interface)
     - [Writing policies](#writing-policies)
+    - [Metrics collection](#metrics-collection)
+    - [Web User Interface](#web-user-interface)
   - [Label mode](#label-mode)
   - [Demo mode](#demo-mode)
-- [Setup](#setup)
-  - [Minikube setup](#minikube-setup)
-- [Getting started](#getting-started)
-- [Testing](#testing)
-- [Read about the PowerfulSeal](#read-about-the-powerfulseal)
-- [FAQ](#faq)
-- [Footnotes](#footnotes)
+  - [Inventory File](#inventory-file)
+  - [Cloud Provider Requirements](#cloud-provider-requirements)
+    - [SSH](#ssh)
+    - [Azure](#azure)
+    - [AWS](#aws)
+    - [OpenStack](#openstack)
+    - [GCP](#gcp)
+  - [Testing](#testing)
+  - [Read about the PowerfulSeal](#read-about-the-powerfulseal)
+  - [FAQ](#faq)
+    - [Where can I learn more about Chaos Engineering ?](#where-can-i-learn-more-about-chaos-engineering)
+    - [How is it different from Chaos Monkey ?](#how-is-it-different-from-chaos-monkey)
+    - [Can I contribute to The Seal ?](#can-i-contribute-to-the-seal)
+    - [Why a Seal ?](#why-a-seal)
+  - [Footnotes](#footnotes)
 
 ## Highlights
 
@@ -51,6 +67,129 @@ __PowerfulSeal__ works in several modes:
 - __Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
 
 - __Demo__ mode allows you to point the Seal at a cluster and a `metrics-server` server and let it try to figure out what to kill, based on the resource utilization.
+
+
+
+
+## Setup
+
+The setup depends on whether you run `PowerfulSeal` inside or outside of your cluster.
+
+
+### Running inside of the cluster
+
+If you're running inside of the cluster (for example from [the docker image](./build)), the setup is pretty easy.
+
+You can see an example of how to do it [in ./kubernetes](./kubernetes). The setup involves:
+
+- creating [RBAC rules](./kubernetes/rbac.yml) to allow the seal to list, get and delete pods,
+- creating a [powerfulseal configmap and deployment](./kubernetes/powerfulseal.yml)
+  - your scenarios will live in the configmap
+  - if you'd like to use the UI, you'll probably also need a service and ingress
+  - make sure to use `--use-pod-delete-instead-of-ssh-kill` flag to not need to configure SSH access for killing pods
+- profit!
+  - the Seal will self-discover the way to connect to `kubernetes` and start executing your policy
+
+
+### Running outside of the cluster
+
+If you're running outside of your cluster, the setup will involve:
+
+- pointing PowerfulSeal at your Kubernetes cluster by giving it a Kubernetes config file
+- pointing PowerfulSeal at your cloud by specifying the cloud driver to use and providing credentials
+- making sure the seal can SSH into the nodes in order to execute `docker kill` command
+- writing a set of policies
+
+It should look something like this:
+
+![pipeline](./media/setup.png)
+
+
+### Minikube setup
+
+It is possible to test a subset of Seal's functionality using a [`minikube`](https://kubernetes.io/docs/setup/minikube/) setup.
+
+To achieve that, please inspect the [Makefile](./Makefile). You will need to override the ssh host, specify the correct username and use minikube's ssh keys.
+
+
+If you'd like to test out the interactive mode, start with this:
+
+```sh
+seal \
+  -vv \
+  interactive \
+    --no-cloud \
+    --inventory-kubernetes \
+    --ssh-allow-missing-host-keys \
+    --remote-user docker \
+    --ssh-path-to-private-key `minikube ssh-key` \
+    --ssh-password `minikube ssh-password` \
+    --override-ssh-host `minikube ip`
+```
+
+For label mode, try something like this:
+
+```sh
+seal \
+  -vv \
+  label \
+    --no-cloud \
+    --min-seconds-between-runs 3 \
+    --max-seconds-between-runs 10 \
+    --inventory-kubernetes \
+    --ssh-allow-missing-host-keys \
+    --remote-user docker \
+    --ssh-path-to-private-key `minikube ssh-key` \
+    --ssh-password `minikube ssh-password` \
+    --override-ssh-host `minikube ip`
+```
+
+For autonomous mode, this should get you started:
+
+```sh
+seal \
+  -vv \
+  autonomous \
+    --no-cloud \
+    --policy-file ./examples/policy_kill_random_default.yml \
+    --inventory-kubernetes \
+    --prometheus-collector \
+    --prometheus-host 0.0.0.0 \
+    --prometheus-port 9999 \
+    --ssh-allow-missing-host-keys \
+    --remote-user docker \
+    --ssh-path-to-private-key `minikube ssh-key` \
+    --ssh-password `minikube ssh-password` \
+    --override-ssh-host `minikube ip` \
+    --host 0.0.0.0 \
+    --port 30100
+```
+
+
+
+## Getting started
+
+`PowerfulSeal` is available to install through pip:
+
+```sh
+pip install powerfulseal
+powerfulseal --help # or seal --help
+```
+
+To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
+
+Both Python 3.6 and Python 3.7 are supported.
+
+
+### Docker
+
+The automatically built docker images are now available on [docker hub](https://hub.docker.com/_/powerfulseal)
+
+```sh
+docker pull bloomberg/powerfulseal:2.7.0
+```
+
+
 
 ## Modes of operation
 
@@ -167,95 +306,6 @@ Demo mode requires [metrics-server](https://github.com/kubernetes-incubator/metr
 ```sh
 $ seal demo --help
 ```
-
-
-## Setup
-
-Setup includes:
-- pointing PowerfulSeal at your Kubernetes cluster by giving it a Kubernetes config file
-- pointing PowerfulSeal at your cloud by specifying the cloud driver to use and providing credentials
-- making sure that PowerfulSeal can SSH into the nodes to execute commands on them
-- writing a set of policies
-
-These interactions are available:
-
-![pipeline](./media/setup.png)
-
-
-### Minikube setup
-
-It is possible to test a subset of Seal's functionality using a [`minikube`](https://kubernetes.io/docs/setup/minikube/) setup. 
-
-To achieve that, please inspect the [Makefile](./Makefile). You will need to override the ssh host, specify the correct username and use minikube's ssh keys.
-
-
-If you'd like to test out the interactive mode, start with this:
-
-```sh
-seal \
-  -vv \
-  interactive \
-    --no-cloud \
-    --inventory-kubernetes \
-    --ssh-allow-missing-host-keys \
-    --remote-user docker \
-    --ssh-path-to-private-key `minikube ssh-key` \
-    --ssh-password `minikube ssh-password` \
-    --override-ssh-host `minikube ip`
-```
-
-For label mode, try something like this:
-
-```sh
-seal \
-  -vv \
-  label \
-    --no-cloud \
-    --min-seconds-between-runs 3 \
-    --max-seconds-between-runs 10 \
-    --inventory-kubernetes \
-    --ssh-allow-missing-host-keys \
-    --remote-user docker \
-    --ssh-path-to-private-key `minikube ssh-key` \
-    --ssh-password `minikube ssh-password` \
-    --override-ssh-host `minikube ip`
-```
-
-For autonomous mode, this should get you started:
-
-```sh
-seal \
-  -vv \
-  autonomous \
-    --no-cloud \
-    --policy-file ./examples/policy_kill_random_default.yml \
-    --inventory-kubernetes \
-    --prometheus-collector \
-    --prometheus-host 0.0.0.0 \
-    --prometheus-port 9999 \
-    --ssh-allow-missing-host-keys \
-    --remote-user docker \
-    --ssh-path-to-private-key `minikube ssh-key` \
-    --ssh-password `minikube ssh-password` \
-    --override-ssh-host `minikube ip` \
-    --host 0.0.0.0 \
-    --port 30100
-```
-
-
-
-## Getting started
-
-`PowerfulSeal` is available to install through pip:
-
-```sh
-pip install powerfulseal
-powerfulseal --help # or seal --help
-```
-
-To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
-
-Both Python 2.7 and Python 3 are supported.
 
 ## Inventory File
 

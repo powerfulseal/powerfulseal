@@ -51,7 +51,7 @@ Embrace the inevitable failure. __Embrace The Seal__.
 - speaks `Kubernetes` natively
 - interactive and autonomous, policy-driven mode
 - web interface to interact with PowerfulSeal
-- metric collection and exposition to `Prometheus`
+- metric collection and exposition to `Prometheus` or `Datadog`
 - minimal setup, easy yaml-based policies
 - easy to extend
 

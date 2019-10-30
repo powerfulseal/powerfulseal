@@ -28,8 +28,11 @@ from powerfulseal.policy.node_scenario import NodeScenario
 from powerfulseal.policy.pod_scenario import PodScenario
 from powerfulseal.web.formatter import PolicyFormatter
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 # Flask instance and routes
 app = Flask(__name__, static_url_path="/static", static_folder="dist/static", template_folder="dist")
+app = ProxyFix(app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
 # Set up CORS to allow requests originating outside the server for the API
 CORS(app, resources={r"/api/*": {"origins": "*"}})

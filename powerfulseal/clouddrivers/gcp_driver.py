@@ -119,7 +119,8 @@ class GCPDriver(AbstractDriver):
             if not config:
                 default_config = read_default_config()
             else:
-                default_config = json.loads(config)
+                with open(config, "r") as f:
+                    default_config = json.loads(f.read())
             self.logger.info(
                 "Using Default gcloud config with project: %s and region: %s",
                 default_config['core']['project'],

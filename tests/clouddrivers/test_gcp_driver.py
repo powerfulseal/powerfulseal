@@ -7,16 +7,7 @@ PRIVATE_IPS = ['198.168.1.1', '198.168.2.1']
 PUBLIC_IPS = ['31.31.31.31', '41.41.41.41']
 INVALID_IP = '198.168.3.1'
 
-GCLOUD_CONFIG = '''
-{
-  "compute": {
-    "region": "us-central1"
-  },
-  "core": {
-    "project": "marine-foundry-184612"
-  }
-}
-'''
+GCLOUD_CONFIG = './moch_gcloud_config.json'
 
 
 class Computeinstance():

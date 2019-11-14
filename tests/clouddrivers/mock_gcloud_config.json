@@ -1,0 +1,8 @@
+{
+    "compute": {
+      "region": "us-central1"
+    },
+    "core": {
+      "project": "marine-foundry-184612"
+    }
+}

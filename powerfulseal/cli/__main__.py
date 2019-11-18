@@ -366,6 +366,11 @@ def parse_args(args):
         default=int(os.environ.get('PORT', '8080')),
         type=check_valid_port
     )
+    web_args.add_argument(
+        '--accept-proxy-headers',
+        help='Set this flag for the webserver to accept X-Forwarded-* headers',
+        action='store_true'
+    )
 
     ##########################################################################
     # LABEL MODE
@@ -620,7 +625,7 @@ def main(argv):
             state.start_policy_runner()
             # start the server
             logger.info("Starting the UI server")
-            start_server(args.host, args.port)
+            start_server(args.host, args.port, args.accept_proxy_headers)
         else:
             logger.info("NOT starting the UI server")
 

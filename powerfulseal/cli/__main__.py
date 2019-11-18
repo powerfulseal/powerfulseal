@@ -22,6 +22,7 @@ import coloredlogs
 import textwrap
 import sys
 import os
+import six
 
 import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient

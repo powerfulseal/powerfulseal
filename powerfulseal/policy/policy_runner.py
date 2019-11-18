@@ -61,7 +61,7 @@ class PolicyRunner():
         config = policy.get("config", {})
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
-        loops = int(config.get("loopsNumber", -1))
+        loops = config.get("loopsNumber", None)
         node_scenarios = [
             NodeScenario(
                 name=item.get("name"),
@@ -84,7 +84,7 @@ class PolicyRunner():
             )
             for item in policy.get("podScenarios", [])
         ]
-        for _ in range(0, loops):
+        while loops is None or loops > 0:
             for scenario in node_scenarios:
                 scenario.execute()
             for scenario in pod_scenarios:
@@ -93,4 +93,6 @@ class PolicyRunner():
             logger.info("Sleeping for %s seconds", sleep_time)
             time.sleep(sleep_time)
             inventory.sync()
+            if loops is not None:
+                loops -= 1
         return node_scenarios, pod_scenarios

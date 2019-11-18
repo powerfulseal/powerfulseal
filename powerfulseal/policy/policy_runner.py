@@ -95,4 +95,5 @@ class PolicyRunner():
             inventory.sync()
             if loops is not None:
                 loops -= 1
+            logger.info("All done here!")
         return node_scenarios, pod_scenarios

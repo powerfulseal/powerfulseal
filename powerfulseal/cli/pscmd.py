@@ -44,7 +44,11 @@ DEFAULT_COLOR_KEYWORDS = {
     "Succeeded": "green",
     "Pending": "grey",
     "Failed": "red",
-    "Unknown": "red"
+    "Unknown": "red",
+    "CrashLoopBackOff": "red",
+    "error": "red",
+    "Error": "red",
+    "namespace": "blue"
 }
 # couple of helpers
 def colour_output(output, extras=None):

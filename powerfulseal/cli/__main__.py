@@ -324,7 +324,6 @@ def parse_args(args):
             'commands on pods and nodes and provides a sweet autocomplete. '
             'If you\'re reading this for the first time, you should probably '
             'start here. '
-            'This is a DAEMONLESS mode of operation.'
         ),
     )
     add_common_options(parser_interactive)
@@ -335,11 +334,7 @@ def parse_args(args):
     ##########################################################################
     parser_autonomous = subparsers.add_parser('autonomous',
         help=(
-            'Starts in autonomous mode. '
-            'This is the main mode of operation. The Seal reads the policy '
-            'file and executes it indefinitely. '
-            'It works on nodes and pods. '
-            'This is a DAEMONLESS mode of operation.'
+            'This is the main mode of operation. It reads the policy file and executes it.'
         ),
     )
     add_common_options(parser_autonomous)
@@ -383,7 +378,6 @@ def parse_args(args):
             'There is no policy needed in this mode. '
             'To learn about supported labels, read more at '
             'https://github.com/bloomberg/powerfulseal/ '
-            'This is a DAEMONLESS mode of operation. '
         ),
     )
     add_common_options(parser_label)
@@ -399,7 +393,6 @@ def parse_args(args):
             'Starts in demo mode. '
             'It reads Kubernetes pods in specified namespaces, and reads '
             'metrics-server metrics to guess what\'s worth killing. '
-            'This is a DAEMONLESS mode of operation. '
         ),
     )
     add_common_options(parser_demo)

@@ -44,7 +44,11 @@ DEFAULT_COLOR_KEYWORDS = {
     "Succeeded": "green",
     "Pending": "grey",
     "Failed": "red",
-    "Unknown": "red"
+    "Unknown": "red",
+    "CrashLoopBackOff": "red",
+    "error": "red",
+    "Error": "red",
+    "namespace": "blue"
 }
 # couple of helpers
 def colour_output(output, extras=None):
@@ -434,6 +438,17 @@ class PSCmd(cmd.Cmd):
             return print("Pod number not found.")
         if pod.state == 'Pending':
             return print("Can't kill pod on pending state")
+
+        # In case we are setup to delete pods, instead of SSHing
+        if self.k8s_inventory.delete_pods:
+            ans = False
+            while ans not in ("y", "n"):
+                print("Will delete pod '%s' through kubernetes API. Continue ? [y/n]: " % pod)
+                ans = six.moves.input().lower()
+            if ans != "y":
+                return print("Cancelling")
+            self.k8s_inventory.k8s_client.delete_pods([pod])
+            return
 
         # find the node
         node = self.inventory.get_node_by_ip(pod.host_ip)

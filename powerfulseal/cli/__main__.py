@@ -577,14 +577,19 @@ def main(argv):
     ##########################################################################
     metric_collector = StdoutCollector()
     if args.prometheus_collector:
-        logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
-        start_http_server(args.prometheus_port, args.prometheus_host)
-        metric_collector = PrometheusCollector()
+        flask_debug = os.environ.get("FLASK_DEBUG")
+        flask_env = os.environ.get("FLASK_ENVIROMENT")
+        if flask_debug is not None or (flask_env is not None and flask_env != "production"):
+            logger.error("PROMETHEUS METRICS NOT SUPPORTED WHEN USING FLASK RELOAD. NOT STARTING THE SERVER")
+        else:
+            logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
+            start_http_server(args.prometheus_port, args.prometheus_host)
+            metric_collector = PrometheusCollector()
     elif args.datadog_collector:
         logger.info("Starting datadog collector")
         metric_collector = DatadogCollector()
     else:
-        logger.info("Not starting prometheus collector")
+        logger.info("Using stdout metrics collector")
 
     ##########################################################################
     # AUTONOMOUS MODE

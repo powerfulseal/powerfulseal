@@ -36,7 +36,7 @@ class NoCloudDriver(AbstractDriver):
     def sync(self):
         """ Noop
         """
-        self.logger.error(
+        self.logger.info(
             MESSAGE_IM_NO_CLOUD_DRIVER, "sync"
         )
 

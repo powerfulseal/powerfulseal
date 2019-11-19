@@ -101,7 +101,11 @@ class PodScenario(Scenario):
         if self.k8s_inventory.delete_pods:
             if probability >= random.random():
                 self.logger.info("Deleting pod %r", item)
-                self.k8s_inventory.k8s_client.delete_pods([item])
+                try:
+                    self.k8s_inventory.k8s_client.delete_pods([item])
+                    self.metric_collector.add_pod_killed_metric(item)
+                except:
+                    self.metric_collector.add_pod_kill_failed_metric(item)
             else:
                 self.logger.info("Pod got lucky - not deleting")
             return

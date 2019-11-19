@@ -38,7 +38,7 @@ spec:
       serviceAccountName: powerfulseal
       containers:
         - name: powerfulseal
-          image: bloomberg/powerfulseal:2.5.0
+          image: store/bloomberg/powerfulseal:2.5.0
           args: 
           - autonomous
           - --inventory-kubernetes 

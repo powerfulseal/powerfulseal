@@ -32,7 +32,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Flask instance and routes
 app = Flask(__name__, static_url_path="/static", static_folder="dist/static", template_folder="dist")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
 # Set up CORS to allow requests originating outside the server for the API
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -252,7 +251,9 @@ def catch_all(path):
     return render_template('index.html', baseUrl='%sapi' % request.base_url)
 
 
-def start_server(host, port):
+def start_server(host, port, should_accept_proxy_headers=False):
+    if should_accept_proxy_headers:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
     app.run(host=host, port=port)
 
 

@@ -22,6 +22,7 @@ import coloredlogs
 import textwrap
 import sys
 import os
+import six
 
 import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient
@@ -323,7 +324,6 @@ def parse_args(args):
             'commands on pods and nodes and provides a sweet autocomplete. '
             'If you\'re reading this for the first time, you should probably '
             'start here. '
-            'This is a DAEMONLESS mode of operation.'
         ),
     )
     add_common_options(parser_interactive)
@@ -334,11 +334,7 @@ def parse_args(args):
     ##########################################################################
     parser_autonomous = subparsers.add_parser('autonomous',
         help=(
-            'Starts in autonomous mode. '
-            'This is the main mode of operation. The Seal reads the policy '
-            'file and executes it indefinitely. '
-            'It works on nodes and pods. '
-            'This is a DAEMONLESS mode of operation.'
+            'This is the main mode of operation. It reads the policy file and executes it.'
         ),
     )
     add_common_options(parser_autonomous)
@@ -365,6 +361,11 @@ def parse_args(args):
         default=int(os.environ.get('PORT', '8080')),
         type=check_valid_port
     )
+    web_args.add_argument(
+        '--accept-proxy-headers',
+        help='Set this flag for the webserver to accept X-Forwarded-* headers',
+        action='store_true'
+    )
 
     ##########################################################################
     # LABEL MODE
@@ -377,7 +378,6 @@ def parse_args(args):
             'There is no policy needed in this mode. '
             'To learn about supported labels, read more at '
             'https://github.com/bloomberg/powerfulseal/ '
-            'This is a DAEMONLESS mode of operation. '
         ),
     )
     add_common_options(parser_label)
@@ -393,7 +393,6 @@ def parse_args(args):
             'Starts in demo mode. '
             'It reads Kubernetes pods in specified namespaces, and reads '
             'metrics-server metrics to guess what\'s worth killing. '
-            'This is a DAEMONLESS mode of operation. '
         ),
     )
     add_common_options(parser_demo)
@@ -619,7 +618,7 @@ def main(argv):
             state.start_policy_runner()
             # start the server
             logger.info("Starting the UI server")
-            start_server(args.host, args.port)
+            start_server(args.host, args.port, args.accept_proxy_headers)
         else:
             logger.info("NOT starting the UI server")
 

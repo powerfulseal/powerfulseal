@@ -19,6 +19,14 @@ from datetime import datetime
 from .pod import Pod
 
 
+def get_status(status):
+    # try to find the error reasons, if any
+    try:
+        reasons = [x.state.waiting.reason for x in status.container_statuses]
+        return ','.join(reasons)
+    except:
+        return status.phase
+
 class K8sInventory():
     """ Kubernetes inventory - deal with namespaces, deployments and pods.
         Also manages cache.
@@ -40,6 +48,15 @@ class K8sInventory():
             return False
         return True
 
+    def preprocess_namespace(self, namespace):
+        # Check if namespace is None instead of using "or" as Kubernetes treats
+        # an empty string as the */all wildcard
+        if namespace is None:
+            namespace = "default"
+        if namespace == "*":
+            namespace = ""
+        return namespace
+
     def find_namespaces(self):
         """ Returns all namespaces.
         """
@@ -57,10 +74,7 @@ class K8sInventory():
     def find_deployments(self, namespace=None, labels=None):
         """ Find deployments for a namespace (default to "default" namespace).
         """
-        # Check if namespace is None instead of using "or" as Kubernetes treats
-        # an empty string as the */all wildcard
-        if namespace is None:
-            namespace = "default"
+        namespace = self.preprocess_namespace(namespace)
         return [
             item.metadata.name
             for item in self.k8s_client.list_deployments(
@@ -72,10 +86,7 @@ class K8sInventory():
     def find_pods(self, namespace, selector=None, deployment_name=None):
         """ Find pods in a namespace, for a deployment or selector.
         """
-        # Check if namespace is None instead of using "or" as Kubernetes treats
-        # an empty string as the */all wildcard
-        if namespace is None:
-            namespace = "default"
+        namespace = self.preprocess_namespace(namespace)
         pods = self.k8s_client.list_pods(
             namespace=namespace,
             selector=selector,
@@ -100,7 +111,7 @@ class K8sInventory():
                             ip=item.status.pod_ip,
                             container_ids=container_ids,
                             restart_count=sum(restart_count),
-                            state=item.status.phase,
+                            state=get_status(item.status),
                             labels=item.metadata.labels,
                             meta=item,
                         ))

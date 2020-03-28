@@ -33,21 +33,29 @@ def dummy_object():
 
 
 # Scenario fixtures
-class NoopScenario(Scenario):
-
-    def match(self):
-        return []
-
-    def act(self, items):
-        pass
-
-
 @pytest.fixture
 def noop_scenario():
-    return NoopScenario(
+    scenario = Scenario(
         name="test scenario",
         schema={}
     )
+    scenario.match = MagicMock(return_value=[])
+    scenario.filter = MagicMock(return_value=[])
+    scenario.act = MagicMock()
+    return scenario
+
+
+@pytest.fixture
+def no_filtered_items_scenario():
+    scenario = Scenario(
+        name="test scenario",
+        schema={}
+    )
+    matched_items = [ make_dummy_object() ]
+    scenario.match = MagicMock(return_value=matched_items)
+    scenario.filter = MagicMock(return_value=[])
+    scenario.act = MagicMock()
+    return scenario
 
 
 # Pod Scenario Fixtures

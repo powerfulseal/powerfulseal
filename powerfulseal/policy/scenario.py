@@ -65,6 +65,8 @@ class Scenario():
             self.logger.info("Filtered set length: %d", len(filtered_set))
             if filtered_set:
                 self.act(filtered_set)
+        else:
+            self.metric_collector.add_filtered_to_empty_set_metric()
         self.logger.debug("Done")
 
     @abc.abstractmethod

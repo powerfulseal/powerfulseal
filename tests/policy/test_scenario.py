@@ -21,7 +21,7 @@ from mock import MagicMock
 import pytest
 
 # noinspection PyUnresolvedReferences
-from tests.fixtures import noop_scenario
+from tests.fixtures import noop_scenario, no_filtered_items_scenario
 from tests.fixtures import make_dummy_object, dummy_object
 
 
@@ -41,6 +41,18 @@ def test_matches_list_types(noop_scenario, dummy_object, query, should_match):
         "value": query,
     }
     assert should_match == noop_scenario.match_property(dummy_object, criterion)
+
+
+def test_no_matched_items(noop_scenario):
+    noop_scenario.execute()
+    noop_scenario.filter.assert_not_called()
+    noop_scenario.act.assert_not_called()
+
+
+def test_no_filtered_items(no_filtered_items_scenario):
+    no_filtered_items_scenario.execute()
+    no_filtered_items_scenario.filter.assert_called()
+    no_filtered_items_scenario.act.assert_not_called()
 
 
 def test_filter_property(noop_scenario):

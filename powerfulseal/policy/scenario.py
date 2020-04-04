@@ -59,10 +59,14 @@ class Scenario():
         initial_set = self.match()
         self.logger.debug("Initial set: %r", initial_set)
         self.logger.info("Initial set length: %d", len(initial_set))
-        filtered_set = self.filter(initial_set)
-        self.logger.debug("Filtered set: %r", filtered_set)
-        self.logger.info("Filtered set length: %d", len(filtered_set))
-        self.act(filtered_set)
+        if initial_set:
+            filtered_set = self.filter(initial_set)
+            self.logger.debug("Filtered set: %r", filtered_set)
+            self.logger.info("Filtered set length: %d", len(filtered_set))
+            if filtered_set:
+                self.act(filtered_set)
+        else:
+            self.metric_collector.add_filtered_to_empty_set_metric()
         self.logger.debug("Done")
 
     @abc.abstractmethod

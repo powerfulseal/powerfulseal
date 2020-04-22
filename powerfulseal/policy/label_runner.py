@@ -77,6 +77,17 @@ class LabelRunner:
             self.logger.info("Node not found for pod: %s", pod)
             return
 
+        # In case we are setup to delete pods, instead of SSHing
+        if self.k8s_inventory.delete_pods:
+            self.logger.info("Deleting pod %r", pod)
+            try:
+                self.k8s_inventory.k8s_client.delete_pods([pod])
+                self.metric_collector.add_pod_killed_metric(pod)
+            except:
+                self.metric_collector.add_pod_kill_failed_metric(pod)
+            return
+
+        # In case we are setup to kill pods by SSHing
         # Format command
         signal = "SIGKILL" if pod.labels.get("seal/force-kill", "false") == "true" else "SIGTERM"
         container_id = random.choice(pod.container_ids)

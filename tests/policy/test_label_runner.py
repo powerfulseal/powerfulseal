@@ -21,10 +21,49 @@ from powerfulseal.execute import RemoteExecutor
 from powerfulseal.node import NodeInventory, Node
 from powerfulseal.policy.label_runner import LabelRunner
 
-
-def test_kill_pod():
+def test_kill_pod_APIcalling():
+     
     label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
 
+    # Patch action of getting nodes to execute kill command on
+    test_node = Node(1)
+    get_node_by_ip_mock = MagicMock(return_value=test_node)
+    label_runner.inventory.get_node_by_ip = get_node_by_ip_mock
+
+    #Pactch action of switching to APIcalling mode
+    k8s_inventory = MagicMock()
+    k8s_inventory.delete_pods = True
+    label_runner.k8s_inventory = k8s_inventory
+
+    # Patch action of choosing container
+    k8s_client_mock = MagicMock()
+    label_runner.k8s_inventory.k8s_client = k8s_client_mock
+
+    delete_pods_mock = MagicMock()
+    label_runner.k8s_inventory.k8s_client.delete_pods = delete_pods_mock
+    
+    metric_collector = MagicMock()
+    label_runner.metric_collector = metric_collector
+
+    add_pod_killed_metric_mock = MagicMock()
+    label_runner.metric_collector.add_pod_killed_metric = add_pod_killed_metric_mock
+
+    mock_pod = MagicMock()
+    mock_pod.container_ids = ["docker://container1"]
+    label_runner.kill_pod(mock_pod)
+
+    delete_pods_mock.assert_called_with([mock_pod])
+    add_pod_killed_metric_mock.assert_called_with(mock_pod)
+
+
+def test_kill_pod_SSHing():    
+    label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
+
+    #Pactch action of switching to SSHing mode
+    k8s_inventory = MagicMock()
+    k8s_inventory.delete_pods = False
+    label_runner.k8s_inventory = k8s_inventory
+    
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
     get_node_by_ip_mock = MagicMock(return_value=test_node)
@@ -47,9 +86,14 @@ def test_kill_pod():
     execute_mock.assert_called_with("sudo docker kill -s SIGTERM container1", nodes=[test_node])
 
 
-def test_kill_pod_forced():
+def test_kill_pod_forced_SSHing():
     label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
 
+    #Pactch action of switching to SSHing mode
+    k8s_inventory = MagicMock()
+    k8s_inventory.delete_pods = False
+    label_runner.k8s_inventory = k8s_inventory
+    
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
     get_node_by_ip_mock = MagicMock(return_value=test_node)

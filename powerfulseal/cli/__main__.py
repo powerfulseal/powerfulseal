@@ -445,7 +445,7 @@ def main(argv):
         if PolicyRunner.is_policy_valid(policy):
             return print('OK')
         print("Policy not valid. See log output above.")
-        return os.exit(1)
+        return sys.exit(1)
 
     ##########################################################################
     # LOGGING
@@ -599,8 +599,8 @@ def main(argv):
         # read and validate the policy
         policy = PolicyRunner.load_file(args.policy_file)
         if not PolicyRunner.is_policy_valid(policy):
-            logger.info("Policy not valid. See log output above.")
-            return os.exit(1)
+            logger.error("Policy not valid. See log output above.")
+            return sys.exit(1)
 
         # run the metrics server if requested
         if not args.headless:
@@ -661,7 +661,7 @@ def main(argv):
         aggressiveness = int(args.aggressiveness)
         if not 1 <= aggressiveness <= 5:
             print("Aggressiveness must be between 1 and 5 inclusive")
-            os.exit(1)
+            sys.exit(1)
 
         metrics_server_client = MetricsServerClient(args.metrics_server_path)
         demo_runner = DemoRunner(

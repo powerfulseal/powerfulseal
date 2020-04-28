@@ -11,6 +11,10 @@ Labels can be manually set using the `kubectl label pods [POD NAME] [LABEL]` com
 
 To reduce the processing time needed to filter a large number of pods, you can instruct PowerfulSeal to only look up pods under a specific namespace by using the `--kubernetes-namespace` argument. This behaves similar to `kubectl`, where not specifying the argument defaults PowerfulSeal to the `default` namespace, whereas specifying an empty value (`--kubernetes-namespace=`) retrieves all pods across all namespaces.
 
+## Annotations
+
+The values labels can have in Kubernetes is restricted, so some of the configuration below is not possible with labels (`seal/days` at the moment). To work around this, you can use any of the labels specified here as annotations instead. If you specify a key both as a label and an annotation, the label value will be preferred. 
+
 ## Example
 
 Suppose we have pods `my-app-1`, `my-app-2`, etc. under the `default` namespace in a system which is designed to handle the failure of one `my-app` pod. In this case, we can make the decision to label the first application pod:

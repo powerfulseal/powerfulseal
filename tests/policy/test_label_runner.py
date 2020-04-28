@@ -20,6 +20,7 @@ from mock import MagicMock
 from powerfulseal.execute import RemoteExecutor
 from powerfulseal.node import NodeInventory, Node
 from powerfulseal.policy.label_runner import LabelRunner
+from powerfulseal.k8s.pod import Pod
 
 def test_kill_pod_APIcalling():
      
@@ -48,7 +49,7 @@ def test_kill_pod_APIcalling():
     add_pod_killed_metric_mock = MagicMock()
     label_runner.metric_collector.add_pod_killed_metric = add_pod_killed_metric_mock
 
-    mock_pod = MagicMock()
+    mock_pod = Pod(name='test', namespace='test')
     mock_pod.container_ids = ["docker://container1"]
     label_runner.kill_pod(mock_pod)
 
@@ -73,12 +74,12 @@ def test_kill_pod_SSHing():
     execute_mock = MagicMock()
     label_runner.executor.execute = execute_mock
 
-    mock_pod = MagicMock()
+    mock_pod = Pod(name='test', namespace='test')
     mock_pod.container_ids = ["docker://container1"]
     mock_pod.labels = {"seal/force-kill": "false"}
     label_runner.kill_pod(mock_pod)
 
-    mock_pod = MagicMock()
+    mock_pod = Pod(name='test', namespace='test')
     mock_pod.container_ids = ["docker://container1"]
     mock_pod.labels = {}
     label_runner.kill_pod(mock_pod)
@@ -103,7 +104,7 @@ def test_kill_pod_forced_SSHing():
     execute_mock = MagicMock()
     label_runner.executor.execute = execute_mock
 
-    mock_pod = MagicMock()
+    mock_pod = Pod(name='test', namespace='test')
     mock_pod.container_ids = ["docker://container1"]
     mock_pod.labels = {"seal/force-kill": "true"}
     label_runner.kill_pod(mock_pod)
@@ -113,20 +114,23 @@ def test_kill_pod_forced_SSHing():
 def test_filter_is_enabled():
     label_runner = LabelRunner(None, None, None, None)
 
-    enabled_pod = MagicMock()
-    enabled_pod.labels = {'seal/enabled': 'true'}
-    disabled_pod_1 = MagicMock()
-    disabled_pod_1.labels = {'seal/enabled': 'false'}
-    disabled_pod_2 = MagicMock()
-    disabled_pod_2.labels = {'seal/enabled': 'asdf'}
-    disabled_pod_3 = MagicMock()
-    disabled_pod_3.labels = {'bla': 'bla'}
+    pods = [
+        Pod(name='test', namespace='test', labels={'seal/enabled': 'true'}),
+        Pod(name='test', namespace='test', labels={'seal/enabled': 'false'}),
+        Pod(name='test', namespace='test', labels={'seal/enabled': 'asdf'}),
+        Pod(name='test', namespace='test', labels={'bla': 'bla'}),
+        Pod(name='test', namespace='test', annotations={'seal/enabled': 'true'}),
+        Pod(name='test', namespace='test', annotations={'seal/enabled': 'false'}),
+        Pod(name='test', namespace='test', annotations={'seal/enabled': 'true'}, labels={'seal/enabled': 'false'}),
+        Pod(name='test', namespace='test', annotations={'seal/enabled': 'false'}, labels={'seal/enabled': 'true'})
+    ]
 
-    filtered_pods = label_runner.filter_is_enabled([enabled_pod, disabled_pod_1,
-                                                    disabled_pod_2, disabled_pod_3])
-    assert len(filtered_pods) is 1
-    assert filtered_pods[0] == enabled_pod
+    filtered_pods = label_runner.filter_is_enabled(pods)
 
+    assert len(filtered_pods) is 3
+    assert filtered_pods[0] is pods[0]
+    assert filtered_pods[1] is pods[4]
+    assert filtered_pods[2] is pods[7]
 
 @pytest.mark.parametrize("proba", [
     0.3,
@@ -139,7 +143,7 @@ def test_filter_kill_probability(proba):
     SAMPLES = 100000
 
     label_runner = LabelRunner(None, None, None, None)
-    pod = MagicMock()
+    pod = Pod(name='test', namespace='test')
     pod.labels = {'seal/kill-probability': str(proba)}
 
     agg_len = 0.0
@@ -151,7 +155,7 @@ def test_filter_kill_probability(proba):
 def test_filter_day_time():
     label_runner = LabelRunner(None, None, None, None)
 
-    pod = MagicMock
+    pod = Pod(name="test", namespace="test")
     pod.labels = {
         "seal/start-time": "10-00-00",
         "seal/end-time": "17-30-00",

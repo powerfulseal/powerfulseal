@@ -89,7 +89,7 @@ class LabelRunner:
 
         # In case we are setup to kill pods by SSHing
         # Format command
-        signal = "SIGKILL" if pod.labels.get("seal/force-kill", "false") == "true" else "SIGTERM"
+        signal = "SIGKILL" if pod.get_label_or_annotation("seal/force-kill", "false") == "true" else "SIGTERM"
         container_id = random.choice(pod.container_ids)
         cmd = self.executor.get_kill_command(
             signal=signal,
@@ -119,14 +119,14 @@ class LabelRunner:
         return remaining_pods
 
     def filter_is_enabled(self, pods):
-        return list(filter(lambda pod: pod.labels.get("seal/enabled", "false") == "true", pods))
+        return list(filter(lambda pod: pod.get_label_or_annotation("seal/enabled", "false") == "true", pods))
 
     def filter_kill_probability(self, pods):
         remaining_pods = []
         for pod in pods:
             # Retrieve probability value, performing validation
             try:
-                probability = float(pod.labels.get("seal/kill-probability", "1"))
+                probability = float(pod.get_label_or_annotation("seal/kill-probability", "1"))
                 if probability < 0 or probability > 1:
                     raise ValueError
             except ValueError:
@@ -147,12 +147,12 @@ class LabelRunner:
 
         for pod in pods:
             # Filter on days
-            days_label = pod.labels.get("seal/days", self.DEFAULT_DAYS_LABEL)
+            days_label = pod.get_label_or_annotation("seal/days", self.DEFAULT_DAYS_LABEL)
             if now.weekday() not in self.get_integer_days_from_days_label(days_label):
                 continue
 
             # Filter on start time
-            start_time_label = pod.labels.get("seal/start-time", "10-00-00")
+            start_time_label = pod.get_label_or_annotation("seal/start-time", "10-00-00")
             try:
                 hours, minutes, seconds = self.process_time_label(start_time_label)
                 start_time = now.replace(hour=hours, minute=minutes, second=seconds, microsecond=0)
@@ -163,7 +163,7 @@ class LabelRunner:
                 continue
 
             # Filter on end time
-            end_time_label = pod.labels.get("seal/end-time", "17-30-00")
+            end_time_label = pod.get_label_or_annotation("seal/end-time", "17-30-00")
             try:
                 hours, minutes, seconds = self.process_time_label(end_time_label)
                 end_time = now.replace(hour=hours, minute=minutes, second=seconds, microsecond=0)

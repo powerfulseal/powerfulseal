@@ -22,7 +22,7 @@ class Pod():
     """
 
     def __init__(self, name, namespace, num=None, uid=None, host_ip=None, ip=None,
-                container_ids=None, restart_count=None, state=None, labels=None, meta=None):
+                container_ids=None, restart_count=None, state=None, labels=None, annotations=None, meta=None):
         self.name = name
         self.namespace = namespace
         self.num = num
@@ -33,12 +33,13 @@ class Pod():
         self.restart_count = restart_count or 0
         self.state = state
         self.labels = labels or dict()
+        self.annotations = annotations or dict()
         self.meta = meta
 
     def __str__(self):
         return (
             "[pod #{num} name={name} namespace={namespace} containers={containers} ip={ip} host_ip={host_ip} "
-            "state={state} labels:{labels}]"
+            "state={state} labels:{labels} annotations:{annotations}]"
         ).format(
             num=self.num,
             name=self.name,
@@ -48,6 +49,7 @@ class Pod():
             host_ip=self.host_ip,
             state=str(self.state),
             labels=",".join(["%s=%s" % (k,v) for k,v in self.labels.items()]),
+            annotations=",".join(["%s=%s" % (k,v) for k,v in self.annotations.items()]),
         )
 
     def __repr__(self):
@@ -60,3 +62,6 @@ class Pod():
 
     def __eq__(self, other):
         return self.__hash__() == other.__hash__()
+    
+    def get_label_or_annotation(self, key, default):
+        return self.labels.get(key) or self.annotations.get(key) or default

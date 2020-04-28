@@ -113,6 +113,7 @@ class K8sInventory():
                             restart_count=sum(restart_count),
                             state=get_status(item.status),
                             labels=item.metadata.labels,
+                            annotations=item.metadata.annotations,
                             meta=item,
                         ))
         self.last_pods = pod_objects

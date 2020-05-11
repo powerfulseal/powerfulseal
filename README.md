@@ -374,7 +374,7 @@ PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test with multiple ve
 
 Once the required Python versions are set up and can be discovered by tox (e.g., by having them discoverable in your PATH), you can run the tests by running `tox`.
 
-For testing the web server and more details on testing, see [TESTING.md](TESTING.md). 
+For testing the web server and more details on testing, see [TESTING.md](./media/TESTING.md).
 
 ## Read about the PowerfulSeal
 

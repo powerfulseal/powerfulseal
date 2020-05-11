@@ -276,10 +276,8 @@ Autonomous mode also comes with the ability for metrics useful for monitoring to
 
 PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:
 
-- starting/stopping autonomous mode
-- viewing and filtering logs
-- changing the configuration (either overwriting the remote policy file or copying the changes to clipboard)
-- stopping/killing individual nodes and pods
+- viewing logs
+- viewing the policy
 
 
 ![web interface](./media/web.png)

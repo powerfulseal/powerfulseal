@@ -1,0 +1,28 @@
+{% extends 'base.html.j2' %}
+
+{% block title %}Logs{% endblock %}
+
+{% block content %}
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Level</th>
+            <th>Name</th>
+            <th>Log</th>
+        </tr>
+        </thead>
+        <tbody>
+{% for log in logs %}
+        <tr>
+            <td>{{ log.timestamp }}</td>
+            <td>{{ log.level }}</td>
+            <td>{{ log.name }}</td>
+            <td>{{ log.message }}</td>
+        </tr>
+{% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

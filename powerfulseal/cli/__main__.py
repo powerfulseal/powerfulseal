@@ -30,7 +30,7 @@ from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector, DatadogCollector
 from powerfulseal.policy.label_runner import LabelRunner
-from powerfulseal.web.server import ServerState, start_server, ServerStateLogHandler
+from powerfulseal.web.server import start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver, GCPDriver
@@ -298,6 +298,10 @@ def parse_args(args):
         action='count',
         help='Verbose logging.'
     )
+    parser.add_argument('-s', '--silent',
+        action='count',
+        help='Silent logging.'
+    )
     parser.add_argument(
         '-V', '--version',
         action='version',
@@ -450,31 +454,33 @@ def main(argv):
     ##########################################################################
     # LOGGING
     ##########################################################################
-    # Ensure the logger config propagates from the root module of this package
-    logger = logging.getLogger(__name__.split('.')[0])
-
-    # The default level should be set to logging.DEBUG to ensure that the stdout
-    # stream handler can filter to the user-specified verbosity level while the
-    # server logging handler can receive all logs
-    logger.setLevel(logging.DEBUG)
-
-    # Configure logging for stdout
-    if not args.verbose:
-        log_level = logging.ERROR
-    elif args.verbose == 1:
+    if args.silent == 1:
         log_level = logging.WARNING
-    elif args.verbose == 2:
+    elif args.silent == 2:
+        log_level = logging.ERROR
+    elif not args.verbose:
         log_level = logging.INFO
     else:
         log_level = logging.DEBUG
 
-    stdout_handler = logging.StreamHandler()
-    stdout_handler.setLevel(log_level)
-    logger.addHandler(stdout_handler)
-    coloredlogs.install(logger=logger)
+    server_log_handler = ServerStateLogHandler()
+    server_log_handler.setLevel(log_level)
 
-    my_verb = args.verbose
-    logger.info("modules %s : verbosity %s : log level %s : handler level %s ", __name__, my_verb, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
+    # do a basic config with the server log handler
+    logging.basicConfig(level=log_level, handlers=[server_log_handler])
+    # this installs a stdout handler by default to the root
+    coloredlogs.install(level=log_level)
+
+    # calm down the workzeug
+    logging.getLogger("werkzeug").setLevel(logging.WARNING)
+
+    # the main cli handler
+    logger = logging.getLogger(__name__)
+    logger.setLevel(log_level)
+
+
+
+    logger.info("modules %s : verbosity %s : log level %s : handler level %s ", __name__, args.verbose, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
 
     ##########################################################################
     # KUBERNETES
@@ -604,38 +610,27 @@ def main(argv):
 
         # run the metrics server if requested
         if not args.headless:
-            # Create an instance of the singleton server state, ensuring all logs
-            # for retrieval from the web interface
-            state = ServerState(
-                policy,
-                inventory,
-                k8s_inventory,
-                driver,
-                executor,
-                args.host,
-                args.port,
-                args.policy_file,
-                metric_collector=metric_collector,
-            )
-            server_log_handler = ServerStateLogHandler()
-            server_log_handler.setLevel(log_level)
-            logger.addHandler(server_log_handler)
-            state.start_policy_runner()
             # start the server
             logger.info("Starting the UI server")
-            start_server(args.host, args.port, args.accept_proxy_headers)
+            start_server(
+                host=args.host,
+                port=args.port,
+                policy=policy,
+                accept_proxy_headers=args.accept_proxy_headers,
+                logger=server_log_handler,
+            )
         else:
             logger.info("NOT starting the UI server")
 
-            logger.info("STARTING AUTONOMOUS MODE")
-            PolicyRunner.run(
-                policy,
-                inventory,
-                k8s_inventory,
-                driver,
-                executor,
-                metric_collector=metric_collector
-            )
+        logger.info("STARTING AUTONOMOUS MODE")
+        PolicyRunner.run(
+            policy,
+            inventory,
+            k8s_inventory,
+            driver,
+            executor,
+            metric_collector=metric_collector
+        )
 
     ##########################################################################
     # LABEL MODE

@@ -34,15 +34,23 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # singleton for a minute
 config = dict()
 
-@app.route('/api/policy', methods=['GET', 'POST', 'PUT'])
-def policy_actions():
-    return jsonify({}), 501
+@app.route('/logs')
+def logs():
+    logs = config.get("logger").logs
+    print(logs)
+    return render_template('logs.html.j2',
+        title="",
+        logs=logs,
+    )
 
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def catch_all(path):
-    return render_template('index.html.j2', baseUrl='%sapi' % request.base_url)
+def index(path):
+    return render_template('index.html.j2',
+        title="",
+        policy=yaml.dump(config.get("policy")),
+    )
 
 
 def start_server(host, port, policy, accept_proxy_headers=False, logger=None):
@@ -64,4 +72,4 @@ class ServerStateLogHandler(logging.Handler):
             'level': record.levelname,
             'message': record.getMessage()
         })
-        self.logs = self.logs[:self.max]
+        self.logs = self.logs[-self.max:]

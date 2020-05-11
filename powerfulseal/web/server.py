@@ -42,19 +42,15 @@ config = dict()
 def logs():
     logs = config.get("logger").logs
     return render_template('logs.html.j2',
-        title="",
         logs=logs,
     )
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def index(path):
     return render_template('index.html.j2',
-        title="",
         policy=yaml.dump(config.get("policy")),
     )
-
 
 def start_server(host, port, policy, accept_proxy_headers=False, logger=None):
     if accept_proxy_headers:
@@ -62,6 +58,7 @@ def start_server(host, port, policy, accept_proxy_headers=False, logger=None):
     config["policy"] = policy
     config["logger"] = logger
     threading.Thread(target=app.run, args=(host, port)).start()
+
 
 class ServerStateLogHandler(logging.Handler):
     def __init__(self, max=100):

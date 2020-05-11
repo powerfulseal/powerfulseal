@@ -30,7 +30,7 @@ from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector, DatadogCollector
 from powerfulseal.policy.label_runner import LabelRunner
-from powerfulseal.web.server import ServerState, start_server, ServerStateLogHandler
+from powerfulseal.web.server import start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver, GCPDriver
@@ -604,38 +604,31 @@ def main(argv):
 
         # run the metrics server if requested
         if not args.headless:
-            # Create an instance of the singleton server state, ensuring all logs
-            # for retrieval from the web interface
-            state = ServerState(
-                policy,
-                inventory,
-                k8s_inventory,
-                driver,
-                executor,
-                args.host,
-                args.port,
-                args.policy_file,
-                metric_collector=metric_collector,
-            )
+            # used to collect logs for the UI
             server_log_handler = ServerStateLogHandler()
             server_log_handler.setLevel(log_level)
             logger.addHandler(server_log_handler)
-            state.start_policy_runner()
             # start the server
             logger.info("Starting the UI server")
-            start_server(args.host, args.port, args.accept_proxy_headers)
+            start_server(
+                host=args.host,
+                port=args.port,
+                policy=policy,
+                accept_proxy_headers=args.accept_proxy_headers,
+                logger=server_log_handler,
+            )
         else:
             logger.info("NOT starting the UI server")
 
-            logger.info("STARTING AUTONOMOUS MODE")
-            PolicyRunner.run(
-                policy,
-                inventory,
-                k8s_inventory,
-                driver,
-                executor,
-                metric_collector=metric_collector
-            )
+        logger.info("STARTING AUTONOMOUS MODE")
+        PolicyRunner.run(
+            policy,
+            inventory,
+            k8s_inventory,
+            driver,
+            executor,
+            metric_collector=metric_collector
+        )
 
     ##########################################################################
     # LABEL MODE

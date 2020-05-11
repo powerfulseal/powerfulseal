@@ -267,7 +267,7 @@ The schemas are validated against the [powerful JSON schema](./powerfulseal/poli
 
 #### Metrics collection
 
-Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout`, Prometheus and Datadog collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](METRICS.md).
+Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout`, Prometheus and Datadog collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](./media/METRICS.md).
 
 
 #### Web User Interface

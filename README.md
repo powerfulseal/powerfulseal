@@ -289,7 +289,7 @@ Label mode is a more imperative alternative to autonomous mode, allowing you to 
 
 To mark a pod for attack, do `kubectl label pods my-app-1 seal/enabled=true`, and the `Seal` will start attacking it, but only during working hours (defaults).
 
-Detailed instructions on how to use label mode can be found in [LABELS.md](LABELS.md).
+Detailed instructions on how to use label mode can be found in [LABELS.md](./media/LABELS.md).
 
 ```sh
 $ seal label --help

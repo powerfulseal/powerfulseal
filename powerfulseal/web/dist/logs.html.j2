@@ -9,6 +9,7 @@
         <tr>
             <th>Timestamp</th>
             <th>Level</th>
+            <th>Name</th>
             <th>Log</th>
         </tr>
         </thead>
@@ -17,6 +18,7 @@
         <tr>
             <td>{{ log.timestamp }}</td>
             <td>{{ log.level }}</td>
+            <td>{{ log.name }}</td>
             <td>{{ log.message }}</td>
         </tr>
 {% endfor %}

@@ -15,6 +15,7 @@ import logging
 import random
 import time
 import threading
+from datetime import datetime
 
 import jsonschema
 import yaml
@@ -31,13 +32,15 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__, static_url_path="/static", static_folder="dist/static", template_folder="dist")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+app.debug = False
+app.env = "PRODUCTION"
+
 # singleton for a minute
 config = dict()
 
 @app.route('/logs')
 def logs():
     logs = config.get("logger").logs
-    print(logs)
     return render_template('logs.html.j2',
         title="",
         logs=logs,
@@ -68,8 +71,9 @@ class ServerStateLogHandler(logging.Handler):
 
     def emit(self, record):
         self.logs.append({
-            'timestamp': record.created,
+            'timestamp': datetime.fromtimestamp(record.created),
             'level': record.levelname,
-            'message': record.getMessage()
+            'message': record.getMessage(),
+            'name': record.name,
         })
         self.logs = self.logs[-self.max:]

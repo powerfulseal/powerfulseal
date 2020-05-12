@@ -74,9 +74,22 @@ def add_kubernetes_options(parser):
     )
     args_kubernetes.add_argument(
         '--use-pod-delete-instead-of-ssh-kill',
-        help='If set, will not require SSH (will delete pods instead)',
+        help='If set, will not require SSH (will delete pods instead) - DEPRECATED - now triggers --operation-mode=kubernetes',
         default=False,
         action='store_true',
+    )
+    args_kubernetes.add_argument(
+        '--operation-mode',
+        help=(
+            'PowerfulSeal supports two ways of injecting failure: ',
+            '1) through SSH and 2) by scheduling containers in Kubernetes. ',
+            'Use of SSH leverages Docker directly and removes Kubernetes from the equation. It\'s typically faster too. ',
+            'But it requires SSH access to all nodes in the cluster. ',
+            'Alternatively, we can rely on Kubernetes to schedule our chaos pods. Slower, less reliable, but requires no special setup. ',
+            'The default is now to use Kubernetes',
+        ),
+        default="kubernetes",
+        choices=["kubernetes", "ssh"]
     )
 
 def add_ssh_options(parser):

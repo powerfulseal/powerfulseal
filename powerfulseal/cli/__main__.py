@@ -141,7 +141,7 @@ def add_inventory_options(parser):
 def add_cloud_options(parser):
     # Cloud Driver
     args = parser.add_argument_group('Cloud settings')
-    cloud_options = args.add_mutually_exclusive_group(required=True)
+    cloud_options = args.add_mutually_exclusive_group()
     cloud_options.add_argument('--openstack',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',

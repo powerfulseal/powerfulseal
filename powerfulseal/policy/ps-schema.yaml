@@ -22,20 +22,20 @@ properties:
     description: General configuration of this policy.
   nodeScenarios:
     type: array
+    description: >
+      An array of scenarios manipulating the nodes in the cluster.
+      The scenarios are executed one by one in the specified order.
     items:
       type: object
       "$ref": "#/definitions/nodeScenario"
-      description: >
-        An array of scenarios manipulating the nodes in the cluster.
-        The scenarios are executed one by one in the specified order.
   podScenarios:
     type: array
+    description: >
+      An array of scenarios manipulating the pods in the cluster.
+      The scenarios are executed one by one in the specified order.
     items:
       type: object
       "$ref": "#/definitions/podScenario"
-      description: >
-        An array of scenarios manipulating the pods in the cluster.
-        The scenarios are executed one by one in the specified order.
 
 
 ###################################################################################################

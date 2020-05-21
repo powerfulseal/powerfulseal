@@ -30,7 +30,7 @@ except:
     pass
 
 from ..execute import (
-    RemoteExecutor,
+    SSHExecutor,
 )
 
 DEFAULT_COLOR_KEYWORDS = {

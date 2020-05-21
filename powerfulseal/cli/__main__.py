@@ -33,7 +33,7 @@ from powerfulseal.web.server import start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver, GCPDriver
-from ..execute import RemoteExecutor
+from ..execute import SSHExecutor
 from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
@@ -534,7 +534,7 @@ def main(argv):
     if operation_mode == "kubernetes":
         if args.use_private_ip:
             logger.info("Using each node's private IP address")
-        executor = RemoteExecutor(
+        executor = SSHExecutor(
             user=args.remote_user,
             ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
             ssh_path_to_private_key=args.ssh_path_to_private_key,
@@ -546,7 +546,7 @@ def main(argv):
     else:
         if args.use_private_ip:
             logger.info("Using each node's private IP address")
-        executor = RemoteExecutor(
+        executor = SSHExecutor(
             user=args.remote_user,
             ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
             ssh_path_to_private_key=args.ssh_path_to_private_key,

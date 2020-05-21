@@ -17,7 +17,7 @@ from mock import MagicMock
 from powerfulseal.policy.node_scenario import NodeScenario
 from powerfulseal.policy.pod_scenario import PodScenario
 from powerfulseal.policy.scenario import Scenario
-from powerfulseal.execute import RemoteExecutor
+from powerfulseal.execute import SSHExecutor
 
 
 # Common fixtures
@@ -76,7 +76,7 @@ def pod_scenario():
     inventory = MagicMock()
     k8s_inventory = MagicMock()
     k8s_inventory.delete_pods = False
-    executor = RemoteExecutor()
+    executor = SSHExecutor()
     return PodScenario(
         name="test scenario",
         schema=EXAMPLE_POD_SCHEMA,

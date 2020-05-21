@@ -17,14 +17,14 @@ from datetime import datetime
 import pytest
 from mock import MagicMock
 
-from powerfulseal.execute import RemoteExecutor
+from powerfulseal.execute import SSHExecutor
 from powerfulseal.node import NodeInventory, Node
 from powerfulseal.policy.label_runner import LabelRunner
 from powerfulseal.k8s.pod import Pod
 
 def test_kill_pod_APIcalling():
      
-    label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
+    label_runner = LabelRunner(NodeInventory(None), None, None, SSHExecutor())
 
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
@@ -58,7 +58,7 @@ def test_kill_pod_APIcalling():
 
 
 def test_kill_pod_SSHing():    
-    label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
+    label_runner = LabelRunner(NodeInventory(None), None, None, SSHExecutor())
 
     #Pactch action of switching to SSHing mode
     k8s_inventory = MagicMock()
@@ -88,7 +88,7 @@ def test_kill_pod_SSHing():
 
 
 def test_kill_pod_forced_SSHing():
-    label_runner = LabelRunner(NodeInventory(None), None, None, RemoteExecutor())
+    label_runner = LabelRunner(NodeInventory(None), None, None, SSHExecutor())
 
     #Pactch action of switching to SSHing mode
     k8s_inventory = MagicMock()

@@ -19,7 +19,7 @@ import logging
 import spur
 
 
-class RemoteExecutor(object):
+class SSHExecutor(object):
     """ Executes commands on Node instances via SSH.
         Assumes password-less setup.
     """

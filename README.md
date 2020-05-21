@@ -1,5 +1,7 @@
 
-# PowerfulSeal [![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.com/bloomberg/powerfulseal) [![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
+# PowerfulSeal
+
+[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.com/bloomberg/powerfulseal) [![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
 
 __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect problems in your systems as early as possible. It kills targeted pods and takes VMs up and down.
 
@@ -16,37 +18,38 @@ __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect 
 It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/), and is inspired by [Chaos Monkey](https://github.com/Netflix/chaosmonkey). [Watch the Seal at KubeCon 2017 Austin](https://youtu.be/00BMn0UjsG4).
 ## On the menu
 
-- [Highlights](#highlights)
-- [Introduction](#introduction)
-- [Setup](#setup)
-  - [Running inside of the cluster](#running-inside-of-the-cluster)
-  - [Running outside of the cluster](#running-outside-of-the-cluster)
-  - [Minikube setup](#minikube-setup)
-- [Getting started](#getting-started)
-  - [Docker](#docker)
-- [Modes of operation](#modes-of-operation)
-  - [Interactive mode](#interactive-mode)
-  - [Autonomous mode](#autonomous-mode)
-    - [Writing policies](#writing-policies)
-    - [Metrics collection](#metrics-collection)
-    - [Web User Interface](#web-user-interface)
-  - [Label mode](#label-mode)
-  - [Demo mode](#demo-mode)
-- [Inventory File](#inventory-file)
-- [Cloud Provider Requirements](#cloud-provider-requirements)
-  - [SSH](#ssh)
-  - [Azure](#azure)
-  - [AWS](#aws)
-  - [OpenStack](#openstack)
-  - [GCP](#gcp)
-- [Testing](#testing)
-- [Read about the PowerfulSeal](#read-about-the-powerfulseal)
-- [FAQ](#faq)
-  - [Where can I learn more about Chaos Engineering ?](#where-can-i-learn-more-about-chaos-engineering)
-  - [How is it different from Chaos Monkey ?](#how-is-it-different-from-chaos-monkey)
-  - [Can I contribute to The Seal ?](#can-i-contribute-to-the-seal)
-  - [Why a Seal ?](#why-a-seal)
-- [Footnotes](#footnotes)
+- [PowerfulSeal](#powerfulseal)
+  - [On the menu](#on-the-menu)
+  - [Highlights](#highlights)
+  - [Introduction](#introduction)
+  - [Setup](#setup)
+    - [Running inside of the cluster](#running-inside-of-the-cluster)
+    - [Running outside of the cluster](#running-outside-of-the-cluster)
+    - [Minikube setup](#minikube-setup)
+  - [Getting started](#getting-started)
+    - [Docker](#docker)
+  - [Modes of operation](#modes-of-operation)
+    - [Interactive mode](#interactive-mode)
+    - [Autonomous mode](#autonomous-mode)
+      - [Writing policies](#writing-policies)
+      - [Metrics collection](#metrics-collection)
+      - [Web User Interface](#web-user-interface)
+    - [Label mode](#label-mode)
+  - [Inventory File](#inventory-file)
+  - [Cloud Provider Requirements](#cloud-provider-requirements)
+    - [SSH](#ssh)
+    - [Azure](#azure)
+    - [AWS](#aws)
+    - [OpenStack](#openstack)
+    - [GCP](#gcp)
+  - [Testing](#testing)
+  - [Read about the PowerfulSeal](#read-about-the-powerfulseal)
+  - [FAQ](#faq)
+    - [Where can I learn more about Chaos Engineering ?](#where-can-i-learn-more-about-chaos-engineering)
+    - [How is it different from Chaos Monkey ?](#how-is-it-different-from-chaos-monkey)
+    - [Can I contribute to The Seal ?](#can-i-contribute-to-the-seal)
+    - [Why a Seal ?](#why-a-seal)
+  - [Footnotes](#footnotes)
 
 ## Highlights
 
@@ -68,8 +71,6 @@ __PowerfulSeal__ works in several modes:
 - __Autonomous__ mode reads a policy file, which can contain any number of pod and node scenarios. Each scenario describes a list of matches, filters and actions to execute on your cluster, and will be executed in a loop.
 
 - __Label__ mode allows you to specify which pods to kill with a small number of options by adding `seal/` labels to pods. This is a more imperative alternative to autonomous mode.  
-
-- __Demo__ mode allows you to point the Seal at a cluster and a `metrics-server` server and let it try to figure out what to kill, based on the resource utilization.
 
 
 
@@ -295,16 +296,6 @@ Detailed instructions on how to use label mode can be found in [LABELS.md](./med
 $ seal label --help
 ```
 
-
-### Demo mode
-
-The main way to use PowerfulSeal is to write a policy file for Autonomous mode which reflects realistic failures in your system. However, PowerfulSeal comes with a demo mode to demonstrate how it can cause chaos on your Kubernetes cluster. Demo mode gets all the pods in the cluster, selects those which are using the most resources, then kills them based on a probability.
-
-Demo mode requires [metrics-server](https://github.com/kubernetes-incubator/metrics-server). To run demo mode, use the `demo` subcommand along with `--metrics-server-path` (path to metrics-server without a trailing slash, e.g., `http://localhost:8080/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy`). You can also optionally specify `--aggressiveness` (from `1` (weakest) to `5` (strongest)) inclusive, as well as `--[min/max]-seconds-between-runs`.
-
-```sh
-$ seal demo --help
-```
 
 ## Inventory File
 

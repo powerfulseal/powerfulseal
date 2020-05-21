@@ -50,11 +50,25 @@ definitions:
     additionalProperties: false
     properties:
       loopsNumber:
+        description: >
+          If set, will execute the given scenarios once, and then exit.
+          Use this option for one-off experiments, rather than a process running continuosly on the cluster.
         type: number
+        minimum: 1
       minSecondsBetweenRuns:
+        description: >
+          The Seal waits a randomized amount of time before executing the scenarios.
+          This sets the MIN number of seconds that it will wait.
         type: number
+        minimum: 0
+        default: 30
       maxSecondsBetweenRuns:
+        description: >
+          The Seal waits a randomized amount of time before executing the scenarios.
+          This sets the MAX number of seconds that it will wait.
         type: number
+        minimum: 0
+        default: 30
 
   nodeScenario:
     description: >

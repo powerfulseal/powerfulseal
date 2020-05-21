@@ -60,7 +60,7 @@ class K8sInventory():
         """ Returns all namespaces.
         """
         if self._cache_last is not None and self.is_fresh(self._cache_last):
-            self.logger.info("Using cached namespaces")
+            self.logger.debug("Using cached namespaces")
             return self._cache_namespaces
         self.logger.info("Reading kubernetes namespaces")
         namespaces = [

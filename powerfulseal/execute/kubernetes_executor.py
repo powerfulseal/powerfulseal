@@ -34,4 +34,4 @@ class KubernetesExecutor(AbstractExecutor):
     def execute(self, *args, **kwargs):
         """ Noop for backwards compatibility"""
         self.logger.error("NOOP: can't execute arbitrary SSH commands in Kubernetes mode")
-        return []
+        return {}

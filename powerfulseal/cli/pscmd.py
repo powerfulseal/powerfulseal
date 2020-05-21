@@ -123,6 +123,12 @@ class PSCmd(cmd.Cmd):
 
         return suggestions
 
+    def find_nodes(self, query):
+        nodes = list(self.inventory.find_nodes(query))
+        if not nodes:
+            print(colored("No matching hosts", "yellow"))
+        return nodes
+
     ###########################################################################
     # CLI control
     ###########################################################################
@@ -147,7 +153,7 @@ class PSCmd(cmd.Cmd):
             extras = {query: "blue"}
         else:
             extras = {}
-        for node in self.inventory.find_nodes(query):
+        for node in self.find_nodes(query):
             print(colour_output(str(node), extras))
 
     def do_sync(self, line):
@@ -176,7 +182,7 @@ class PSCmd(cmd.Cmd):
         Brings up a subset of machines
         """
         cmd = Command(line)
-        for node in self.inventory.find_nodes(cmd.get(0)):
+        for node in self.find_nodes(cmd.get(0)):
             print("Starting %s" % (node))
             try:
                 self.driver.start(node)
@@ -188,7 +194,7 @@ class PSCmd(cmd.Cmd):
         Brings down a subset of machines
         """
         cmd = Command(line)
-        for node in self.inventory.find_nodes(cmd.get(0)):
+        for node in self.find_nodes(cmd.get(0)):
             print("Stopping %s" % (node))
             try:
                 self.driver.stop(node)
@@ -206,7 +212,7 @@ class PSCmd(cmd.Cmd):
         cmd = Command(line)
         if cmd.get(0) is None:
             return print("Can't delete all machines at once. It's for your own good")
-        for node in self.inventory.find_nodes(cmd.get(0)):
+        for node in self.find_nodes(cmd.get(0)):
             print("About to PERMANENTLY DELETE THIS NODE: \n{node}".format(
                 node=colour_output(str(node))
             ))
@@ -260,7 +266,7 @@ class PSCmd(cmd.Cmd):
             exec <subset> "command -to 'execute'"
         """
         cmd = Command(line)
-        nodes = self.inventory.find_nodes(cmd.get(0))
+        nodes = self.find_nodes(cmd.get(0))
         command = " ".join(cmd.args[1:])
         if prefix is not None:
             command = prefix + " " + command

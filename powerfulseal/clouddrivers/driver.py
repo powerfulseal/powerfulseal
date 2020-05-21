@@ -13,11 +13,10 @@
 # limitations under the License.
 
 
-import abc, six
+from abc import ABC, abstractmethod
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AbstractDriver():
+class AbstractDriver(ABC):
     """
         Abstract class representing a cloud driver.
         All concrete drivers should implement this.
@@ -27,22 +26,22 @@ class AbstractDriver():
               no separate public IP.
     """
 
-    @abc.abstractmethod
+    @abstractmethod
     def sync(self):
         pass  # pragma: no cover
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_by_ip(self, ip):
         pass  # pragma: no cover
 
-    @abc.abstractmethod
+    @abstractmethod
     def stop(self, node):
         pass  # pragma: no cover
 
-    @abc.abstractmethod
+    @abstractmethod
     def start(self, node):
         pass  # pragma: no cover
 
-    @abc.abstractmethod
+    @abstractmethod
     def delete(self, node):
         pass  # pragma: no cover

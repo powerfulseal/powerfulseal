@@ -71,12 +71,12 @@ def add_kubernetes_options(parser):
     )
     args_kubernetes.add_argument(
         '--use-pod-delete-instead-of-ssh-kill',
-        help='DEPRECATED! If set, will not require SSH (will delete pods instead) - DEPRECATED - now triggers --operation-mode=kubernetes',
+        help='DEPRECATED! If set, will not require SSH (will delete pods instead) - DEPRECATED - now triggers --mode=kubernetes',
         default=False,
         action='store_true',
     )
     args_kubernetes.add_argument(
-        '--operation-mode',
+        '--mode',
         help=(
             'PowerfulSeal supports two ways of injecting failure: ',
             '1) through SSH and 2) by scheduling containers in Kubernetes. ',
@@ -469,7 +469,7 @@ def main(argv):
     ##########################################################################
     kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
-    operation_mode = args.operation_mode
+    operation_mode = args.mode
     # backwards compatibility
     if args.use_pod_delete_instead_of_ssh_kill:
         operation_mode = "kubernetes"

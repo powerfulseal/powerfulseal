@@ -141,8 +141,8 @@ minikube-interactive:
 
 docs: $(SCHEMA_FILE)
 	# https://coveooss.github.io/json-schema-for-humans/
-	cat $(SCHEMA_FILE) | python -c "import sys; import yaml; import json; print(json.dumps(yaml.safe_load(sys.stdin.read()), indent=4, sort_keys=True))" > tmp.json
 	pip install yaml json-schema-for-humans
+	cat $(SCHEMA_FILE) | python -c "import sys; import yaml; import json; print(json.dumps(yaml.safe_load(sys.stdin.read()), indent=4, sort_keys=True))" > tmp.json
 	mkdir -p docs-schema
 	generate-schema-doc --no-minify --expand-buttons tmp.json docs-schema/index.html
 

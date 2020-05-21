@@ -14,4 +14,4 @@
 # limitations under the License.
 
 
-from .remote_executor import SSHExecutor
+from .ssh_executor import SSHExecutor

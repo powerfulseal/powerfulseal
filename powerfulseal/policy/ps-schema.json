@@ -1,6 +1,7 @@
 {
     "title": "PowerfulSeal configuration schema",
     "$schema": "https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/policy/ps-schema.json",
+    "description": "The following configuration options document all features available for writing policy files with PowerfulSeal\n",
     "type": "object",
     "properties": {
         "config": {

@@ -1,5 +1,6 @@
 {
-    "title": "PowerfulSeal config",
+    "title": "PowerfulSeal configuration schema",
+    "$schema": "https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/policy/ps-schema.json",
     "type": "object",
     "properties": {
         "config": {

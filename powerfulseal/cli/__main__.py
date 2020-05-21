@@ -200,6 +200,7 @@ def add_namespace_options(parser):
     args.add_argument('--kubernetes-namespace',
         default='default',
         help='Namespace to use for label mode '
+             'or a comma-separated list of namespaces'
              '(set to blank for all namespaces)'
     )
 

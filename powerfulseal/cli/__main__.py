@@ -24,7 +24,6 @@ import os
 
 import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient
-from powerfulseal.policy.demo_runner import DemoRunner
 from prometheus_client import start_http_server
 from powerfulseal.metriccollectors import StdoutCollector, PrometheusCollector, DatadogCollector
 from powerfulseal.policy.label_runner import LabelRunner
@@ -187,7 +186,7 @@ def add_namespace_options(parser):
     args = parser.add_argument_group('Kubernetes options')
     args.add_argument('--kubernetes-namespace',
         default='default',
-        help='Namespace to use for label and demo mode '
+        help='Namespace to use for label mode '
              '(set to blank for all namespaces)'
     )
 
@@ -386,34 +385,6 @@ def parse_args(args):
     add_namespace_options(parser_label)
     add_run_options(parser_label)
     add_metrics_options(parser_label)
-
-    ##########################################################################
-    # DEMO MODE
-    ##########################################################################
-    parser_demo = subparsers.add_parser('demo',
-        help=(
-            'Starts in demo mode. '
-            'It reads Kubernetes pods in specified namespaces, and reads '
-            'metrics-server metrics to guess what\'s worth killing. '
-        ),
-    )
-    add_common_options(parser_demo)
-    add_namespace_options(parser_demo)
-    add_run_options(parser_demo)
-    add_metrics_options(parser_demo)
-
-    demo_options = parser_demo.add_argument_group(
-        title='metrics-server settings'
-    )
-    demo_options.add_argument('--metrics-server-path',
-        help='Base path of metrics-server without trailing slash',
-        required=True
-    )
-    demo_options.add_argument('--aggressiveness',
-        help='Aggressiveness of demo mode (default: 3)',
-        default=3,
-        type=int
-    )
 
     ##########################################################################
     # VALIDATE POLICY MODE
@@ -646,31 +617,6 @@ def main(argv):
         )
         logger.info("STARTING LABEL MODE")
         label_runner.run()
-
-    ##########################################################################
-    # DEMO MODE
-    ##########################################################################
-    elif args.mode == 'demo':
-        aggressiveness = int(args.aggressiveness)
-        if not 1 <= aggressiveness <= 5:
-            print("Aggressiveness must be between 1 and 5 inclusive")
-            sys.exit(1)
-
-        metrics_server_client = MetricsServerClient(args.metrics_server_path)
-        demo_runner = DemoRunner(
-            inventory,
-            k8s_inventory,
-            driver,
-            executor,
-            metrics_server_client,
-            aggressiveness=aggressiveness,
-            min_seconds_between_runs=args.min_seconds_between_runs,
-            max_seconds_between_runs=args.max_seconds_between_runs,
-            namespace=args.kubernetes_namespace,
-            metric_collector=metric_collector,
-        )
-        logger.info("STARTING DEMO MODE")
-        demo_runner.run()
 
 
 def start():

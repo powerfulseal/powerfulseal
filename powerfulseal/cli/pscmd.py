@@ -437,30 +437,13 @@ class PSCmd(cmd.Cmd):
         if pod.state == 'Pending':
             return print("Can't kill pod on pending state")
 
-        # In case we are setup to delete pods, instead of SSHing
-        if self.k8s_inventory.delete_pods:
-            ans = False
-            while ans not in ("y", "n"):
-                print("Will delete pod '%s' through kubernetes API. Continue ? [y/n]: " % pod)
-                ans = input().lower()
-            if ans != "y":
-                return print("Cancelling")
-            self.k8s_inventory.k8s_client.delete_pods([pod])
-            return
+        # check with the user
+        ans = False
+        while ans not in ("y", "n"):
+            print("Will delete pod '%s' through kubernetes API. Continue ? [y/n]: " % pod)
+            ans = input().lower()
+        if ans != "y":
+            return print("Cancelling")
 
-        # find the node
-        node = self.inventory.get_node_by_ip(pod.host_ip)
-        if node is None:
-            return print("Node not found")
-
-        # execute docker of the pod on the node
-        for container_id in pod.container_ids:
-            cmd = self.executor.get_kill_command(container_id.replace("docker://",""))
-            ans = False
-            while ans not in ("y", "n"):
-                print("Will execute '%s' on %s. Continue ? [y/n]: " % (cmd, node))
-                ans = input().lower()
-            if ans != "y":
-                return print("Cancelling")
-            self.execute(cmd, [node])
-
+        # kill the pod
+        return self.executor.kill_pod(pod, self.inventory)

@@ -475,7 +475,6 @@ def main(argv):
         operation_mode = "kubernetes"
     k8s_inventory = K8sInventory(
         k8s_client=k8s_client,
-        delete_pods=args.use_pod_delete_instead_of_ssh_kill
     )
 
     ##########################################################################

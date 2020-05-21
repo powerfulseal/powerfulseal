@@ -86,8 +86,10 @@ class LabelRunner:
         # update the metrics
         if success:
             self.metric_collector.add_pod_killed_metric(pod)
+            self.logger.info("Pod killed: %s", pod)
         else:
             self.metric_collector.add_pod_kill_failed_metric(pod)
+            self.logger.error("Pod NOT killed: %s", pod)
         return success
 
     def filter_pods(self, pods):

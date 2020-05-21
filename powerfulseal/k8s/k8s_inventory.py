@@ -50,10 +50,16 @@ class K8sInventory():
     def preprocess_namespace(self, namespace):
         # Check if namespace is None instead of using "or" as Kubernetes treats
         # an empty string as the */all wildcard
+        # always returns a list of namespaces
+        sep = ","
         if namespace is None:
-            namespace = "default"
+            namespaces = ["default"]
         if namespace == "*":
-            namespace = ""
+            namespaces = [""]
+        if sep in namespace:
+            namespaces = namespace.split(sep)
+        # sort and deduplicate
+        namespaces = sorted(list(set(namespaces)))
         return namespace
 
     def find_namespaces(self):
@@ -73,24 +79,26 @@ class K8sInventory():
     def find_deployments(self, namespace=None, labels=None):
         """ Find deployments for a namespace (default to "default" namespace).
         """
-        namespace = self.preprocess_namespace(namespace)
-        return [
-            item.metadata.name
+        deployments = []
+        for ns in self.preprocess_namespace(namespace):
             for item in self.k8s_client.list_deployments(
-                namespace=namespace,
+                namespace=ns,
                 labels=labels,
-            )
-        ]
+            ):
+                deployments.append(item.metadata.name)
+        return deployments
 
     def find_pods(self, namespace, selector=None, deployment_name=None):
         """ Find pods in a namespace, for a deployment or selector.
         """
-        namespace = self.preprocess_namespace(namespace)
-        pods = self.k8s_client.list_pods(
-            namespace=namespace,
-            selector=selector,
-            deployment_name=deployment_name,
-        )
+        pods = []
+        for ns in self.preprocess_namespace(namespace):
+            for pod in self.k8s_client.list_pods(
+                namespace=ns,
+                selector=selector,
+                deployment_name=deployment_name,
+            ):
+                pods.append(pod)
         pod_objects = []
         if pods is not None:
             for i, item in enumerate(pods):

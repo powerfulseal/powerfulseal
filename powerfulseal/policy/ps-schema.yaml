@@ -61,14 +61,14 @@ definitions:
           This sets the MIN number of seconds that it will wait.
         type: number
         minimum: 0
-        default: 30
+        default: 0
       maxSecondsBetweenRuns:
         description: >
           The Seal waits a randomized amount of time before executing the scenarios.
           This sets the MAX number of seconds that it will wait.
         type: number
         minimum: 0
-        default: 30
+        default: 300
 
   nodeScenario:
     description: >

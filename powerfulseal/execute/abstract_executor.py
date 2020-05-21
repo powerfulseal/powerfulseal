@@ -1,4 +1,3 @@
-
 # Copyright 2017 Bloomberg Finance L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,5 +13,14 @@
 # limitations under the License.
 
 
-from .ssh_executor import SSHExecutor
-from .kubernetes_executor import KubernetesExecutor
+from abc import ABC, abstractmethod
+
+
+class AbstractExecutor(ABC):
+    """
+        Abstract class representing an executor.
+    """
+
+    @abstractmethod
+    def kill_pod(self, pod, inventory, signal):
+        pass  # pragma: no cover

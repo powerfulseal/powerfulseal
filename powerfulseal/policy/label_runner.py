@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 import random
+
 import time
 from datetime import datetime
 
@@ -71,39 +72,25 @@ class LabelRunner:
             self.inventory.sync()
 
     def kill_pod(self, pod):
-        # Find node
-        node = self.inventory.get_node_by_ip(pod.host_ip)
-        if node is None:
-            self.logger.info("Node not found for pod: %s", pod)
-            return
-
-        # In case we are setup to delete pods, instead of SSHing
-        if self.k8s_inventory.delete_pods:
-            self.logger.info("Deleting pod %r", pod)
-            try:
-                self.k8s_inventory.k8s_client.delete_pods([pod])
-                self.metric_collector.add_pod_killed_metric(pod)
-            except:
-                self.metric_collector.add_pod_kill_failed_metric(pod)
-            return
-
-        # In case we are setup to kill pods by SSHing
-        # Format command
-        signal = "SIGKILL" if pod.get_label_or_annotation("seal/force-kill", "false") == "true" else "SIGTERM"
-        container_id = random.choice(pod.container_ids)
-        cmd = self.executor.get_kill_command(
-            signal=signal,
-            container_id=container_id.replace("docker://", ""),
-        )
-
-        # Execute command
-        self.logger.info("Action execute '%s' on %r", cmd, pod)
-        for value in self.executor.execute(cmd, nodes=[node]).values():
-            if value["ret_code"] > 0:
-                self.logger.info("Error return code: %s", value)
-                self.metric_collector.add_pod_kill_failed_metric(pod)
-            else:
-                self.metric_collector.add_pod_killed_metric(pod)
+        # prep the arguments
+        signal = "SIGTERM"
+        if pod.get_label_or_annotation("seal/force-kill", "false") == "true":
+            signal = "SIGKILL"
+        # kill the pod
+        success = None
+        try:
+            success = self.executor.kill_pod(pod, self.inventory, signal)
+        except:
+            success = False
+            self.logger.exception("Exception while killing pod")
+        # update the metrics
+        if success:
+            self.metric_collector.add_pod_killed_metric(pod)
+            self.logger.info("Pod killed: %s", pod)
+        else:
+            self.metric_collector.add_pod_kill_failed_metric(pod)
+            self.logger.error("Pod NOT killed: %s", pod)
+        return success
 
     def filter_pods(self, pods):
         filters = [

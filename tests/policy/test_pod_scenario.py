@@ -172,9 +172,10 @@ def test_doesnt_kill_when_cant_find_node(pod_scenario):
         },
     })
     pod_scenario.executor.execute = mock
+    pod_scenario.executor.logger = MagicMock()
     mock_item1 = MagicMock()
     mock_item2 = MagicMock()
     items = [mock_item1, mock_item2]
     pod_scenario.act(items)
     assert mock.call_count == 0
-    assert pod_scenario.logger.info.call_args[0] == ("Node not found for pod: %s", items[1])
+    assert pod_scenario.executor.logger.info.call_args[0] == ("Node not found for pod: %s", items[1])

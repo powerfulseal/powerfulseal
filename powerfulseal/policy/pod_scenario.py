@@ -92,46 +92,28 @@ class PodScenario(Scenario):
         )
         return pods
 
-    def action_kill(self, item, params):
+    def action_kill(self, pod, params):
         """ Kills a pod by executing a docker kill on one of the containers or pod delete
         """
         probability = params.get("probability", 1)
-
-        # In case we are setup to delete pods, instead of SSHing
-        if self.k8s_inventory.delete_pods:
-            if probability >= random.random():
-                self.logger.info("Deleting pod %r", item)
-                try:
-                    self.k8s_inventory.k8s_client.delete_pods([item])
-                    self.metric_collector.add_pod_killed_metric(item)
-                except:
-                    self.metric_collector.add_pod_kill_failed_metric(item)
-            else:
-                self.logger.info("Pod got lucky - not deleting")
-            return
-
-        node = self.inventory.get_node_by_ip(item.host_ip)
-        if node is None:
-            self.logger.info("Node not found for pod: %s", item)
-            return
         force = params.get("force", True)
         signal = "SIGKILL" if force else "SIGTERM"
-        container_id = random.choice(item.container_ids)
-        cmd = self.executor.get_kill_command(
-            signal=signal,
-            container_id=container_id.replace("docker://",""),
-        )
-
         if probability >= random.random():
-            self.logger.info("Action execute '%s' on %r", cmd, item)
-            for value in self.executor.execute(
-                cmd, nodes=[node]
-            ).values():
-                if value["ret_code"] > 0:
-                    self.logger.info("Error return code: %s", value)
-                    self.metric_collector.add_pod_kill_failed_metric(item)
-                else:
-                    self.metric_collector.add_pod_killed_metric(item)
+            # kill the pod
+            success = None
+            try:
+                success = self.executor.kill_pod(pod, self.inventory, signal)
+            except:
+                success = False
+                self.logger.exception("Exception while killing pod")
+            # update the metrics
+            if success:
+                self.metric_collector.add_pod_killed_metric(pod)
+                self.logger.info("Pod killed: %s", pod)
+            else:
+                self.metric_collector.add_pod_kill_failed_metric(pod)
+                self.logger.error("Pod NOT killed: %s", pod)
+            return success
         else:
             self.logger.info("Pod got lucky - not killing")
 

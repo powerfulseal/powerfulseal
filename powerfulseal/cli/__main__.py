@@ -31,7 +31,7 @@ from powerfulseal.web.server import start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver, GCPDriver
-from ..execute import RemoteExecutor
+from ..execute import SSHExecutor, KubernetesExecutor
 from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
@@ -71,9 +71,22 @@ def add_kubernetes_options(parser):
     )
     args_kubernetes.add_argument(
         '--use-pod-delete-instead-of-ssh-kill',
-        help='If set, will not require SSH (will delete pods instead)',
+        help='DEPRECATED! If set, will not require SSH (will delete pods instead) - DEPRECATED - now triggers --mode=kubernetes',
         default=False,
         action='store_true',
+    )
+    args_kubernetes.add_argument(
+        '--execution-mode',
+        help=(
+            'PowerfulSeal supports two ways of injecting failure: ',
+            '1) through SSH and 2) by scheduling containers in Kubernetes. ',
+            'Use of SSH leverages Docker directly and removes Kubernetes from the equation. It\'s typically faster too. ',
+            'But it requires SSH access to all nodes in the cluster. ',
+            'Alternatively, we can rely on Kubernetes to schedule our chaos pods. Slower, less reliable, but requires no special setup. ',
+            'The default is now to use Kubernetes',
+        ),
+        default="kubernetes",
+        choices=["kubernetes", "ssh"]
     )
 
 def add_ssh_options(parser):
@@ -138,7 +151,7 @@ def add_inventory_options(parser):
 def add_cloud_options(parser):
     # Cloud Driver
     args = parser.add_argument_group('Cloud settings')
-    cloud_options = args.add_mutually_exclusive_group(required=True)
+    cloud_options = args.add_mutually_exclusive_group()
     cloud_options.add_argument('--openstack',
         default=os.environ.get("OPENSTACK_CLOUD"),
         action='store_true',
@@ -456,9 +469,12 @@ def main(argv):
     ##########################################################################
     kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
+    operation_mode = args.execution_mode
+    # backwards compatibility
+    if args.use_pod_delete_instead_of_ssh_kill:
+        operation_mode = "kubernetes"
     k8s_inventory = K8sInventory(
         k8s_client=k8s_client,
-        delete_pods=args.use_pod_delete_instead_of_ssh_kill
     )
 
     ##########################################################################
@@ -508,17 +524,24 @@ def main(argv):
     ##########################################################################
     # SSH EXECUTOR
     ##########################################################################
-    if args.use_private_ip:
-        logger.info("Using each node's private IP address")
-    executor = RemoteExecutor(
-        user=args.remote_user,
-        ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
-        ssh_path_to_private_key=args.ssh_path_to_private_key,
-        override_host=args.override_ssh_host,
-        ssh_password=args.ssh_password,
-        use_private_ip=args.use_private_ip,
-        ssh_kill_command=args.ssh_kill_command,
-    )
+    if operation_mode == "kubernetes":
+        executor = KubernetesExecutor(
+            k8s_client=k8s_client,
+        )
+    else:
+        if args.use_private_ip:
+            logger.info("Using each node's private IP address")
+        if args.override_ssh_host:
+            logger.info("Using each overriten host: %s", args.override_ssh_host)
+        executor = SSHExecutor(
+            user=args.remote_user,
+            ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
+            ssh_path_to_private_key=args.ssh_path_to_private_key,
+            override_host=args.override_ssh_host,
+            ssh_password=args.ssh_password,
+            use_private_ip=args.use_private_ip,
+            ssh_kill_command=args.ssh_kill_command,
+        )
 
     ##########################################################################
     # INTERACTIVE MODE

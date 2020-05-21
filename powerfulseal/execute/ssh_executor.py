@@ -14,11 +14,13 @@
 # limitations under the License.
 
 import logging
-
 import spur
+import random
+
+from .abstract_executor import AbstractExecutor
 
 
-class RemoteExecutor(object):
+class SSHExecutor(AbstractExecutor):
     """ Executes commands on Node instances via SSH.
         Assumes password-less setup.
     """
@@ -85,9 +87,30 @@ class RemoteExecutor(object):
                     "ret_code": 1,
                     "error": str(e),
                 }
-                self.logger.info("Executing '%s' on %s failed with error: %s" % (cmd_full, node.name, str(e)))
+                self.logger.error("Executing '%s' on %s failed with error: %s" % (cmd_full, node.name, str(e)))
         return results
 
-    def get_kill_command(self, container_id, signal="SIGKILL"):
+    def get_kill_command(self, container_id, signal=None):
         """ Produces a templated command to execute """
-        return self.ssh_kill_command.format(signal=str(signal), container_id=str(container_id))
+        return self.ssh_kill_command.format(signal=str(signal or "SIGKILL"), container_id=str(container_id))
+
+    def kill_pod(self, pod, inventory, signal=None):
+        # Find node to execute SSH on
+        node = inventory.get_node_by_ip(pod.host_ip)
+        if node is None:
+            self.logger.info("Node not found for pod: %s", pod)
+            return False
+        # Format command
+        container_id = random.choice(pod.container_ids)
+        cmd = self.get_kill_command(
+            signal=signal,
+            container_id=container_id.replace("docker://", ""),
+        )
+        # Execute command
+        self.logger.info("Action execute '%s' on %r", cmd, pod)
+        for value in self.execute(cmd, nodes=[node]).values():
+            if value["ret_code"] > 0:
+                self.logger.error("Error return code: %s", value)
+                return False
+
+        return True

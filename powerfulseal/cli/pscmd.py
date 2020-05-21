@@ -126,7 +126,7 @@ class PSCmd(cmd.Cmd):
     def find_nodes(self, query):
         nodes = self.inventory.find_nodes(query)
         if not nodes:
-            print(colored("No matching hosts", "yello"))
+            print(colored("No matching hosts", "yellow"))
         return nodes
 
     ###########################################################################

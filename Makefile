@@ -140,6 +140,7 @@ minikube-interactive:
 			--override-ssh-host `minikube ip`
 
 docs: $(SCHEMA_FILE)
+	# https://coveooss.github.io/json-schema-for-humans/
 	$(shell cat $(SCHEMA_FILE) | python -c "import sys; import yaml; import json; print(json.dumps(yaml.safe_load(sys.stdin.read()), indent=4, sort_keys=True))" > tmp.json)
 	pip install json-schema-for-humans
 	mkdir -p docs-schema

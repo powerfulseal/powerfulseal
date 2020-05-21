@@ -54,10 +54,12 @@ class K8sInventory():
         sep = ","
         if namespace is None:
             namespaces = ["default"]
-        if namespace == "*":
+        elif namespace == "*":
             namespaces = [""]
-        if sep in namespace:
+        elif sep in namespace:
             namespaces = namespace.split(sep)
+        else:
+            namespaces = [namespace]
         # sort and deduplicate
         namespaces = sorted(list(set(namespaces)))
         return namespace

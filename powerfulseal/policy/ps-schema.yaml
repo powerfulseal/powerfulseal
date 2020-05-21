@@ -19,19 +19,23 @@ properties:
   config:
     type: object
     "$ref": "#/definitions/config"
-    description: Configuration specific to the current policy
+    description: General configuration of this policy.
   nodeScenarios:
     type: array
     items:
       type: object
       "$ref": "#/definitions/nodeScenario"
-      description: Configuration specific to the current policy
+      description: >
+        An array of scenarios manipulating the nodes in the cluster.
+        The scenarios are executed one by one in the specified order.
   podScenarios:
     type: array
     items:
       type: object
       "$ref": "#/definitions/podScenario"
-      description: Configuration specific to the current policy
+      description: >
+        An array of scenarios manipulating the pods in the cluster.
+        The scenarios are executed one by one in the specified order.
 
 
 ###################################################################################################

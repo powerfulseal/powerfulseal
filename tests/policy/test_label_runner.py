@@ -17,27 +17,26 @@ from datetime import datetime
 import pytest
 from mock import MagicMock
 
-from powerfulseal.execute import SSHExecutor
+from powerfulseal.execute import SSHExecutor, KubernetesExecutor
 from powerfulseal.node import NodeInventory, Node
 from powerfulseal.policy.label_runner import LabelRunner
 from powerfulseal.k8s.pod import Pod
 
 def test_kill_pod_APIcalling():
-     
-    label_runner = LabelRunner(NodeInventory(None), None, None, SSHExecutor())
+
+    k8s_client_mock = MagicMock()
+    label_runner = LabelRunner(NodeInventory(None), None, None, KubernetesExecutor(k8s_client_mock))
 
     # Patch action of getting nodes to execute kill command on
     test_node = Node(1)
     get_node_by_ip_mock = MagicMock(return_value=test_node)
     label_runner.inventory.get_node_by_ip = get_node_by_ip_mock
 
-    #Pactch action of switching to APIcalling mode
+    # Patch k8s inventory
     k8s_inventory = MagicMock()
-    k8s_inventory.delete_pods = True
     label_runner.k8s_inventory = k8s_inventory
 
     # Patch action of choosing container
-    k8s_client_mock = MagicMock()
     label_runner.k8s_inventory.k8s_client = k8s_client_mock
 
     delete_pods_mock = MagicMock()

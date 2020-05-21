@@ -45,6 +45,7 @@ properties:
 definitions:
 
   config:
+    description: "Configure the current policy"
     type: object
     additionalProperties: false
     properties:
@@ -56,6 +57,11 @@ definitions:
         type: number
 
   nodeScenario:
+    description: >
+      Describe a node scenario. It's a scenario that can match, filter and action on nodes in your kubernetes cluster.
+      It can integrate with your cloud provider and take nodes up and down to simulate VMs going down.
+      If you're running in SSH mode, it can also execute various commands on hosts. And much more!
+      See below for mode details.
     type: object
     additionalProperties: false
     properties:
@@ -93,6 +99,12 @@ definitions:
     - actions
 
   podScenario:
+    description: >
+      Describe a pod scenario. It's a scenario that can match, filter and action on pods in your kubernetes cluster.
+      You can filter by selectors, namespaces, deployments etc.
+      Then you can filter the pods based on various criteria, like state or IP.
+      Then you can action on each of them, by executing the configured actions.
+      See below for the details of the configuration available.
     type: object
     additionalProperties: false
     properties:

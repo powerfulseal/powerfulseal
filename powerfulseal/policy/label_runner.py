@@ -206,7 +206,7 @@ class LabelRunner:
         tokens = label.split('-')
 
         # Ensure tokens is a list of three values ('HH', 'MM', 'SS')
-        if len(tokens) != 3 or not all(map(lambda x: len(x) is 2, tokens)):
+        if len(tokens) != 3 or not all(map(lambda x: len(x) == 2, tokens)):
             raise ValueError("Label be in HH-MM-SS format")
 
         hours = int(tokens[0])

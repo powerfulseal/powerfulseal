@@ -90,9 +90,9 @@ class SSHExecutor(AbstractExecutor):
                 self.logger.error("Executing '%s' on %s failed with error: %s" % (cmd_full, node.name, str(e)))
         return results
 
-    def get_kill_command(self, container_id, signal="SIGKILL"):
+    def get_kill_command(self, container_id, signal=None):
         """ Produces a templated command to execute """
-        return self.ssh_kill_command.format(signal=str(signal), container_id=str(container_id))
+        return self.ssh_kill_command.format(signal=str(signal or "SIGKILL"), container_id=str(container_id))
 
     def kill_pod(self, pod, inventory, signal=None):
         # Find node to execute SSH on

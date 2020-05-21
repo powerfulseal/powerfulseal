@@ -96,11 +96,13 @@ class PodScenario(Scenario):
         """ Kills a pod by executing a docker kill on one of the containers or pod delete
         """
         probability = params.get("probability", 1)
+        force = params.get("force", True)
+        signal = "SIGKILL" if force else "SIGTERM"
         if probability >= random.random():
             # kill the pod
             success = None
             try:
-                success = self.executor.kill_pod(pod, self.inventory)
+                success = self.executor.kill_pod(pod, self.inventory, signal)
             except:
                 success = False
                 self.logger.exception("Exception while killing pod")

@@ -34,7 +34,7 @@ class Scenario(ABC):
             - actions - to execute on all of the remaining items
 
         The scenarios are described using a yaml schema, that conforms
-        to powerfulseal/policy/ps-schema.json JSON schema.
+        to powerfulseal/policy/ps-schema.yaml JSON schema.
 
         This is a base class, containing some shared filters, shouldn't be
         used by itself. It's extended for both node and pod scenarios.

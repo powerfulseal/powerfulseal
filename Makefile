@@ -144,7 +144,7 @@ docs: $(SCHEMA_FILE)
 	cat $(SCHEMA_FILE) | python -c "import sys; import yaml; import json; print(json.dumps(yaml.safe_load(sys.stdin.read()), indent=4, sort_keys=True))" > tmp.json
 	pip install json-schema-for-humans
 	mkdir -p docs-schema
-	generate-schema-doc --expand-buttons tmp.json docs-schema/index.html
+	generate-schema-doc --no-minify --expand-buttons tmp.json docs-schema/index.html
 
 .PHONY: test watch upload clean build tag push version autonomous autonomous-headless interactive validate label minikube-autonomous minikube-label minikube-interactive
 

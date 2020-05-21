@@ -74,7 +74,7 @@ def add_kubernetes_options(parser):
     )
     args_kubernetes.add_argument(
         '--use-pod-delete-instead-of-ssh-kill',
-        help='If set, will not require SSH (will delete pods instead) - DEPRECATED - now triggers --operation-mode=kubernetes',
+        help='DEPRECATED! If set, will not require SSH (will delete pods instead) - DEPRECATED - now triggers --operation-mode=kubernetes',
         default=False,
         action='store_true',
     )

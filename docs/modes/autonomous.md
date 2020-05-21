@@ -67,14 +67,14 @@ podScenarios:
           force: true
 ```
 
-A [full featured example](./tests/policy/example_config.yml) listing most of the available options can be found in the [tests](./tests/policy).
+A [full featured example](https://github.com/bloomberg/powerfulseal/blob/master/tests/policy/example_config.yml) listing most of the available options can be found in the [tests](https://github.com/bloomberg/powerfulseal/tree/master/tests/policy).
 
-The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json).
+The schemas are validated against the [powerful YAML schema](https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/policy/ps-schema.yaml).
 
 
 ## Metrics collection
 
-Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout`, Prometheus and Datadog collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](./media/METRICS.md).
+Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a `stdout`, Prometheus and Datadog collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found [here](/in-depth-topics#metric-collection).
 
 
 ## Web User Interface

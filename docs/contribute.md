@@ -27,7 +27,7 @@ Pull Requests are always welcome, however they will only be accepted if they pro
 
 ## Contribution Licensing
 
-Since `PowerfulSeal` is distributed under the terms of the [Apache Version 2 license](LICENSE), contributions that you make are licensed under the same terms. In order for us to be able to accept your contributions, we will need explicit confirmation from you that you are able and willing to provide them under these terms, and the mechanism we use to do this is called a Developer's Certificate of Origin [DCO](DCO.md).  This is very similar to the process used by the Linux(R) kernel, Samba, and many other major open source projects.
+Since `PowerfulSeal` is distributed under the terms of the [Apache Version 2 license](https://github.com/bloomberg/powerfulseal/blob/master/LICENSE), contributions that you make are licensed under the same terms. In order for us to be able to accept your contributions, we will need explicit confirmation from you that you are able and willing to provide them under these terms, and the mechanism we use to do this is called a Developer's Certificate of Origin [DCO](https://github.com/bloomberg/powerfulseal/blob/master/DCO.md).  This is very similar to the process used by the Linux(R) kernel, Samba, and many other major open source projects.
 
 To participate under these terms, all that you must do is include a line like the following as the last line of the commit message for each commit in your contribution:
 
@@ -42,7 +42,7 @@ To participate under these terms, all that you must do is include a line like th
 PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test multiple Python versions in a straightforward manner.
 
 ### Installation
-In order to use `tox`, `tox` must be installed and Python binaries for the versions listed in [tox.ini](tox.ini) (3.6, 3.7 as of writing) must be visible in your PATH.
+In order to use `tox`, `tox` must be installed and Python binaries for the versions listed in [tox.ini](https://github.com/bloomberg/powerfulseal/blob/master/tox.ini) (3.6, 3.7 as of writing) must be visible in your PATH.
 
 Due to the difficulty in maintaining the required libraries for so many Python versions, it is recommended to use [pyenv](https://github.com/pyenv/pyenv) to install and manage multiple versions of Python.
 
@@ -58,3 +58,7 @@ The recommended installation steps are:
 With the installation complete, simply run `tox` (or the analagous `make test`). If you are running on a machine with `inotifywait` installed (i.e., a UNIX machine), you can run `make watch` and run tests automatically when you run changes.
 
 You can also run tests for specific versions by running `tox -e [version(s)]` (e.g., `tox -e py36`). Additionally, if you need to reinstall dependencies, you can use the `-r` flag.
+
+## Docs
+
+We use plain Markdown and Github Pages for the documentation. If you want to have a local environment [this](https://help.github.com/en/github/working-with-github-pages/testing-your-github-pages-site-locally-with-jekyll) is a good explanation.

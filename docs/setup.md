@@ -23,12 +23,12 @@ The setup depends on whether you run `PowerfulSeal` inside or outside of your cl
 
 ## Running inside of the cluster
 
-If you're running inside of the cluster (for example from [the docker image](./build)), the setup is pretty easy.
+If you're running inside of the cluster (for example from [the docker image](https://github.com/bloomberg/powerfulseal/tree/master/build)), the setup is pretty easy.
 
-You can see an example of how to do it [in ./kubernetes](./kubernetes). The setup involves:
+You can see an example of how to do it [in ./kubernetes](https://github.com/bloomberg/powerfulseal/tree/master/kubernetes). The setup involves:
 
-- creating [RBAC rules](./kubernetes/rbac.yml) to allow the seal to list, get and delete pods,
-- creating a [powerfulseal configmap and deployment](./kubernetes/powerfulseal.yml)
+- creating [RBAC rules](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/rbac.yml) to allow the seal to list, get and delete pods,
+- creating a [powerfulseal configmap and deployment](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/powerfulseal.yml)
   - your scenarios will live in the configmap
   - if you'd like to use the UI, you'll probably also need a service and ingress
   - make sure to use `--use-pod-delete-instead-of-ssh-kill` flag to not need to configure SSH access for killing pods
@@ -45,14 +45,14 @@ If you're running outside of your cluster, the setup will involve:
 - making sure the seal can SSH into the nodes in order to execute `docker kill` command
 - writing a set of policies
 
-It should look something like [this](./media/setup.png).
+It should look something like [this](https://github.com/bloomberg/powerfulseal/blob/master/media/setup.png).
 
 
 ## Minikube setup
 
 It is possible to test a subset of Seal's functionality using a [`minikube`](https://kubernetes.io/docs/setup/minikube/) setup.
 
-To achieve that, please inspect the [Makefile](./Makefile). You will need to override the ssh host, specify the correct username and use minikube's ssh keys.
+To achieve that, please inspect the [Makefile](https://github.com/bloomberg/powerfulseal/blob/master/Makefile). You will need to override the ssh host, specify the correct username and use minikube's ssh keys.
 
 
 If you'd like to test out the interactive mode, start with this:

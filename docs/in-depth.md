@@ -1,6 +1,26 @@
-# Metric Collection
+---
+layout: default
+title: In-depth topics
+nav_order: 10
+description: ""
+permalink: /in-depth-topics
+---
 
-## Description
+# In-depth topics
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+
+## Metric collection
+
+### Description
 
 The purpose of metric collection is to keep track of events which you may consider useful to be monitored (e.g., via Grafana). Three metric collectors have been implemented:
 
@@ -21,23 +41,23 @@ The metric collectors collect the following events:
 | seal_probability_filter_not_passed_total | N/A | Cases where the probability filter decides to skip all nodes | Useful to track long-term in order to ensure that probability distribution is as expected. |
 | seal_empty_match_total | source (either `nodes` or `pods`) | Cases where matching returns an empty result | See `seal_empty_filter_total` |
 
-## Usage
+### Usage
 
-### StdoutCollector (default)
+#### StdoutCollector (default)
 
 To print metrics to `stdout`, use the `--stdout-collector` flag.
 
-### PrometheusCollector
+#### PrometheusCollector
 
 To collect metrics, run PowerfulSeal with the `--prometheus-collector` flag, along with the `--prometheus-host` and `--prometheus-port` flags. Metrics will be exposed under a web server with URL `http://HOST:PORT/metrics`.
 
-### DatadogCollector
+#### DatadogCollector
 
 This collector relies on [DogStatsD](https://docs.datadoghq.com/developers/dogstatsd/) server (bundled with the [Datadog Agent](https://docs.datadoghq.com/agent/)), so a working instance is expected.
 
 To collect metrics, run PowerfulSeal with the `--datadog-collector` flag.
 
-## Use Case: Prometheus + Grafana + AlertManager
+### Use Case: Prometheus + Grafana + AlertManager
 
 ![Grafana example example](./media/grafana.png)
 
@@ -83,7 +103,7 @@ In order to configure this integration, follow the steps below. (The below instr
 4. Start PowerfulSeal with the `--prometheus-collector`, `--prometheus-host` and `--prometheus-port` flags, and restart Prometheus. Metrics should begin to appear.
 5. Ensure Grafana has your Prometheus server added as a data source and create a new Grafana dashboard with the metrics ([example here](examples/grafana.json) - note that the data source name may need to be changed)
 
-## Use Case: Datadog
+### Use Case: Datadog
 
 ![Datadog example example](./media/datadog.png)
 
@@ -96,3 +116,25 @@ In order to configure this properly, follow the steps below. (The below instruct
 2. Create a new dashboard with the collected metrics ([example here](examples/datadog.json)).
 
 3. Configure alerting with [Monitors](https://docs.datadoghq.com/monitors/), to give you the ability to know when critical changes are occurring.
+
+## Inventory file
+`PowerfulSeal` can use an ansible-style inventory file (in ini format)
+```ini
+[mygroup]
+myhost01
+
+[mygroup2]
+myhost02
+
+[some_hosts]
+myhost01
+myhost02
+```
+
+## Extend Powerfulseal
+
+### Custom Metric Collectors 
+
+### Custom Cloud Drivers 
+
+### Custom Filters 

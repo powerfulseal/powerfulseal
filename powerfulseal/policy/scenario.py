@@ -20,12 +20,12 @@ from datetime import datetime
 import calendar
 import random
 import logging
-import abc
 
+from abc import ABC, abstractmethod
 from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
 
 
-class Scenario():
+class Scenario(ABC):
     """ Basic class to represent a single testing scenario.
 
         Scenarios consist of 3 lists of things:
@@ -69,7 +69,6 @@ class Scenario():
             self.metric_collector.add_filtered_to_empty_set_metric()
         self.logger.debug("Done")
 
-    @abc.abstractmethod
     def match(self):
         """ Reads the policy and returns the initial set of items.
         """
@@ -201,7 +200,6 @@ class Scenario():
 
         return items
 
-    @abc.abstractmethod
     def act(self, items):
         """ Execute policy's actions on the items,
         """

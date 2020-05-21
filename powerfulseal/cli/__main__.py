@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 import argparse
 
 import yaml
@@ -22,7 +21,6 @@ import coloredlogs
 import textwrap
 import sys
 import os
-import six
 
 import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient
@@ -573,7 +571,7 @@ def main(argv):
                 print()
                 print("Ctrl-c again to quit")
             try:
-                six.moves.input()
+                input()
             except KeyboardInterrupt:
                 sys.exit(0)
         return

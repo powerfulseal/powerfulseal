@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import abc
-import six
+from abc import ABC, abstractmethod
 
 # Used to identify the source of metrics for actions which can be performed on
 # both pods and nodes
@@ -22,42 +20,41 @@ POD_SOURCE = 'pods'
 NODE_SOURCE = 'nodes'
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AbstractCollector():
+class AbstractCollector(ABC):
     """
         Metric collectors record events which are useful to users. The storage
         of these metrics is handled by the the collectors which extend this
         abstract class.
     """
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_pod_killed_metric(self, pod):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_pod_kill_failed_metric(self, pod):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_node_stopped_metric(self, node):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_node_stop_failed_metric(self, node):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_execute_failed_metric(self, node):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_filtered_to_empty_set_metric(self):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_probability_filter_passed_no_nodes_filter(self):
         pass  # pragma: nocover
 
-    @abc.abstractmethod
+    @abstractmethod
     def add_matched_to_empty_set_metric(self, source):
         pass  # pragma: nocover

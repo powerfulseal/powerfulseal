@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 import cmd
 import shlex
 import random
@@ -21,7 +20,6 @@ from datetime import datetime
 import json
 from termcolor import colored, cprint
 import sys
-import six
 
 try:
     import readline
@@ -215,7 +213,7 @@ class PSCmd(cmd.Cmd):
             answer = None
             while answer not in ("yes", "no"):
                 sys.stdout.write("Proceed ? (yes|no): ")
-                answer = six.moves.input()
+                answer = input()
             if answer == "yes":
                 print("Deleting")
                 self.driver.delete(node)
@@ -444,7 +442,7 @@ class PSCmd(cmd.Cmd):
             ans = False
             while ans not in ("y", "n"):
                 print("Will delete pod '%s' through kubernetes API. Continue ? [y/n]: " % pod)
-                ans = six.moves.input().lower()
+                ans = input().lower()
             if ans != "y":
                 return print("Cancelling")
             self.k8s_inventory.k8s_client.delete_pods([pod])
@@ -461,7 +459,7 @@ class PSCmd(cmd.Cmd):
             ans = False
             while ans not in ("y", "n"):
                 print("Will execute '%s' on %s. Continue ? [y/n]: " % (cmd, node))
-                ans = six.moves.input().lower()
+                ans = input().lower()
             if ans != "y":
                 return print("Cancelling")
             self.execute(cmd, [node])

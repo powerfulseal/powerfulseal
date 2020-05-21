@@ -7,7 +7,6 @@ import time
 import googleapiclient.discovery
 from oauth2client.client import GoogleCredentials
 from oauth2client.service_account import ServiceAccountCredentials
-from six.moves import input
 
 from . import AbstractDriver
 from ..node import Node

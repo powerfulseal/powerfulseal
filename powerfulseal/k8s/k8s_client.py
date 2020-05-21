@@ -153,8 +153,13 @@ class K8sClient():
             Delete all pods synchronously
         """
         for pod in pods:
-            self.client_corev1api.delete_namespaced_pod(
-                name=pod.name,
-                namespace=pod.namespace,
-                grace_period_seconds=0
-            )
+            try:
+                self.client_corev1api.delete_namespaced_pod(
+                    name=pod.name,
+                    namespace=pod.namespace,
+                    grace_period_seconds=0
+                )
+            except ApiException as e:
+                self.logger.exception(e)
+                return False
+        return True

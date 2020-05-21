@@ -263,7 +263,7 @@ podScenarios:
 
 A [full featured example](./tests/policy/example_config.yml) listing most of the available options can be found in the [tests](./tests/policy).
 
-The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.json).
+The schemas are validated against the [powerful JSON schema](./powerfulseal/policy/ps-schema.yaml).
 
 
 #### Metrics collection

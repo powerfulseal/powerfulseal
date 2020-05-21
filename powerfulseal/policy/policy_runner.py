@@ -35,7 +35,7 @@ class PolicyRunner():
     def get_schema(cls):
         """ Reads the schema from the file
         """
-        data = pkgutil.get_data(__name__, "ps-schema.json")
+        data = pkgutil.get_data(__name__, "ps-schema.yaml")
         return yaml.safe_load(data)
 
     @classmethod

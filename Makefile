@@ -2,7 +2,7 @@ INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
 TOX_CALL ?= tox -r
 METRICS_SERVER_URL ?= http://metrics-server.kube-system.svc.kubernetes.cluster/
 CLOUD_OPTION ?= --openstack
-SCHEMA_FILE=powerfulseal/policy/ps-schema.json
+SCHEMA_FILE=powerfulseal/policy/ps-schema.yaml
 
 name ?= powerfulseal
 version ?= `python setup.py --version`
@@ -140,9 +140,10 @@ minikube-interactive:
 			--override-ssh-host `minikube ip`
 
 docs: $(SCHEMA_FILE)
+	$(shell cat $(SCHEMA_FILE) | python -c "import sys; import yaml; import json; print(json.dumps(yaml.safe_load(sys.stdin.read()), indent=4, sort_keys=True))" > > schema.json)
 	pip install json-schema-for-humans
 	mkdir -p docs-schema
-	generate-schema-doc $(SCHEMA_FILE) docs-schema/index.html
+	generate-schema-doc schema.json docs-schema/index.html
 
 .PHONY: test watch upload clean build tag push version autonomous autonomous-headless interactive validate label minikube-autonomous minikube-label minikube-interactive
 

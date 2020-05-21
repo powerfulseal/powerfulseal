@@ -76,7 +76,7 @@ def add_kubernetes_options(parser):
         action='store_true',
     )
     args_kubernetes.add_argument(
-        '--mode',
+        '--execution-mode',
         help=(
             'PowerfulSeal supports two ways of injecting failure: ',
             '1) through SSH and 2) by scheduling containers in Kubernetes. ',
@@ -469,7 +469,7 @@ def main(argv):
     ##########################################################################
     kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
-    operation_mode = args.mode
+    operation_mode = args.execution_mode
     # backwards compatibility
     if args.use_pod_delete_instead_of_ssh_kill:
         operation_mode = "kubernetes"

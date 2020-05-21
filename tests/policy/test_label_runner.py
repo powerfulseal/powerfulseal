@@ -96,7 +96,6 @@ def test_kill_pod_forced_SSHing():
 
     # Patch action of switching to SSHing mode
     k8s_inventory = MagicMock()
-    k8s_inventory.delete_pods = False
     label_runner.k8s_inventory = k8s_inventory
     
     # Patch action of getting nodes to execute kill command on

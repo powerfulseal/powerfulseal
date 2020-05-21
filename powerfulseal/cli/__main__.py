@@ -31,7 +31,7 @@ from powerfulseal.web.server import start_server, ServerStateLogHandler
 from ..node import NodeInventory
 from ..node.inventory import read_inventory_file_to_dict
 from ..clouddrivers import OpenStackDriver, AWSDriver, NoCloudDriver, AzureDriver, GCPDriver
-from ..execute import SSHExecutor
+from ..execute import SSHExecutor, KubernetesExecutor
 from ..k8s import K8sClient, K8sInventory
 from .pscmd import PSCmd
 from ..policy import PolicyRunner
@@ -525,23 +525,13 @@ def main(argv):
     ##########################################################################
     # SSH EXECUTOR
     ##########################################################################
-    operation_mode = args.operation_mode
-    # backwards compatibility
-    if args.use_pod_delete_instead_of_ssh_kill:
-        operation_mode = "kubernetes"
     if operation_mode == "kubernetes":
-        if args.use_private_ip:
-            logger.info("Using each node's private IP address")
-        executor = SSHExecutor(
-            user=args.remote_user,
-            ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
-            ssh_path_to_private_key=args.ssh_path_to_private_key,
-            override_host=args.override_ssh_host,
-            ssh_password=args.ssh_password,
-            use_private_ip=args.use_private_ip,
-            ssh_kill_command=args.ssh_kill_command,
+        executor = KubernetesExecutor(
+            k8s_client=k8s_client,
         )
     else:
+        if args.use_private_ip:
+            logger.info("Using each node's private IP address")
         if args.use_private_ip:
             logger.info("Using each node's private IP address")
         executor = SSHExecutor(

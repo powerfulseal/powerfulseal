@@ -91,20 +91,6 @@ label:
 			--max-seconds-between-runs 10 \
 			--ssh-allow-missing-host-keys
 
-demo:
-	HTTP_PROXY=  \
-	http_proxy=  \
-	seal \
-		-vv \
-		demo \
-			--kubeconfig ~/.kube/config \
-			${CLOUD_OPTION} \
-			--inventory-kubernetes \
-			--prometheus-collector \
-			--prometheus-host 0.0.0.0 \
-			--prometheus-port 9999 \
-			--ssh-allow-missing-host-keys \
-			--metrics-server-path $(METRICS_SERVER_URL)
 
 
 # THE EXAMPLES BELOW SHOULD WORK FOR MINIKUBE
@@ -152,4 +138,5 @@ minikube-interactive:
 			--ssh-path-to-private-key `minikube ssh-key` \
 			--override-ssh-host `minikube ip`
 
-.PHONY: test watch upload clean build tag push version autonomous autonomous-headless interactive validate label demo minikube-autonomous minikube-label minikube-interactive
+.PHONY: test watch upload clean build tag push version autonomous autonomous-headless interactive validate label minikube-autonomous minikube-label minikube-interactive
+

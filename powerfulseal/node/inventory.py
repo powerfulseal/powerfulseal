@@ -15,14 +15,9 @@
 
 
 import logging
+import configparser
 
-import six
-from six.moves import configparser
-
-if six.PY2:
-    ConfigParser = configparser.SafeConfigParser
-else:
-    ConfigParser = configparser.ConfigParser
+ConfigParser = configparser.ConfigParser
 
 
 def read_inventory_file_to_dict(inventory_filename):

@@ -531,8 +531,8 @@ def main(argv):
     else:
         if args.use_private_ip:
             logger.info("Using each node's private IP address")
-        if args.use_private_ip:
-            logger.info("Using each node's private IP address")
+        if args.override_ssh_host:
+            logger.info("Using each overriten host: %s", args.override_ssh_host)
         executor = SSHExecutor(
             user=args.remote_user,
             ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,

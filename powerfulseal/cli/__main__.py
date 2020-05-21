@@ -500,6 +500,10 @@ def main(argv):
     ##########################################################################
     kube_config = parse_kubeconfig(args)
     k8s_client = K8sClient(kube_config=kube_config)
+    operation_mode = args.operation_mode
+    # backwards compatibility
+    if args.use_pod_delete_instead_of_ssh_kill:
+        operation_mode = "kubernetes"
     k8s_inventory = K8sInventory(
         k8s_client=k8s_client,
         delete_pods=args.use_pod_delete_instead_of_ssh_kill
@@ -552,17 +556,34 @@ def main(argv):
     ##########################################################################
     # SSH EXECUTOR
     ##########################################################################
-    if args.use_private_ip:
-        logger.info("Using each node's private IP address")
-    executor = RemoteExecutor(
-        user=args.remote_user,
-        ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
-        ssh_path_to_private_key=args.ssh_path_to_private_key,
-        override_host=args.override_ssh_host,
-        ssh_password=args.ssh_password,
-        use_private_ip=args.use_private_ip,
-        ssh_kill_command=args.ssh_kill_command,
-    )
+    operation_mode = args.operation_mode
+    # backwards compatibility
+    if args.use_pod_delete_instead_of_ssh_kill:
+        operation_mode = "kubernetes"
+    if operation_mode == "kubernetes":
+        if args.use_private_ip:
+            logger.info("Using each node's private IP address")
+        executor = RemoteExecutor(
+            user=args.remote_user,
+            ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
+            ssh_path_to_private_key=args.ssh_path_to_private_key,
+            override_host=args.override_ssh_host,
+            ssh_password=args.ssh_password,
+            use_private_ip=args.use_private_ip,
+            ssh_kill_command=args.ssh_kill_command,
+        )
+    else:
+        if args.use_private_ip:
+            logger.info("Using each node's private IP address")
+        executor = RemoteExecutor(
+            user=args.remote_user,
+            ssh_allow_missing_host_keys=args.ssh_allow_missing_host_keys,
+            ssh_path_to_private_key=args.ssh_path_to_private_key,
+            override_host=args.override_ssh_host,
+            ssh_password=args.ssh_password,
+            use_private_ip=args.use_private_ip,
+            ssh_kill_command=args.ssh_kill_command,
+        )
 
     ##########################################################################
     # INTERACTIVE MODE

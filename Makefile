@@ -1,5 +1,4 @@
 INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
-NPM_CALL ?= cd powerfulseal/web/ui && npm install && npm run build
 TOX_CALL ?= tox -r
 METRICS_SERVER_URL ?= http://metrics-server.kube-system.svc.kubernetes.cluster/
 CLOUD_OPTION ?= --openstack
@@ -14,9 +13,6 @@ test:
 
 watch:
 	$(TOX_CALL) && while $(INOTIFY_CALL); do $(TOX_CALL); done
-
-web:
-	$(NPM_CALL)
 
 upload:
 	rm -rfv dist
@@ -142,4 +138,5 @@ minikube-interactive:
 			--ssh-path-to-private-key `minikube ssh-key` \
 			--override-ssh-host `minikube ip`
 
-.PHONY: test watch web upload clean build tag push version autonomous autonomous-headless interactive validate label minikube-autonomous minikube-label minikube-interactive
+.PHONY: test watch upload clean build tag push version autonomous autonomous-headless interactive validate label minikube-autonomous minikube-label minikube-interactive
+

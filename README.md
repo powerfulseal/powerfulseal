@@ -72,7 +72,7 @@ We would love you to. In particular, it would be great to get help with:
 - <del>__get an amazing logo__</del>
 - make the PowerfulSeal more powerful
 
-Check out our [contribution](https://bloomberg.github.io/powerfulseal/contribute) page for more information about how to contribute.
+Check out our [contributing](https://bloomberg.github.io/powerfulseal/contribute) page for more information about how to contribute.
 
 ### Why a Seal ?
 

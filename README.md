@@ -27,6 +27,10 @@ It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/),
 - minimal setup, easy yaml-based policies
 - easy to extend
 
+## Documentation
+
+[Powerfulseal documentation](https://bloomberg.github.io/powerfulseal) is included in the docs directory. It can be hosted locally with jekyll by running jekyll serve from the docs directory.
+
 ## Read about the PowerfulSeal
 
 - https://www.techatbloomberg.com/blog/powerfulseal-testing-tool-kubernetes-clusters/
@@ -63,12 +67,12 @@ The Seal doesn't:
 
 We would love you to. In particular, it would be great to get help with:
 
-- get more [cloud drivers](./powerfulseal/clouddrivers/driver.py)
-- get more [awesome filters](./powerfulseal/policy/scenario.py)
+- get more [cloud drivers](https://bloomberg.github.io/powerfulseal/in-depth-topics#custom-cloud-drivers)
+- get more [awesome filters](https://bloomberg.github.io/powerfulseal/in-depth-topics#custom-filters)
 - <del>__get an amazing logo__</del>
 - make the PowerfulSeal more powerful
 
-Check out our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information about how to contribute.
+Check out our contributing (https://bloomberg.github.io/powerfulseal/contribute) page for more information about how to contribute.
 
 ### Why a Seal ?
 

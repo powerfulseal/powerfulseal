@@ -61,4 +61,4 @@ You can also run tests for specific versions by running `tox -e [version(s)]` (e
 
 ## Docs
 
-We use plain Markdown and Github Pages for the documentation. If you want to have a local environment [this](https://help.github.com/en/github/working-with-github-pages/testing-your-github-pages-site-locally-with-jekyll) is a good explanation.
+We use Jekyll for the documentation. In order to host/generate the docs locally, you have to follow [this](https://help.github.com/en/github/working-with-github-pages/testing-your-github-pages-site-locally-with-jekyll) tutorial.

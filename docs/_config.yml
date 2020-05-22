@@ -3,3 +3,4 @@ remote_theme: pmarsceill/just-the-docs
 aux_links:
   "Powerfulseal on GitHub":
     - "//github.com/bloomberg/powerfulseal"
+footer: "© 2020 Bloomberg Finance L.P."

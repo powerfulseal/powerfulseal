@@ -1,3 +1,12 @@
+---
+layout: default
+title: Label
+nav_order: 3
+description: ""
+permalink: /label-mode
+parent: Modes
+---
+
 # Label Mode
 
 Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
@@ -11,7 +20,7 @@ Labels can be manually set using the `kubectl label pods [POD NAME] [LABEL]` com
 
 To reduce the processing time needed to filter a large number of pods, you can instruct PowerfulSeal to only look up pods under a specific namespace by using the `--kubernetes-namespace` argument. This behaves similar to `kubectl`, where not specifying the argument defaults PowerfulSeal to the `default` namespace, whereas specifying an empty value (`--kubernetes-namespace=`) retrieves all pods across all namespaces.
 
-## Annotations
+## Annotations
 
 The values labels can have in Kubernetes is restricted, so some of the configuration below is not possible with labels (`seal/days` at the moment). To work around this, you can use any of the labels specified here as annotations instead. If you specify a key both as a label and an annotation, the label value will be preferred. 
 

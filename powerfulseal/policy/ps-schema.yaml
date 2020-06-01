@@ -38,6 +38,7 @@ properties:
       "$ref": "#/definitions/podScenario"
 
 
+
 ###################################################################################################
 # DEFINITIONS
 ###################################################################################################
@@ -49,10 +50,28 @@ definitions:
     type: object
     additionalProperties: false
     properties:
-      loopsNumber:
+      runStrategy:
+        type: object
+        "$ref": "#/definitions/runStrategy"
+
+  runStrategy:
+    description: "Configure how the scenarios are run"
+    type: object
+    additionalProperties: false
+    properties:
+      strategy:
+        type: string
         description: >
-          If set, will execute the given scenarios once, and then exit.
-          Use this option for one-off experiments, rather than a process running continuosly on the cluster.
+          Affects how the scenarios are executed.
+          The default "round-robin" iterates over the every scenario in the order they were defined.
+          Random ("random") pick a random scenario from the available pool every time.
+        default: round-robin
+        enum:
+        - round-robin
+        - random
+      runs:
+        description: >
+          If set, it will exit after the given number of scenario runs. By default, it continues forever.
         type: number
         minimum: 1
       minSecondsBetweenRuns:
@@ -61,7 +80,7 @@ definitions:
           This sets the MIN number of seconds that it will wait.
         type: number
         minimum: 0
-        default: 0
+        default: 30
       maxSecondsBetweenRuns:
         description: >
           The Seal waits a randomized amount of time before executing the scenarios.
@@ -69,6 +88,7 @@ definitions:
         type: number
         minimum: 0
         default: 300
+
 
   nodeScenario:
     description: >

@@ -14,7 +14,7 @@
 import pytest
 from mock import MagicMock
 
-from powerfulseal.policy.node_scenario import ActionNodes
+from powerfulseal.policy.action_nodes import ActionNodes
 from powerfulseal.policy.action_pods import ActionPods
 from powerfulseal.policy.scenario import Scenario
 from powerfulseal.execute import SSHExecutor

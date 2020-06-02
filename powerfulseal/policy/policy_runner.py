@@ -21,7 +21,7 @@ import yaml
 import pkgutil
 import logging
 from .action_pods import ActionPods
-from .node_scenario import ActionNodes
+from .action_nodes import ActionNodes
 
 logger = logging.getLogger(__name__)
 

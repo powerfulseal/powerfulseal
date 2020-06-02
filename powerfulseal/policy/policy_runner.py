@@ -20,7 +20,7 @@ import jsonschema
 import yaml
 import pkgutil
 import logging
-from .pod_scenario import ActionPods
+from .action_pods import ActionPods
 from .node_scenario import ActionNodes
 
 logger = logging.getLogger(__name__)

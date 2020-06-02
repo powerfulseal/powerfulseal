@@ -20,7 +20,7 @@ import jsonschema
 import yaml
 import pkgutil
 import logging
-from .pod_scenario import PodScenario
+from .pod_scenario import ActionPods
 from .node_scenario import NodeScenario
 
 logger = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ class PolicyRunner():
             for item in policy.get("nodeScenarios", [])
         ]
         pod_scenarios = [
-            PodScenario(
+            ActionPods(
                 name=item.get("name"),
                 schema=item,
                 inventory=inventory,
@@ -85,7 +85,7 @@ class PolicyRunner():
                 executor=executor,
                 metric_collector=metric_collector
             )
-            for item in policy.get("podScenarios", [])
+            for item in policy.get("ActionPodss", [])
         ]
         while loops is None or loops > 0:
             for scenario in node_scenarios:

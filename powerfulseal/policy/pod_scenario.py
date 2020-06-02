@@ -20,7 +20,7 @@ from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .scenario import Scenario
 
 
-class PodScenario(Scenario):
+class ActionPods(Scenario):
     """ Pod scenario handler.
 
         Adds metching for k8s-specific things and pod-specific actions

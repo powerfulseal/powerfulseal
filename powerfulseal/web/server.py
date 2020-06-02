@@ -24,7 +24,7 @@ from flask_cors import CORS
 
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.node_scenario import NodeScenario
-from powerfulseal.policy.pod_scenario import PodScenario
+from powerfulseal.policy.pod_scenario import ActionPods
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 

@@ -29,6 +29,7 @@ properties:
       "$ref": "#/definitions/scenario"
 required:
 - scenarios
+additionalProperties: false
 
 
 ###################################################################################################

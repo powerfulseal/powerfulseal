@@ -3,4 +3,6 @@ config:
     runs: 7
     minSecondsBetweenRuns: 77
     maxSecondsBetweenRuns: 78
-scenarios: []
+scenarios:
+  - name: Test
+    steps: []

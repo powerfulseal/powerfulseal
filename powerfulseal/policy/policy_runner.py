@@ -20,8 +20,7 @@ import jsonschema
 import yaml
 import pkgutil
 import logging
-from .action_pods import ActionPods
-from .action_nodes import ActionNodes
+from .scenario import Scenario
 
 logger = logging.getLogger(__name__)
 
@@ -61,42 +60,36 @@ class PolicyRunner():
         """ Runs a policy forever
         """
         config = policy.get("config", {}).get("runStrategy", {})
-        strategy = config.get("strategy")
+        should_randomize = config.get("strategy") == "random"
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
         loops = config.get("runs", None)
-        node_scenarios = [
-            ActionNodes(
-                name=item.get("name"),
-                schema=item,
-                inventory=inventory,
-                driver=driver,
-                executor=executor,
-                metric_collector=metric_collector
-            )
-            for item in policy.get("ActionNodess", [])
-        ]
-        pod_scenarios = [
-            ActionPods(
+        scenarios = [
+            Scenario(
                 name=item.get("name"),
                 schema=item,
                 inventory=inventory,
                 k8s_inventory=k8s_inventory,
+                driver=driver,
                 executor=executor,
                 metric_collector=metric_collector
             )
-            for item in policy.get("ActionPodss", [])
+            for item in policy.get("scenarios", [])
         ]
         while loops is None or loops > 0:
-            for scenario in node_scenarios:
-                scenario.execute()
-            for scenario in pod_scenarios:
-                scenario.execute()
-            sleep_time = int(random.uniform(wait_min, wait_max))
-            logger.info("Sleeping for %s seconds", sleep_time)
-            time.sleep(sleep_time)
+            if len(scenarios) == 0:
+                return True
+            if should_randomize:
+                random.shuffle(scenarios)
+            for scenario in scenarios:
+                ret = scenario.execute()
+                if not ret:
+                    return False
+                sleep_time = int(random.uniform(wait_min, wait_max))
+                logger.info("Sleeping for %s seconds", sleep_time)
+                time.sleep(sleep_time)
+                if loops is not None:
+                    loops -= 1
             inventory.sync()
-            if loops is not None:
-                loops -= 1
         logger.info("All done here!")
-        return node_scenarios, pod_scenarios
+        return True

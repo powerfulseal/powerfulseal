@@ -252,8 +252,9 @@ definitions:
           target:
             type: object
             oneOf:
-            - "$ref": "#/definitions/targetService"
             - "$ref": "#/definitions/targetURL"
+            - "$ref": "#/definitions/targetService"
+            - "$ref": "#/definitions/targetIngress"
           retries:
             type: number
             description: >
@@ -632,3 +633,23 @@ definitions:
         - namespace
     required:
     - service
+
+  targetIngress:
+    type: object
+    description: >
+      Target the given ingress in a given namespace.
+    additionalProperties: false
+    properties:
+      ingress:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+          namespace:
+            type: string
+        required:
+        - name
+        - namespace
+    required:
+    - ingress

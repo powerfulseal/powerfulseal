@@ -246,3 +246,9 @@ scenarios:
         service:
           name: some-service
           namespace: default
+
+  - probeHTTP:
+      target:
+        ingress:
+          name: some-service
+          namespace: default

@@ -48,17 +48,18 @@ class Scenario():
         steps = self.schema.get("steps", [])
         self.logger.info("Starting scenario '%s' (%d steps)", self.name, len(steps))
         for step in steps:
-            for key, val in self.action_mapping.items():
-                if step.get(key) is not None:
-                    ret = val(step)
+            for action_name, action_method in self.action_mapping.items():
+                if action_name in step:
+                    ret = action_method(schema=step.get(action_name))
                     if not ret:
+                        self.logger.warning("Step returned failure %s", step)
                         return False
         self.logger.info("Scenario '%s' finished", self.name)
         return True
 
     def action_nodes(self, schema):
         action = ActionNodes(
-            schema=self.schema,
+            schema=schema,
             name=self.name,
             inventory=self.inventory,
             driver=self.driver,
@@ -68,7 +69,7 @@ class Scenario():
 
     def action_pods(self, schema):
         action = ActionPods(
-            schema=self.schema,
+            schema=schema,
             name=self.name,
             inventory=self.inventory,
             k8s_inventory=self.k8s_inventory,

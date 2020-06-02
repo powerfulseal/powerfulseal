@@ -48,10 +48,11 @@ class ActionPods(ActionNodesPods):
         selected = set()
         criteria = self.schema.get("matches", [])
         for criterion in criteria:
-            for key, method in mapping.items():
-                if key in criterion:
-                    params = criterion.get(key)
-                    for pod in method(params):
+            for action_name, action_method in mapping.items():
+                if action_name in criterion:
+                    self.logger.info("Matching %r %r", action_name, criterion)
+                    params = criterion.get(action_name)
+                    for pod in action_method(params):
                         self.logger.debug("Matching %r", pod)
                         selected.add(pod)
         if len(selected) == 0:

@@ -119,38 +119,41 @@ definitions:
     type: object
     additionalProperties: false
     properties:
-      matches:
-        type: array
-        description: >
-          An array of match criteria to select a set of nodes. Will be deduplicated.
-        items:
-          oneOf:
-          - "$ref": "#/definitions/filterPropertyNode"
-      filters:
-        type: array
-        description: >
-          An array of filters, which will be applied in the defined order.
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/filterPropertyNode"
-          - "$ref": "#/definitions/filterDayTime"
-          - "$ref": "#/definitions/filterRandomSample"
-          - "$ref": "#/definitions/filterProbability"
-      actions:
-        type: array
-        description: >
-          An array of actions, which will be executed on each node.
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/actionStartNode"
-          - "$ref": "#/definitions/actionStopNode"
-          - "$ref": "#/definitions/actionExecuteNode"
-          - "$ref": "#/definitions/actionWait"
-    required:
-    - matches
-    - actions
+      nodeAction:
+        type: object
+        properties:
+          matches:
+            type: array
+            description: >
+              An array of match criteria to select a set of nodes. Will be deduplicated.
+            items:
+              oneOf:
+              - "$ref": "#/definitions/filterPropertyNode"
+          filters:
+            type: array
+            description: >
+              An array of filters, which will be applied in the defined order.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/filterPropertyNode"
+              - "$ref": "#/definitions/filterDayTime"
+              - "$ref": "#/definitions/filterRandomSample"
+              - "$ref": "#/definitions/filterProbability"
+          actions:
+            type: array
+            description: >
+              An array of actions, which will be executed on each node.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/actionStartNode"
+              - "$ref": "#/definitions/actionStopNode"
+              - "$ref": "#/definitions/actionExecuteNode"
+              - "$ref": "#/definitions/actionWait"
+        required:
+        - matches
+        - actions
 
   podAction:
     description: >
@@ -163,38 +166,41 @@ definitions:
     type: object
     additionalProperties: false
     properties:
-      matches:
-        type: array
-        description: >
-          An array of match criteria to select a set of pods. Will be deduplicated.
-        items:
-          oneOf:
-          - "$ref": "#/definitions/matchPodNamespace"
-          - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
-          - "$ref": "#/definitions/matchPodLabelsAndNamespace"
-      filters:
-        type: array
-        description: >
-          An array of filters to only select certain pods from the initial set.
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/filterPropertyPod"
-          - "$ref": "#/definitions/filterDayTime"
-          - "$ref": "#/definitions/filterRandomSample"
-          - "$ref": "#/definitions/filterProbability"
-      actions:
-        type: array
-        description: >
-          An array of actions to be applied to each pod from the set.
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/actionKillPod"
-          - "$ref": "#/definitions/actionWait"
-    required:
-    - matches
-    - actions
+      podAction:
+        type: object
+        properties:
+          matches:
+            type: array
+            description: >
+              An array of match criteria to select a set of pods. Will be deduplicated.
+            items:
+              oneOf:
+              - "$ref": "#/definitions/matchPodNamespace"
+              - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
+              - "$ref": "#/definitions/matchPodLabelsAndNamespace"
+          filters:
+            type: array
+            description: >
+              An array of filters to only select certain pods from the initial set.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/filterPropertyPod"
+              - "$ref": "#/definitions/filterDayTime"
+              - "$ref": "#/definitions/filterRandomSample"
+              - "$ref": "#/definitions/filterProbability"
+          actions:
+            type: array
+            description: >
+              An array of actions to be applied to each pod from the set.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/actionKillPod"
+              - "$ref": "#/definitions/actionWait"
+        required:
+        - matches
+        - actions
 
 
 ###################################################################################################

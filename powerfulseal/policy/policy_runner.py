@@ -29,7 +29,9 @@ logger = logging.getLogger(__name__)
 class PolicyRunner():
     """ Reads, validates and executes a JSON schema-compliant policy
     """
-    DEFAULT_POLICY = {}
+    DEFAULT_POLICY = {
+        "scenarios": []
+    }
 
     @classmethod
     def get_schema(cls):

@@ -264,6 +264,11 @@ definitions:
             description: >
               Delay in ms between retries.
             default: 100
+          timeout:
+            type: number
+            description: >
+              Timeout in ms.
+            default: 1000
           code:
             type: number
             description: >

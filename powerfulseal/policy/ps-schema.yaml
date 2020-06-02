@@ -279,6 +279,11 @@ definitions:
             description: >
               Expected status code.
             default: 200
+          count:
+            type: number
+            description: >
+              Number of requests to make.
+            default: 1
           endpoint:
             type: string
             description: >

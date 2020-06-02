@@ -20,22 +20,13 @@ properties:
     type: object
     "$ref": "#/definitions/config"
     description: General configuration of this policy.
-  nodeScenarios:
+  scenarios:
     type: array
     description: >
-      An array of scenarios manipulating the nodes in the cluster.
-      The scenarios are executed one by one in the specified order.
+      An array of scenarios, each describing a complete chaos experiment.
     items:
       type: object
-      "$ref": "#/definitions/nodeScenario"
-  podScenarios:
-    type: array
-    description: >
-      An array of scenarios manipulating the pods in the cluster.
-      The scenarios are executed one by one in the specified order.
-    items:
-      type: object
-      "$ref": "#/definitions/podScenario"
+      "$ref": "#/definitions/scenario"
 
 
 
@@ -89,27 +80,56 @@ definitions:
         minimum: 0
         default: 300
 
-
-  nodeScenario:
+  scenario:
     description: >
-      Describe a node scenario. It's a scenario that can match, filter and action on nodes in your kubernetes cluster.
+      A scenario contains all the steps necessary to prepare, implement and validate a chaos engineering experiment.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        description: >
+          A brief, descriptive name of the scenario. Will be used to identify the scenario in logs.
+        minLength: 3
+        maxLength: 30
+      description:
+        type: string
+        description: >
+          A longer description, helping to understand what the scenario is doing when reading the yaml file.
+          Optional.
+      steps:
+        type: array
+        description: >
+          The sequence of events to prepare, validate, execute and analyse the chaos engineering experiment.
+        items:
+          oneOf:
+          - "$ref": "#/definitions/podAction"
+          - "$ref": "#/definitions/nodeAction"
+    required:
+    - name
+    - steps
+
+
+  nodeAction:
+    description: >
+      Match, filter and action on nodes in your kubernetes cluster.
       It can integrate with your cloud provider and take nodes up and down to simulate VMs going down.
       If you're running in SSH mode, it can also execute various commands on hosts. And much more!
       See below for mode details.
     type: object
     additionalProperties: false
     properties:
-      name:
-        type: string
-      description:
-        type: string
-      match:
+      matches:
         type: array
+        description: >
+          An array of match criteria to select a set of nodes. Will be deduplicated.
         items:
           oneOf:
           - "$ref": "#/definitions/filterPropertyNode"
       filters:
         type: array
+        description: >
+          An array of filters, which will be applied in the defined order.
         items:
           type: object
           oneOf:
@@ -119,6 +139,8 @@ definitions:
           - "$ref": "#/definitions/filterProbability"
       actions:
         type: array
+        description: >
+          An array of actions, which will be executed on each node.
         items:
           type: object
           oneOf:
@@ -127,27 +149,24 @@ definitions:
           - "$ref": "#/definitions/actionExecuteNode"
           - "$ref": "#/definitions/actionWait"
     required:
-    - name
-    - match
-    - filters
+    - matches
     - actions
 
-  podScenario:
+  podAction:
     description: >
-      Describe a pod scenario. It's a scenario that can match, filter and action on pods in your kubernetes cluster.
-      You can filter by selectors, namespaces, deployments etc.
-      Then you can filter the pods based on various criteria, like state or IP.
-      Then you can action on each of them, by executing the configured actions.
+      Match, filter and action on pods in your kubernetes cluster.
+      Matchers create the initial set.
+      That set is de-duplicated and passed on to the filters.
+      Filters can exclude items.
+      Whatever is passed through the filters will then be actioned with every action in the action array
       See below for the details of the configuration available.
     type: object
     additionalProperties: false
     properties:
-      name:
-        type: string
-      description:
-        type: string
-      match:
+      matches:
         type: array
+        description: >
+          An array of match criteria to select a set of pods. Will be deduplicated.
         items:
           oneOf:
           - "$ref": "#/definitions/matchPodNamespace"
@@ -155,6 +174,8 @@ definitions:
           - "$ref": "#/definitions/matchPodLabelsAndNamespace"
       filters:
         type: array
+        description: >
+          An array of filters to only select certain pods from the initial set.
         items:
           type: object
           oneOf:
@@ -164,15 +185,15 @@ definitions:
           - "$ref": "#/definitions/filterProbability"
       actions:
         type: array
+        description: >
+          An array of actions to be applied to each pod from the set.
         items:
           type: object
           oneOf:
           - "$ref": "#/definitions/actionKillPod"
           - "$ref": "#/definitions/actionWait"
     required:
-    - name
-    - match
-    - filters
+    - matches
     - actions
 
 

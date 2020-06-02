@@ -23,7 +23,7 @@ from .action_nodes_pods import ActionNodesPods
 class ActionPods(ActionNodesPods):
     """ Pod scenario handler.
 
-        Adds metching for k8s-specific things and pod-specific actions
+        Adds matching for k8s-specific things and pod-specific actions
     """
 
     def __init__(self, name, schema, inventory, k8s_inventory, executor,

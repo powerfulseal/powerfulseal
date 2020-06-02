@@ -19,7 +19,7 @@ from .action_nodes_pods import ActionNodesPods
 class ActionNodes(ActionNodesPods):
     """ ActionNodess scenario handler.
 
-        Adds metching for nodes and node-specific actions
+        Adds matching for nodes and node-specific actions
     """
 
     def __init__(self, name, schema, inventory, driver,

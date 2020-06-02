@@ -58,10 +58,10 @@ class PolicyRunner():
             metric_collector=None):
         """ Runs a policy forever
         """
-        config = policy.get("config", {})
+        config = policy.get("config", {}).get("runStrategy", {})
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
-        loops = config.get("loopsNumber", None)
+        loops = config.get("runs", None)
         node_scenarios = [
             NodeScenario(
                 name=item.get("name"),

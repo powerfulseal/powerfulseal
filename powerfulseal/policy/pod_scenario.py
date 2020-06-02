@@ -46,7 +46,7 @@ class PodScenario(Scenario):
             "labels": self.match_labels,
         }
         selected = set()
-        criteria = self.schema.get("match", [])
+        criteria = self.schema.get("matches", [])
         for criterion in criteria:
             for key, method in mapping.items():
                 if key in criterion:

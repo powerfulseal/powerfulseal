@@ -61,6 +61,7 @@ class PolicyRunner():
         """ Runs a policy forever
         """
         config = policy.get("config", {}).get("runStrategy", {})
+        strategy = config.get("strategy")
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
         loops = config.get("runs", None)

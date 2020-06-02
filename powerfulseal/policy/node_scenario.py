@@ -39,7 +39,7 @@ class NodeScenario(Scenario):
         """ Makes a union of all the nodes matching any of the policy criteria.
         """
         selected_nodes = set()
-        criteria = self.schema.get("match", [])
+        criteria = self.schema.get("matches", [])
         for node in self.inventory.find_nodes():
             for criterion in criteria:
                 match = criterion.get("property")

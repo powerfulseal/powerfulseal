@@ -27,7 +27,7 @@ from tests.fixtures import make_dummy_object
 def test_matching_namespace(pod_scenario):
     a, b = make_dummy_object(), make_dummy_object()
     pod_scenario.schema = {
-        "match": [
+        "matches": [
             {
                 "namespace": {
                     "name": "something",
@@ -43,7 +43,7 @@ def test_matching_namespace(pod_scenario):
 def test_matching_deployment(pod_scenario):
     a, b = make_dummy_object(), make_dummy_object()
     pod_scenario.schema = {
-        "match": [
+        "matches": [
             {
                 "deployment": {
                     "name": "lol",
@@ -63,7 +63,7 @@ def test_matching_deployment(pod_scenario):
 def test_matching_labels(pod_scenario):
     a, b = make_dummy_object(), make_dummy_object()
     pod_scenario.schema = {
-        "match": [
+        "matches": [
             {
                 "labels": {
                     "selector": "yes=true",

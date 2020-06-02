@@ -59,10 +59,10 @@ class ActionPods(ActionNodesPods):
             self.metric_collector.add_matched_to_empty_set_metric(POD_SOURCE)
         return list(selected)
 
-    def match_namespace(self, params):
+    def match_namespace(self, param):
         """ Matches pods for a namespace
         """
-        namespace = params.get("name")
+        namespace = param
         pods = self.k8s_inventory.find_pods(
             namespace=namespace,
         )

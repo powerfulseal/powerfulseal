@@ -23,7 +23,7 @@ properties:
   scenarios:
     type: array
     description: >
-      An array of scenarios, each describing a complete chaos experiment.
+      An array of scenarios, each describing a complete `chaos experiment`.
     items:
       type: object
       "$ref": "#/definitions/scenario"
@@ -54,8 +54,8 @@ definitions:
         type: string
         description: >
           Affects how the scenarios are executed.
-          The default "round-robin" iterates over the every scenario in the order they were defined.
-          Random ("random") pick a random scenario from the available pool every time.
+          The default `round-robin` iterates over the every scenario in the order they were defined.
+          `random` picks a random scenario from the available pool every time.
         default: round-robin
         enum:
         - round-robin
@@ -103,6 +103,7 @@ definitions:
           The sequence of events to prepare, validate, execute and analyse the chaos engineering experiment.
         items:
           oneOf:
+          - "$ref": "#/definitions/kubectl"
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
     required:
@@ -201,6 +202,33 @@ definitions:
         required:
         - matches
         - actions
+
+  kubectl:
+    description: >
+      Allows to execute a `kubectl apply` or `kubectl delete` command as part of the scenario.
+    type: object
+    additionalProperties: false
+    properties:
+      kubectl:
+        type: object
+        properties:
+          action:
+            type: string
+            enum:
+            - apply
+            - delete
+          payload:
+            type: object
+            description: >
+              Free-form, kubectl-compatible payload, which will be passed to kubectl as is.
+          autoDelete:
+            type: boolean
+            description:
+              When set to true, all the `kubectl apply` commands will be `kubectl delete`ed at the end of the scenario.
+            default: true
+        required:
+        - kubectl
+        - payload
 
 
 ###################################################################################################

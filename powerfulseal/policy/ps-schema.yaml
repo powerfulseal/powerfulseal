@@ -161,7 +161,7 @@ definitions:
       Matchers create the initial set.
       That set is de-duplicated and passed on to the filters.
       Filters can exclude items.
-      Whatever is passed through the filters will then be actioned with every action in the action array
+      Whatever is passed through the filters will then be actioned with every action in the action array.
       See below for the details of the configuration available.
     type: object
     additionalProperties: false
@@ -210,20 +210,18 @@ definitions:
   matchPodNamespace:
     type: object
     additionalProperties: false
+    description: >
+      Pick all pods for a deployment in a namespace.
     properties:
       namespace:
-        type: object
-        additionalProperties: false
-        properties:
-          name:
-            type: string
-        required:
-        - name
+        type: string
     required:
     - namespace
 
   matchPodDeploymentAndNamespace:
     type: object
+    description: >
+      Pick all pods for a deployment in a namespace.
     additionalProperties: false
     properties:
       deployment:
@@ -242,6 +240,8 @@ definitions:
 
   matchPodLabelsAndNamespace:
     type: object
+    description: >
+      Pick all pods matching the particular set of labels in a namespace.
     additionalProperties: false
     properties:
       labels:
@@ -265,6 +265,9 @@ definitions:
 
   filterRandomSample:
     type: object
+    description: >
+      Take a random sample.
+      Either a specific size (up to N), or a ratio (0.5 == 50%) of the initial size.
     additionalProperties: false
     properties:
       randomSample:
@@ -280,21 +283,19 @@ definitions:
 
   filterProbability:
     type: object
+    description: >
+      Only pass the filter with a desired probability.
     additionalProperties: false
     properties:
       probability:
-        type: object
-        additionalProperties: false
-        properties:
-          probabilityPassAll:
-            type: number
-        required:
-        - probabilityPassAll
+        type: number
     required:
     - probability
 
   filterDayTime:
     type: object
+    description: >
+      Only pass the filter during specific time of the day and week.
     additionalProperties: false
     properties:
       dayTime:
@@ -328,9 +329,11 @@ definitions:
 
   filterPropertyNode:
     type: object
+    description: >
+      Select nodes by property values.
     additionalProperties: false
     properties:
-      property:
+      propertyNode:
         type: object
         additionalProperties: false
         properties:
@@ -348,13 +351,15 @@ definitions:
         - name
         - value
     required:
-    - property
+    - propertyNode
 
   filterPropertyPod:
     type: object
+    description: >
+      Select pods by property values.
     additionalProperties: false
     properties:
-      property:
+      propertyPod:
         type: object
         additionalProperties: false
         properties:
@@ -369,7 +374,7 @@ definitions:
         - name
         - value
     required:
-    - property
+    - propertyPod
 
 
 ###################################################################################################
@@ -378,6 +383,8 @@ definitions:
 
   actionStartNode:
     type: object
+    description: >
+      Start a node.
     additionalProperties: false
     properties:
       start:
@@ -390,6 +397,8 @@ definitions:
 
   actionStopNode:
     type: object
+    description: >
+      Stop a node.
     additionalProperties: false
     properties:
       stop:
@@ -403,9 +412,11 @@ definitions:
 
   actionExecuteNode:
     type: object
+    description: >
+      Executes arbitrary command on a particular node. Use with caution.
     additionalProperties: false
     properties:
-      execute:
+      executeNode:
         type: object
         additionalProperties: false
         properties:
@@ -414,10 +425,12 @@ definitions:
         required:
         - cmd
     required:
-    - execute
+    - executeNode
 
   actionWait:
     type: object
+    description: >
+      Wait some seconds.
     additionalProperties: false
     properties:
       wait:
@@ -433,9 +446,11 @@ definitions:
 
   actionKillPod:
     type: object
+    description: >
+      Kill a pod.
     additionalProperties: false
     properties:
-      kill:
+      killPod:
         type: object
         additionalProperties: false
         properties:
@@ -444,7 +459,7 @@ definitions:
           force:
             type: boolean
     required:
-    - kill
+    - killPod
 
 
 ###################################################################################################
@@ -453,6 +468,8 @@ definitions:
 
   time:
     type: object
+    description: >
+      Describes a time of the day, in the local timezone.
     additionalProperties: false
     properties:
       hour:

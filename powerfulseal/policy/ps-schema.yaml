@@ -226,7 +226,7 @@ definitions:
             - apply
             - delete
           payload:
-            type: object
+            type: string
             description: >
               Free-form, kubectl-compatible payload, which will be passed to kubectl as is.
           autoDelete:
@@ -631,4 +631,4 @@ definitions:
         - name
         - namespace
     required:
-    - deployment
+    - service

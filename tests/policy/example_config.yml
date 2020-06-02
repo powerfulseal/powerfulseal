@@ -36,7 +36,7 @@ scenarios:
               steps:
               - podAction:
                   matches:
-                  - namespace: "kube-system"
+                  - namespace: "default"
                   filters:
                   - randomSample:
                       size: 1

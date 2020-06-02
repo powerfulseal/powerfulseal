@@ -33,6 +33,7 @@ It follows the [Principles of Chaos Engineering](http://principlesofchaos.org/),
 
 ## Read about the PowerfulSeal
 
+- https://medium.com/faun/failures-are-inevitable-even-a-strongest-platform-with-concrete-operations-infrastructure-can-7d0c016430c6
 - https://www.techatbloomberg.com/blog/powerfulseal-testing-tool-kubernetes-clusters/
 - https://siliconangle.com/blog/2017/12/17/bloomberg-open-sources-powerfulseal-new-tool-testing-kubernetes-clusters/
 - https://github.com/ramitsurana/awesome-kubernetes#testing

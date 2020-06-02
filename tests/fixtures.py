@@ -16,7 +16,7 @@ from mock import MagicMock
 
 from powerfulseal.policy.action_nodes import ActionNodes
 from powerfulseal.policy.action_pods import ActionPods
-from powerfulseal.policy.scenario import Scenario
+from powerfulseal.policy.action_nodes_pods import ActionNodesPods
 from powerfulseal.execute import SSHExecutor
 
 
@@ -32,10 +32,10 @@ def dummy_object():
     return make_dummy_object()
 
 
-# Scenario fixtures
+# ActionNodesPods fixtures
 @pytest.fixture
 def noop_scenario():
-    scenario = Scenario(
+    scenario = ActionNodesPods(
         name="test scenario",
         schema={}
     )
@@ -47,7 +47,7 @@ def noop_scenario():
 
 @pytest.fixture
 def no_filtered_items_scenario():
-    scenario = Scenario(
+    scenario = ActionNodesPods(
         name="test scenario",
         schema={}
     )
@@ -58,7 +58,7 @@ def no_filtered_items_scenario():
     return scenario
 
 
-# Pod Scenario Fixtures
+# Pod ActionNodesPods Fixtures
 EXAMPLE_POD_SCHEMA = {
     "match": [
         {
@@ -85,7 +85,7 @@ def pod_scenario():
     )
 
 
-# Node Scenario Fixtures
+# Node ActionNodesPods Fixtures
 EXAMPLE_NODE_SCHEMA = {
     "match": [
         {

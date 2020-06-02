@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from powerfulseal.metriccollectors.collector import NODE_SOURCE
-from .scenario import Scenario
+from .action_nodes_pods import ActionNodesPods
 
 
-class ActionNodes(Scenario):
+class ActionNodes(ActionNodesPods):
     """ ActionNodess scenario handler.
 
         Adds metching for nodes and node-specific actions
@@ -24,7 +24,7 @@ class ActionNodes(Scenario):
 
     def __init__(self, name, schema, inventory, driver,
                  executor, logger=None, metric_collector=None):
-        Scenario.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
+        ActionNodesPods.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
         self.inventory = inventory
         self.driver = driver
         self.executor = executor

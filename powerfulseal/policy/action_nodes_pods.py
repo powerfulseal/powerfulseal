@@ -25,10 +25,10 @@ from abc import ABC, abstractmethod
 from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
 
 
-class Scenario(ABC):
+class ActionNodesPods(ABC):
     """ Basic class to represent a single testing scenario.
 
-        Scenarios consist of 3 lists of things:
+        ActionNodesPodss consist of 3 lists of things:
             - matches - to create the intial set of items
             - filters - to filter out the set
             - actions - to execute on all of the remaining items

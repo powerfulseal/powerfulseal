@@ -17,10 +17,10 @@
 import random
 
 from powerfulseal.metriccollectors.collector import POD_SOURCE
-from .scenario import Scenario
+from .action_nodes_pods import ActionNodesPods
 
 
-class ActionPods(Scenario):
+class ActionPods(ActionNodesPods):
     """ Pod scenario handler.
 
         Adds metching for k8s-specific things and pod-specific actions
@@ -28,7 +28,7 @@ class ActionPods(Scenario):
 
     def __init__(self, name, schema, inventory, k8s_inventory, executor,
                  logger=None, metric_collector=None):
-        Scenario.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
+        ActionNodesPods.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor

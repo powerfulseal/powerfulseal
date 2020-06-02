@@ -16,7 +16,7 @@ def create_connection_from_config():
     compute_client = None
     network_client = None
     try:
-        cred_file_loc=os.environ['AZURE_AUTH_LOCATION']
+        os.environ['AZURE_AUTH_LOCATION']
     except KeyError:
         try:
             subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
@@ -50,7 +50,6 @@ def server_state(compute_client, server):
             ret_state=NodeState.DOWN
     except:
         """ignore"""
-        pass
 
     return ret_state
 
@@ -105,14 +104,12 @@ class AzureDriver(AbstractDriver):
                             public_ip = public_ip_return.ip_address
                         except:
                             """ Ignore the exception.  return no additional values """
-                            pass
 
                     temp_pair = (private_ip, public_ip)
                     output.append(temp_pair)
 
-            except Exception as e:
+            except Exception:
                 """ Ignore the exception.  return no additional values """
-                pass
 
         return output
 

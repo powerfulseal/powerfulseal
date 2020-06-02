@@ -59,7 +59,6 @@ class K8sClient():
         nodes = self.list_nodes()
         groups = dict()
         for node in nodes:
-            name = node.metadata.name
             labels = node.metadata.labels
             addresses = node.status.addresses
             ips = []

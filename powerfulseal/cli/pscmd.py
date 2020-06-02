@@ -15,9 +15,6 @@
 
 import cmd
 import shlex
-import random
-from datetime import datetime
-import json
 from termcolor import colored, cprint
 import sys
 

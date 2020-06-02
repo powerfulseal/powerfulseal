@@ -21,7 +21,7 @@ import calendar
 import random
 import logging
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
 
 

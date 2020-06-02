@@ -14,11 +14,6 @@
 # limitations under the License.
 
 
-import time
-import re
-from datetime import datetime
-import calendar
-import random
 import logging
 
 from powerfulseal.metriccollectors.stdout_collector import StdoutCollector

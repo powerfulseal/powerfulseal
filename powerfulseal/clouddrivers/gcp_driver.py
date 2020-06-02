@@ -2,7 +2,6 @@ import json
 import logging
 import subprocess
 import sys
-import time
 
 import googleapiclient.discovery
 from oauth2client.client import GoogleCredentials
@@ -31,7 +30,7 @@ def get_all_ips(instance):
     try:
         ip_list.append(instance["networkInterfaces"][0]
                        ["accessConfigs"][0]["natIP"])  # Public
-    except Exception as e:
+    except Exception:
         pass
 
     ip_list.append(instance["networkInterfaces"][0]["networkIP"])  # Private
@@ -57,7 +56,7 @@ def create_node_from_server(server):
     # temporal workaround
     try:
         public_ip = server["networkInterfaces"][0]["accessConfigs"][0]["natIP"]
-    except Exception as e:
+    except Exception:
         public_ip = 'None'
 
     return Node(
@@ -126,7 +125,7 @@ class GCPDriver(AbstractDriver):
                 default_config['compute']['region'])
             self.region = default_config['compute']['region']
             self.project = default_config['core']['project']
-        except Exception as ex:
+        except Exception:
             self.logger.error("gcloud config file isn't valid")
             self.logger.info("Exiting")
             sys.exit(0)

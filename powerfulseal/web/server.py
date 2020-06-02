@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import random
-import time
 import threading
 from datetime import datetime
 

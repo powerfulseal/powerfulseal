@@ -27,6 +27,8 @@ properties:
     items:
       type: object
       "$ref": "#/definitions/scenario"
+required:
+- scenarios
 
 
 

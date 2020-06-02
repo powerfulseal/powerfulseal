@@ -62,7 +62,7 @@ class K8sInventory():
             namespaces = [namespace]
         # sort and deduplicate
         namespaces = sorted(list(set(namespaces)))
-        return namespace
+        return namespaces
 
     def find_namespaces(self):
         """ Returns all namespaces.

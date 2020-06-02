@@ -239,7 +239,7 @@ scenarios:
       delay: 2000
       timeout: 100
       code: 404
-      enpoint: /metrics
+      endpoint: /metrics
       # make a hundred requests to guarantee we hit every pod in the service
       count: 100
 

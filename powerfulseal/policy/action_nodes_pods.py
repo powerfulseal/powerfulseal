@@ -28,14 +28,6 @@ from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
 class ActionNodesPods(ABC):
     """ Basic class to represent a single testing scenario.
 
-        ActionNodesPodss consist of 3 lists of things:
-            - matches - to create the intial set of items
-            - filters - to filter out the set
-            - actions - to execute on all of the remaining items
-
-        The scenarios are described using a yaml schema, that conforms
-        to powerfulseal/policy/ps-schema.yaml JSON schema.
-
         This is a base class, containing some shared filters, shouldn't be
         used by itself. It's extended for both node and pod scenarios.
     """

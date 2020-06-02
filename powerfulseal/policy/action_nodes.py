@@ -79,11 +79,12 @@ class ActionNodes(ActionNodesPods):
         """
         cmd = params.get("cmd", "hostname")
         self.logger.info("Action execute '%s' on %r", cmd, item)
+        ret = True
         for value in self.executor.execute(
             cmd, nodes=[item]
         ).values():
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
                 self.metric_collector.add_execute_failed_metric(item)
-                return False
-        return True
+                ret = False
+        return ret

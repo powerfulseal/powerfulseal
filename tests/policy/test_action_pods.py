@@ -29,9 +29,7 @@ def test_matching_namespace(pod_scenario):
     pod_scenario.schema = {
         "matches": [
             {
-                "namespace": {
-                    "name": "something",
-                }
+                "namespace": "something",
             },
         ]
     }

@@ -61,6 +61,8 @@ class ActionNodesPods(ABC):
             filtered_set = self.filter(initial_set)
             self.logger.debug("Filtered set: %r", filtered_set)
             self.logger.info("Filtered set length: %d", len(filtered_set))
+            if not filtered_set:
+                return True
             ret = self.act(filtered_set)
             if not ret:
                 return False
@@ -216,6 +218,7 @@ class ActionNodesPods(ABC):
     def act_mapping(self, items, actions, mapping):
         """ Executes all the actions on the list of pods.
         """
+        overall = True
         for action in actions:
             for key, method in mapping.items():
                 if key in action:
@@ -223,10 +226,10 @@ class ActionNodesPods(ABC):
                     for item in items:
                         ret = method(item, params)
                         if not ret:
-                            return False
+                            overall = False
                         # special case - if we're waiting, only do that on first item
                         if key == "wait":
                             break
-        return True
+        return overall
 
 

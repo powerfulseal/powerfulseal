@@ -34,17 +34,16 @@ scenarios:
             scenarios:
             - name: "delete a random pod in default namespace"
               steps:
-              - matches:
-                - labels:
-                    namespace: "default"
-                    selector: "app=hello"
-                filters:
-                - randomSample:
-                    size: 1
-                actions:
-                - kill:
-                    probability: 0.77
-                    force: true
+              - podAction:
+                  matches:
+                  - namespace: "kube-system"
+                  filters:
+                  - randomSample:
+                      size: 1
+                  actions:
+                  - killPod:
+                      probability: 0.77
+                      force: true
         ---
         apiVersion: apps/v1
         kind: Deployment

@@ -45,9 +45,6 @@ class ActionNodesPods(ABC):
         self.schema = schema
         self.logger = logger or logging.getLogger(__name__ + "." + name)
         self.metric_collector = metric_collector or StdoutCollector()
-        self.property_rewrite = {
-            "group": "groups",
-        }
         self.action_mapping = dict()
 
     def execute(self):
@@ -82,7 +79,6 @@ class ActionNodesPods(ABC):
         if not criterion:
             return False
         attr = criterion.get("name")
-        attr = self.property_rewrite.get(attr, attr)
         value = getattr(candidate, attr)
         expr = re.compile(criterion.get("value"))
         if type(value) is list:

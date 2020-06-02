@@ -269,6 +269,11 @@ definitions:
             description: >
               Expected status code.
             default: 200
+          endpoint:
+            type: string
+            description: >
+              Expected status code.
+            default: /healthz
         required:
         - target
     required:

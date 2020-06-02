@@ -28,6 +28,12 @@ class NodeScenario(Scenario):
         self.inventory = inventory
         self.driver = driver
         self.executor = executor
+        self.action_mapping = {
+            "stop": self.action_stop,
+            "start": self.action_start,
+            "wait": self.action_wait,
+            "execute": self.action_execute,
+        }
 
     def match(self):
         """ Makes a union of all the nodes matching any of the policy criteria.
@@ -75,17 +81,3 @@ class NodeScenario(Scenario):
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
                 self.metric_collector.add_execute_failed_metric(item)
-
-    def act(self, items):
-        """ Executes all the supported actions on the list of nodes.
-        """
-        self.logger.info("Acting on these: %r", items)
-        actions = self.schema.get("actions", [])
-        mapping = {
-            "stop": self.action_stop,
-            "start": self.action_start,
-            "wait": self.action_wait,
-            "execute": self.action_execute,
-        }
-        return self.act_mapping(items, actions, mapping)
-

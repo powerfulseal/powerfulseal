@@ -32,6 +32,10 @@ class PodScenario(Scenario):
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor
+        self.action_mapping = {
+            "wait": self.action_wait,
+            "kill": self.action_kill,
+        }
 
     def match(self):
         """ Makes a union of all the pods matching any of the policy criteria.
@@ -116,14 +120,3 @@ class PodScenario(Scenario):
             return success
         else:
             self.logger.info("Pod got lucky - not killing")
-
-    def act(self, items):
-        """ Executes all the supported actions on the list of pods.
-        """
-        actions = self.schema.get("actions", [])
-        mapping = {
-            "wait": self.action_wait,
-            "kill": self.action_kill,
-        }
-        return self.act_mapping(items, actions, mapping)
-

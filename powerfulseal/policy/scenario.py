@@ -48,6 +48,7 @@ class Scenario(ABC):
         self.property_rewrite = {
             "group": "groups",
         }
+        self.action_mapping = dict()
 
     def execute(self):
         """ Main entry point to starting a scenario.
@@ -72,7 +73,7 @@ class Scenario(ABC):
     def match(self):
         """ Reads the policy and returns the initial set of items.
         """
-        pass # pragma: no cover
+        return [] # pragma: no cover
 
     def match_property(self, candidate, criterion):
         """ Helper method to match a property following some criterion.
@@ -200,17 +201,19 @@ class Scenario(ABC):
 
         return items
 
-    def act(self, items):
-        """ Execute policy's actions on the items,
-        """
-        pass # pragma: no cover
-
     def action_wait(self, item, params):
         """ Waits x seconds, according to the policy.
         """
         sleep_time = params.get("seconds", 0)
         self.logger.info("Action sleep for %s seconds", sleep_time)
         time.sleep(sleep_time)
+
+    def act(self, items):
+        """ Execute policy's actions on the items
+        """
+        self.logger.info("Acting on these: %r", items)
+        actions = self.schema.get("actions", [])
+        return self.act_mapping(items, actions, self.action_mapping)
 
     def act_mapping(self, items, actions, mapping):
         """ Executes all the actions on the list of pods.

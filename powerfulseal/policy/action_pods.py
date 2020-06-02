@@ -34,7 +34,7 @@ class ActionPods(ActionNodesPods):
         self.executor = executor
         self.action_mapping = {
             "wait": self.action_wait,
-            "kill": self.action_kill,
+            "killPod": self.action_kill,
         }
 
     def match(self):

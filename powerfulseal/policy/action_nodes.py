@@ -32,7 +32,7 @@ class ActionNodes(ActionNodesPods):
             "stop": self.action_stop,
             "start": self.action_start,
             "wait": self.action_wait,
-            "execute": self.action_execute,
+            "executeNode": self.action_execute,
         }
 
     def match(self):

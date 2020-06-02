@@ -359,8 +359,10 @@ definitions:
         properties:
           size:
             type: number
+            minimum: 1
           ratio:
             type: number
+            minimum: 0
     required:
     - randomSample
 
@@ -372,6 +374,8 @@ definitions:
     properties:
       probability:
         type: number
+        minimum: 0
+        maximum: 1
     required:
     - probability
 
@@ -539,6 +543,8 @@ definitions:
         properties:
           probability:
             type: number
+            minimum: 0
+            maximum: 1
           force:
             type: boolean
     required:
@@ -594,10 +600,16 @@ definitions:
     properties:
       hour:
         type: number
+        minimum: 0
+        maximum: 23
       minute:
         type: number
+        minimum: 0
+        maximum: 59
       second:
         type: number
+        minimum: 0
+        maximum: 59
     required:
     - hour
     - minute

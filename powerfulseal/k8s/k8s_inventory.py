@@ -71,9 +71,12 @@ class K8sInventory():
             self.logger.debug("Using cached namespaces")
             return self._cache_namespaces
         self.logger.info("Reading kubernetes namespaces")
-        namespaces = [
-            item.metadata.name for item in self.k8s_client.list_namespaces()
-        ]
+        namespaces = []
+        try:
+            for item in self.k8s_client.list_namespaces():
+                namespaces.append(item.metadata.name )
+        except Exception as e:
+            self.logger.exception(e)
         self._cache_namespaces = namespaces
         self._cache_last = datetime.now()
         return namespaces
@@ -83,11 +86,14 @@ class K8sInventory():
         """
         deployments = []
         for ns in self.preprocess_namespace(namespace):
-            for item in self.k8s_client.list_deployments(
-                namespace=ns,
-                labels=labels,
-            ):
-                deployments.append(item.metadata.name)
+            try:
+                for item in self.k8s_client.list_deployments(
+                    namespace=ns,
+                    labels=labels,
+                ):
+                    deployments.append(item.metadata.name)
+            except Exception as e:
+                self.logger.exception(e)
         return deployments
 
     def find_pods(self, namespace, selector=None, deployment_name=None):
@@ -95,12 +101,15 @@ class K8sInventory():
         """
         pods = []
         for ns in self.preprocess_namespace(namespace):
-            for pod in self.k8s_client.list_pods(
-                namespace=ns,
-                selector=selector,
-                deployment_name=deployment_name,
-            ):
-                pods.append(pod)
+            try:
+                for pod in self.k8s_client.list_pods(
+                    namespace=ns,
+                    selector=selector,
+                    deployment_name=deployment_name,
+                ):
+                    pods.append(pod)
+            except Exception as e:
+                self.logger.exception(e)
         pod_objects = []
         if pods is not None:
             for i, item in enumerate(pods):

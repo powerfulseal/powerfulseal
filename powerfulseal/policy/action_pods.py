@@ -120,3 +120,4 @@ class ActionPods(ActionNodesPods):
             return success
         else:
             self.logger.info("Pod got lucky - not killing")
+        return True

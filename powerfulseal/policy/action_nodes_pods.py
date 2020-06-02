@@ -61,11 +61,13 @@ class ActionNodesPods(ABC):
             filtered_set = self.filter(initial_set)
             self.logger.debug("Filtered set: %r", filtered_set)
             self.logger.info("Filtered set length: %d", len(filtered_set))
-            if filtered_set:
-                self.act(filtered_set)
+            ret = self.act(filtered_set)
+            if not ret:
+                return False
         else:
             self.metric_collector.add_filtered_to_empty_set_metric()
         self.logger.debug("Done")
+        return True
 
     def match(self):
         """ Reads the policy and returns the initial set of items.
@@ -219,9 +221,12 @@ class ActionNodesPods(ABC):
                 if key in action:
                     params = action.get(key)
                     for item in items:
-                        method(item, params)
+                        ret = method(item, params)
+                        if not ret:
+                            return False
                         # special case - if we're waiting, only do that on first item
                         if key == "wait":
                             break
+        return True
 
 

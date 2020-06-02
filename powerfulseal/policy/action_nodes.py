@@ -56,8 +56,10 @@ class ActionNodes(ActionNodesPods):
         self.logger.info("Action start on %r", item)
         try:
             self.driver.start(item)
+            return True
         except:
             self.logger.exception("Error starting the machine")
+        return False
 
     def action_stop(self, item, params):
         """ Action to stop a node.
@@ -66,9 +68,11 @@ class ActionNodes(ActionNodesPods):
         try:
             self.metric_collector.add_node_stopped_metric(item)
             self.driver.stop(item)
+            return True
         except:
             self.metric_collector.add_node_stop_failed_metric(item)
             self.logger.exception("Error stopping the machine")
+        return False
 
     def action_execute(self, item, params):
         """ Executes arbitrary code on the node.
@@ -81,3 +85,5 @@ class ActionNodes(ActionNodesPods):
             if value["ret_code"] > 0:
                 self.logger.info("Error return code: %s", value)
                 self.metric_collector.add_execute_failed_metric(item)
+                return False
+        return True

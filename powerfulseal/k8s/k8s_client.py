@@ -126,7 +126,6 @@ class K8sClient():
             ExtensionsV1beta1Api.md#read_namespaced_deployment
         """
         try:
-            print(namespace, name)
             return self.client_appsv1api.read_namespaced_deployment(
                 namespace=namespace,
                 name=name,

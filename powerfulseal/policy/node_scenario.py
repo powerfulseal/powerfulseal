@@ -16,8 +16,8 @@ from powerfulseal.metriccollectors.collector import NODE_SOURCE
 from .scenario import Scenario
 
 
-class NodeScenario(Scenario):
-    """ NodeScenarios scenario handler.
+class ActionNodes(Scenario):
+    """ ActionNodess scenario handler.
 
         Adds metching for nodes and node-specific actions
     """

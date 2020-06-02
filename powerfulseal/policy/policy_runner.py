@@ -21,7 +21,7 @@ import yaml
 import pkgutil
 import logging
 from .pod_scenario import ActionPods
-from .node_scenario import NodeScenario
+from .node_scenario import ActionNodes
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class PolicyRunner():
         wait_max = config.get("maxSecondsBetweenRuns", 300)
         loops = config.get("runs", None)
         node_scenarios = [
-            NodeScenario(
+            ActionNodes(
                 name=item.get("name"),
                 schema=item,
                 inventory=inventory,
@@ -74,7 +74,7 @@ class PolicyRunner():
                 executor=executor,
                 metric_collector=metric_collector
             )
-            for item in policy.get("nodeScenarios", [])
+            for item in policy.get("ActionNodess", [])
         ]
         pod_scenarios = [
             ActionPods(

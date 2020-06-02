@@ -14,7 +14,7 @@
 import pytest
 from mock import MagicMock
 
-from powerfulseal.policy.node_scenario import NodeScenario
+from powerfulseal.policy.node_scenario import ActionNodes
 from powerfulseal.policy.pod_scenario import ActionPods
 from powerfulseal.policy.scenario import Scenario
 from powerfulseal.execute import SSHExecutor
@@ -103,7 +103,7 @@ def node_scenario():
     inventory = MagicMock()
     driver = MagicMock()
     executor = MagicMock()
-    return NodeScenario(
+    return ActionNodes(
         name="test scenario",
         schema=EXAMPLE_NODE_SCHEMA,
         inventory=inventory,

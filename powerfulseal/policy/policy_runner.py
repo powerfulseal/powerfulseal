@@ -77,7 +77,7 @@ class PolicyRunner():
             for item in policy.get("scenarios", [])
         ]
         while loops is None or loops > 0:
-            if len(scenarios) == 0:
+            if not scenarios:
                 return True
             if should_randomize:
                 random.shuffle(scenarios)

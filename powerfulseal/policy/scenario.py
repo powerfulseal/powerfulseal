@@ -23,7 +23,7 @@ from .action_pods import ActionPods
 
 class Scenario():
     """
-        A Scenario represents a complete chaos engineering expriment.
+        A Scenario represents a complete chaos engineering experiment.
     """
 
     def __init__(self, name, schema, inventory, k8s_inventory,

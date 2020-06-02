@@ -108,10 +108,10 @@ definitions:
           - "$ref": "#/definitions/kubectl"
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
+          - "$ref": "#/definitions/probeHTTP"
     required:
     - name
     - steps
-
 
   nodeAction:
     description: >
@@ -157,6 +157,8 @@ definitions:
         required:
         - matches
         - actions
+    required:
+    - nodeAction
 
   podAction:
     description: >
@@ -201,9 +203,13 @@ definitions:
               oneOf:
               - "$ref": "#/definitions/actionKillPod"
               - "$ref": "#/definitions/actionWait"
+              - "$ref": "#/definitions/checkPodState"
+              - "$ref": "#/definitions/checkPodCount"
         required:
         - matches
         - actions
+    required:
+    - podAction
 
   kubectl:
     description: >
@@ -229,8 +235,44 @@ definitions:
               When set to true, all the `kubectl apply` commands will be `kubectl delete`ed at the end of the scenario.
             default: true
         required:
-        - kubectl
+        - action
         - payload
+    required:
+    - kubectl
+
+  probeHTTP:
+    description: >
+      Issue an HTTP request and validate the response.
+    type: object
+    additionalProperties: false
+    properties:
+      probeHTTP:
+        type: object
+        properties:
+          target:
+            type: object
+            oneOf:
+            - "$ref": "#/definitions/targetService"
+            - "$ref": "#/definitions/targetURL"
+          retries:
+            type: number
+            description: >
+              Number of retries before failing the probe.
+            default: 3
+          delay:
+            type: number
+            description: >
+              Delay in ms between retries.
+            default: 100
+          code:
+            type: number
+            description: >
+              Expected status code.
+            default: 200
+        required:
+        - target
+    required:
+    - probeHTTP
 
 
 ###################################################################################################
@@ -491,6 +533,43 @@ definitions:
     required:
     - killPod
 
+  checkPodCount:
+    type: object
+    description: >
+      Count the pods and fail if they don't match the desired number.
+    additionalProperties: false
+    properties:
+      checkPodCount:
+        type: object
+        additionalProperties: false
+        properties:
+          expectedCount:
+            type: number
+        required:
+        - expectedCount
+    required:
+    - checkPodCount
+
+
+  checkPodState:
+    type: object
+    description: >
+      Check that all pods are in the desired state, fail otherwise.
+    additionalProperties: false
+    properties:
+      checkPodState:
+        type: object
+        additionalProperties: false
+        properties:
+          state:
+            description: >
+              Status, as returned by kubernetes (`Running`, `Terminating`, etc).
+            type: string
+        required:
+        - state
+    required:
+    - checkPodState
+
 
 ###################################################################################################
 # MISC
@@ -512,3 +591,34 @@ definitions:
     - hour
     - minute
     - second
+
+  targetURL:
+    type: object
+    description: >
+      A target of a static URL.
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+    required:
+    - url
+
+  targetService:
+    type: object
+    description: >
+      Target the given service in a given namespace.
+    additionalProperties: false
+    properties:
+      service:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+          namespace:
+            type: string
+        required:
+        - name
+        - namespace
+    required:
+    - deployment

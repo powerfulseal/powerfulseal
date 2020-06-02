@@ -157,6 +157,8 @@ class ActionNodesPods(ABC):
         if size == 0:
             self.logger.info("RandomSample size 0")
             return []
+        if size > len(candidates):
+            return candidates
         return random.sample(candidates, size)
 
     def filter_probability(self, candidates, criterion):

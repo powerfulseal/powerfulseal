@@ -35,6 +35,7 @@ class ActionPods(ActionNodesPods):
         self.action_mapping = {
             "wait": self.action_wait,
             "kill": self.action_kill,
+            "checkPodCount": self.action_check_pod_count,
         }
 
     def match(self):
@@ -98,28 +99,36 @@ class ActionPods(ActionNodesPods):
         )
         return pods
 
-    def action_kill(self, pod, params):
+    def action_kill(self, pods, params):
         """ Kills a pod by executing a docker kill on one of the containers or pod delete
         """
         probability = params.get("probability", 1)
         force = params.get("force", True)
         signal = "SIGKILL" if force else "SIGTERM"
-        if probability >= random.random():
-            # kill the pod
-            success = None
-            try:
-                success = self.executor.kill_pod(pod, self.inventory, signal)
-            except:
-                success = False
-                self.logger.exception("Exception while killing pod")
-            # update the metrics
-            if success:
-                self.metric_collector.add_pod_killed_metric(pod)
-                self.logger.info("Pod killed: %s", pod)
+        success = True
+        for pod in pods:
+            if probability < random.random():
+                self.logger.info("Pod got lucky - not killing")
             else:
-                self.metric_collector.add_pod_kill_failed_metric(pod)
-                self.logger.error("Pod NOT killed: %s", pod)
-            return success
-        else:
-            self.logger.info("Pod got lucky - not killing")
-        return True
+                ret_val = True
+                try:
+                    ret_val = self.executor.kill_pod(pod, self.inventory, signal)
+                except:
+                    self.logger.exception("Exception while killing pod")
+                    ret_val = False
+                # update the metrics
+                if ret_val:
+                    self.metric_collector.add_pod_killed_metric(pod)
+                    self.logger.info("Pod killed: %s", pod)
+                else:
+                    self.metric_collector.add_pod_kill_failed_metric(pod)
+                    self.logger.error("Pod NOT killed: %s", pod)
+                    success = False
+        return success
+
+    def action_check_pod_count(self, pods, params):
+        """
+            Checks that the count of pods equals the desired count.
+        """
+        expectedCount = int(params.get("expectedCount"))
+        return len(pods) == expectedCount

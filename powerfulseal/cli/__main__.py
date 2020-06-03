@@ -513,7 +513,7 @@ def main(argv):
         logger.info("Building GCP driver")
         driver = GCPDriver(config=args.gcp_config_file)
     else:
-        logger.info("No driver - some functionality disabled")
+        logger.info("No cloud driver - some functionality disabled")
         driver = NoCloudDriver()
 
     ##########################################################################
@@ -525,7 +525,7 @@ def main(argv):
             args.inventory_file
         )
     else:
-        logger.info("Attempting to read the inventory from kubernetes")
+        logger.debug("Attempting to read the inventory from kubernetes")
         groups_to_restrict_to = k8s_client.get_nodes_groups()
 
     logger.debug("Restricting inventory to %s" % groups_to_restrict_to)

@@ -595,7 +595,7 @@ def main(argv):
         if flask_debug is not None or (flask_env is not None and flask_env != "production"):
             logger.error("PROMETHEUS METRICS NOT SUPPORTED WHEN USING FLASK RELOAD. NOT STARTING THE SERVER")
         else:
-            logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
+            logger.info("Starting prometheus metrics server (%s:%s)", args.prometheus_host, args.prometheus_port)
             start_http_server(args.prometheus_port, args.prometheus_host)
             metric_collector = PrometheusCollector()
     elif args.datadog_collector:
@@ -618,7 +618,7 @@ def main(argv):
         # run the metrics server if requested
         if not args.headless:
             # start the server
-            logger.info("Starting the UI server")
+            logger.info("Starting the UI server (%s:%s)", args.host, args.port)
             start_server(
                 host=args.host,
                 port=args.port,

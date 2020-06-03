@@ -99,5 +99,6 @@ class Scenario():
         action = ActionKubectl(
             schema=schema,
             name=self.name,
+            kube_config=self.k8s_inventory.k8s_client.kube_config,
         )
         return self.execute_action(action)

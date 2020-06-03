@@ -24,9 +24,10 @@ from .action_abstract import ActionAbstract
 
 class ActionKubectl(ActionAbstract):
 
-    def __init__(self, name, schema, logger=None, metric_collector=None):
+    def __init__(self, name, schema, kube_config=None, logger=None, metric_collector=None):
         self.name = name
         self.schema = schema
+        self.kube_config = kube_config
         self.logger = logger or logging.getLogger(__name__ + "." + name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.kubectl_binary = "kubectl"
@@ -38,8 +39,9 @@ class ActionKubectl(ActionAbstract):
         )
 
     def make_kubectl_command(self, action):
-        return "{kubectl} {action} -f -".format(
+        return "{kubectl} {kube_config} {action} -f -".format(
             kubectl=self.kubectl_binary,
+            kube_config="--kubeconfig {}".format(self.kube_config) if self.kube_config else "",
             action=action,
         )
 

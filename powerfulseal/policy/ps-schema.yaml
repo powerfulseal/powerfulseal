@@ -264,6 +264,7 @@ definitions:
             description: >
               Number of retries before failing the probe.
             default: 3
+            minimum: 1
           delay:
             type: number
             description: >

@@ -26,7 +26,7 @@ powerfulseal --help # or seal --help
 
 To start the web interface, use flags `--server --server-host [HOST] --server-port [PORT]` when starting PowerfulSeal in autonomous mode and visit the web server at `http://HOST:PORT/`.
 
-Python 3.6, Python 3.7 and Python 3.8 are supported.
+Python 3.7 and Python 3.8 are supported.
 
 
 ## Docker

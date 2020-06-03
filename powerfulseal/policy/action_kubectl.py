@@ -15,6 +15,7 @@
 
 import logging
 import copy
+import subprocess
 
 from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_abstract import ActionAbstract
@@ -28,9 +29,40 @@ class ActionKubectl(ActionAbstract):
         self.schema = schema
         self.logger = logger or logging.getLogger(__name__ + "." + name)
         self.metric_collector = metric_collector or StdoutCollector()
+        self.kubectl_binary = "kubectl"
 
     def execute(self):
-        pass
+        return self.execute_kubectl(
+            action=self.schema.get("action"),
+            payload=self.schema.get("payload"),
+        )
+
+    def make_kubectl_command(self, action):
+        return "{kubectl} {action} -f -".format(
+            kubectl=self.kubectl_binary,
+            action=action,
+        )
+
+    def execute_kubectl(self, action, payload):
+        cmd = self.make_kubectl_command(action)
+        self.logger.info("Command: %r", cmd)
+        self.logger.info("Payload: %r", payload)
+        process = subprocess.run(
+            cmd,
+            input=payload,
+            capture_output=True,
+            shell=True,
+            text=True,
+        )
+        if process.stdout:
+            self.logger.info(process.stdout)
+        if process.stderr:
+            self.logger.info(process.stderr)
+        self.logger.info("Return code: %d", process.returncode)
+
+        if process.returncode == 0:
+            return True
+        return False
 
     def get_cleanup_actions(self):
         actions = []

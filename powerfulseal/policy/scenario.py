@@ -55,16 +55,19 @@ class Scenario():
                 if action_name in step:
                     ret = action_method(schema=step.get(action_name))
                     if not ret:
-                        self.logger.warning("Step returned failure %s", step)
+                        self.logger.warning("Step returned failure %s. Finishing scenario early", step)
+                        self.cleanup()
                         return False
-        self.logger.info("Scenario '%s' finished", self.name)
+        self.logger.info("Scenario finished")
         self.cleanup()
-        self.logger.info("Scenario '%s' finished", self.name)
         return True
 
     def cleanup(self):
+        self.logger.info("Cleanup started (%d items)", len(self.cleanup_list))
         for action in self.cleanup_list:
             self.execute_action(action)
+        self.cleanup_list = []
+        self.logger.info("Cleanup done")
 
     def execute_action(self, action):
         ret_val = action.execute()

@@ -84,6 +84,7 @@ class PolicyRunner():
             for scenario in scenarios:
                 ret = scenario.execute()
                 if not ret:
+                    logger.error("Exiting early")
                     return False
                 sleep_time = int(random.uniform(wait_min, wait_max))
                 logger.info("Sleeping for %s seconds", sleep_time)

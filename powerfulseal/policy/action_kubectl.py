@@ -34,9 +34,9 @@ class ActionKubectl(ActionAbstract):
 
     def get_cleanup_actions(self):
         actions = []
-        if str(self.schema.get("autoDelete", "true")).lower() != "false":
+        if str(self.schema.get("autoDelete", True)).lower() != "false":
             delete_action = copy.deepcopy(self)
-            delete_action.schema["autoDelete"] = "false"
+            delete_action.schema["autoDelete"] = False
             delete_action.schema["action"] = "delete"
             actions.append(delete_action)
         return actions

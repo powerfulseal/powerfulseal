@@ -21,11 +21,11 @@ import calendar
 import random
 import logging
 
-from abc import ABC
-from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
+from ..metriccollectors.stdout_collector import StdoutCollector
+from .action_abstract import ActionAbstract
 
 
-class ActionNodesPods(ABC):
+class ActionNodesPods(ActionAbstract):
     """ Basic class to represent a single testing scenario.
 
         This is a base class, containing some shared filters, shouldn't be

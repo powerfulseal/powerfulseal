@@ -16,9 +16,10 @@
 
 import logging
 
-from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
+from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_nodes import ActionNodes
 from .action_pods import ActionPods
+from .action_kubectl import ActionKubectl
 
 
 class Scenario():
@@ -39,7 +40,9 @@ class Scenario():
         self.action_mapping = dict(
             nodeAction=self.action_nodes,
             podAction=self.action_pods,
+            kubectl=self.action_kubectl,
         )
+        self.cleanup_list = []
 
     def execute(self):
         """
@@ -55,7 +58,19 @@ class Scenario():
                         self.logger.warning("Step returned failure %s", step)
                         return False
         self.logger.info("Scenario '%s' finished", self.name)
+        self.cleanup()
+        self.logger.info("Scenario '%s' finished", self.name)
         return True
+
+    def cleanup(self):
+        for action in self.cleanup_list:
+            self.execute_action(action)
+
+    def execute_action(self, action):
+        ret_val = action.execute()
+        for action in action.get_cleanup_actions():
+            self.cleanup_list.append(action)
+        return ret_val
 
     def action_nodes(self, schema):
         action = ActionNodes(
@@ -65,7 +80,7 @@ class Scenario():
             driver=self.driver,
             executor=self.executor,
         )
-        return action.execute()
+        return self.execute_action(action)
 
     def action_pods(self, schema):
         action = ActionPods(
@@ -75,4 +90,11 @@ class Scenario():
             k8s_inventory=self.k8s_inventory,
             executor=self.executor,
         )
-        return action.execute()
+        return self.execute_action(action)
+
+    def action_kubectl(self, schema):
+        action = ActionKubectl(
+            schema=schema,
+            name=self.name,
+        )
+        return self.execute_action(action)

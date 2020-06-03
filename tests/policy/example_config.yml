@@ -226,7 +226,7 @@ scenarios:
         - namespace: "luckywinner"
       actions:
         - checkPodCount:
-            expectedCount: 2
+            count: 2
         - checkPodState:
             state: Running
 

@@ -569,10 +569,10 @@ definitions:
         type: object
         additionalProperties: false
         properties:
-          expectedCount:
+          count:
             type: number
         required:
-        - expectedCount
+        - count
     required:
     - checkPodCount
 

@@ -14,6 +14,7 @@
 import pytest
 from mock import MagicMock
 
+from powerfulseal.policy.action_kubectl import ActionKubectl
 from powerfulseal.policy.action_nodes import ActionNodes
 from powerfulseal.policy.action_pods import ActionPods
 from powerfulseal.policy.action_nodes_pods import ActionNodesPods
@@ -109,4 +110,17 @@ def node_scenario():
         inventory=inventory,
         driver=driver,
         executor=executor,
+    )
+
+
+@pytest.fixture
+def action_kubectl():
+    logger = MagicMock()
+    return ActionKubectl(
+        name="test kubectl action",
+        schema=dict(
+            action="apply",
+            payload="---\n"
+        ),
+        logger=logger,
     )

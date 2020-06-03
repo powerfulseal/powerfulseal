@@ -437,6 +437,23 @@ def main(argv):
     ##########################################################################
     # LOGGING
     ##########################################################################
+    # this is to calm down the flask stdout
+    # calm down the workzeug
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)
+    try:
+        import click
+        def secho(text, file=None, nl=None, err=None, color=None, **styles):
+            pass
+
+        def echo(text, file=None, nl=None, err=None, color=None, **styles):
+            pass
+
+        click.echo = echo
+        click.secho = secho
+    except:
+        pass
+
+    # parse the verbosity flags
     if args.silent == 1:
         log_level = logging.WARNING
     elif args.silent == 2:
@@ -457,15 +474,9 @@ def main(argv):
         fmt='%(asctime)s %(levelname)s %(name)s %(message)s'
     )
 
-    # calm down the workzeug
-    logging.getLogger("werkzeug").setLevel(logging.WARNING)
-
     # the main cli handler
     logger = makeLogger(__name__)
     logger.setLevel(log_level)
-
-
-
     logger.info("modules %s : verbosity %s : log level %s : handler level %s ", __name__, args.verbose, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
 
     ##########################################################################

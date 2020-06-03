@@ -28,4 +28,9 @@ COPY --from=builder /usr/local/bin/powerfulseal /usr/local/bin/seal /usr/local/b
 # list the installed packages and their versions
 RUN pip list
 
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl \
+    && chmod +x ./kubectl \
+    && mv ./kubectl /usr/bin/kubectl \
+    && kubectl version --client
+
 ENTRYPOINT ["powerfulseal"]

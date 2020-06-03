@@ -477,7 +477,7 @@ def main(argv):
     # the main cli handler
     logger = makeLogger(__name__)
     logger.setLevel(log_level)
-    logger.info("modules %s : verbosity %s : log level %s : handler level %s ", __name__, args.verbose, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
+    logger.info("verbosity: %s; log level: %s; handler level: %s", args.verbose, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
 
     ##########################################################################
     # KUBERNETES

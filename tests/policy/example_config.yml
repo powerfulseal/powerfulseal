@@ -150,7 +150,7 @@ scenarios:
         - wait:
             seconds: 30
         - start:
-        - executeNode:
+        - execute:
             cmd: "sudo service docker restart"
 
   # podAction performs actions on specific pods in the cluster

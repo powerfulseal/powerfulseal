@@ -512,7 +512,7 @@ definitions:
       Executes arbitrary command on a particular node. Use with caution.
     additionalProperties: false
     properties:
-      executeNode:
+      execute:
         type: object
         additionalProperties: false
         properties:
@@ -521,7 +521,7 @@ definitions:
         required:
         - cmd
     required:
-    - executeNode
+    - execute
 
   actionWait:
     type: object
@@ -575,7 +575,6 @@ definitions:
         - expectedCount
     required:
     - checkPodCount
-
 
   checkPodState:
     type: object

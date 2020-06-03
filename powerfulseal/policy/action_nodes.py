@@ -50,41 +50,46 @@ class ActionNodes(ActionNodesPods):
             self.metric_collector.add_matched_to_empty_set_metric(NODE_SOURCE)
         return list(selected_nodes)
 
-    def action_start(self, item, params):
+    def action_start(self, items, params):
         """ Action to start a node.
         """
-        self.logger.info("Action start on %r", item)
-        try:
-            self.driver.start(item)
-            return True
-        except:
-            self.logger.exception("Error starting the machine")
-        return False
+        success = True
+        for item in items:
+            self.logger.info("Action start on %r", item)
+            try:
+                self.driver.start(item)
+            except:
+                self.logger.exception("Error starting the machine")
+                success = False
+        return success
 
-    def action_stop(self, item, params):
+    def action_stop(self, items, params):
         """ Action to stop a node.
         """
-        self.logger.info("Action stop on %r", item)
-        try:
-            self.metric_collector.add_node_stopped_metric(item)
-            self.driver.stop(item)
-            return True
-        except:
-            self.metric_collector.add_node_stop_failed_metric(item)
-            self.logger.exception("Error stopping the machine")
-        return False
+        success = True
+        for item in items:
+            self.logger.info("Action stop on %r", item)
+            try:
+                self.driver.stop(item)
+                self.metric_collector.add_node_stopped_metric(item)
+            except:
+                self.metric_collector.add_node_stop_failed_metric(item)
+                self.logger.exception("Error stopping the machine")
+                success = False
+        return success
 
-    def action_execute(self, item, params):
+    def action_execute(self, items, params):
         """ Executes arbitrary code on the node.
         """
         cmd = params.get("cmd", "hostname")
-        self.logger.info("Action execute '%s' on %r", cmd, item)
-        ret = True
-        for value in self.executor.execute(
-            cmd, nodes=[item]
-        ).values():
-            if value["ret_code"] > 0:
-                self.logger.info("Error return code: %s", value)
-                self.metric_collector.add_execute_failed_metric(item)
-                ret = False
-        return ret
+        success = True
+        for item in items:
+            self.logger.info("Action execute '%s' on %r", cmd, item)
+            for value in self.executor.execute(
+                cmd, nodes=[item]
+            ).values():
+                if value["ret_code"] > 0:
+                    self.logger.info("Error return code: %s", value)
+                    self.metric_collector.add_execute_failed_metric(item)
+                    success = False
+        return success

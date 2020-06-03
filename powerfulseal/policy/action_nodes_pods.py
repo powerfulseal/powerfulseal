@@ -195,7 +195,7 @@ class ActionNodesPods(ActionAbstract):
 
         return items
 
-    def action_wait(self, item, params):
+    def action_wait(self, items, params):
         """ Waits x seconds, according to the policy.
         """
         sleep_time = params.get("seconds", 0)
@@ -212,18 +212,14 @@ class ActionNodesPods(ActionAbstract):
     def act_mapping(self, items, actions, mapping):
         """ Executes all the actions on the list of pods.
         """
-        overall = True
+        success = True
         for action in actions:
             for key, method in mapping.items():
                 if key in action:
                     params = action.get(key)
-                    for item in items:
-                        ret = method(item, params)
-                        if not ret:
-                            overall = False
-                        # special case - if we're waiting, only do that on first item
-                        if key == "wait":
-                            break
-        return overall
+                    ret = method(items, params)
+                    if not ret:
+                        success = False
+        return success
 
 

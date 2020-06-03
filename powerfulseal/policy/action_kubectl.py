@@ -47,8 +47,8 @@ class ActionKubectl(ActionAbstract):
 
     def execute_kubectl(self, action, payload):
         cmd = self.make_kubectl_command(action)
-        self.logger.info("Command: %r", cmd)
-        self.logger.info("Payload: %r", payload)
+        self.logger.debug("Command: %r", cmd)
+        self.logger.debug("Payload: %r", payload)
         process = subprocess.run(
             cmd,
             input=payload,

@@ -205,7 +205,7 @@ class ActionNodesPods(ActionAbstract):
     def act(self, items):
         """ Execute policy's actions on the items
         """
-        self.logger.info("Acting on these: %r", items)
+        self.logger.debug("Acting on these: %r", items)
         actions = self.schema.get("actions", [])
         return self.act_mapping(items, actions, self.action_mapping)
 

@@ -450,6 +450,10 @@ definitions:
             - state
           value:
             type: string
+          negative:
+            type: boolean
+            description: Set to true to negate the match (logical NOT)
+            default: false
         required:
         - name
         - value
@@ -473,6 +477,10 @@ definitions:
             - state
           value:
             type: string
+          negative:
+            type: boolean
+            description: Set to true to negate the match (logical NOT)
+            default: false
         required:
         - name
         - value

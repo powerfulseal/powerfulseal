@@ -74,17 +74,24 @@ class ActionNodesPods(ActionAbstract):
         """
         if not criterion:
             return False
-        attr = criterion.get("name")
-        value = getattr(candidate, attr)
+        name = criterion.get("name")
+        value = getattr(candidate, name)
+        negative = criterion.get("negative", False)
         expr = re.compile(criterion.get("value"))
-        if type(value) is list:
-            return any([
-                expr.match(str(v))
+        # support single values or list of values
+        if type(value) is not list:
+            value = [value]
+        # if negative, reverse the condition
+        if negative:
+            return all([
+                not expr.match(str(v))
                 for v in value
             ])
-        else:
-            value = str(value)
-        return expr.match(value)
+        # otherwise do match for any values in the list
+        return any([
+            expr.match(str(v))
+            for v in value
+        ])
 
     def filter(self, items):
         """ Applies various filters based on the given policy.

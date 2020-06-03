@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
+from powerfulseal import getLogger
 
 import requests
 
@@ -35,7 +35,7 @@ class MetricsServerClient:
 
     def __init__(self, base_path, logger=None):
         self.base_path = base_path or ''
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
 
     def get_pod_metrics(self):
         response = requests.get(self.base_path + POD_METRICS_PATH)

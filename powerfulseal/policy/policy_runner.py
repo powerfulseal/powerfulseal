@@ -19,10 +19,10 @@ import time
 import jsonschema
 import yaml
 import pkgutil
-import logging
+from powerfulseal import getLogger
 from .scenario import Scenario
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class PolicyRunner():

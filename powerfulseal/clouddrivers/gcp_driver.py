@@ -1,5 +1,5 @@
 import json
-import logging
+from powerfulseal import getLogger
 import subprocess
 import sys
 
@@ -110,7 +110,7 @@ class GCPDriver(AbstractDriver):
     """
 
     def __init__(self, cloud=None, conn=None, logger=None, config=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
         self.conn = create_connection_from_config()
         self.remote_servers = []
         try:

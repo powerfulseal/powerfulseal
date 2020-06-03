@@ -19,7 +19,7 @@ import re
 from datetime import datetime
 import calendar
 import random
-import logging
+from powerfulseal import getLogger
 
 from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_abstract import ActionAbstract
@@ -35,7 +35,7 @@ class ActionNodesPods(ActionAbstract):
     def __init__(self, name, schema, logger=None, metric_collector=None):
         self.name = name
         self.schema = schema
-        self.logger = logger or logging.getLogger(__name__ + "." + name)
+        self.logger = logger or getLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.action_mapping = dict()
 

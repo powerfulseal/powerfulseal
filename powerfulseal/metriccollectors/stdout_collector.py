@@ -14,10 +14,10 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import getLogger
 from powerfulseal.metriccollectors.collector import AbstractCollector
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class StdoutCollector(AbstractCollector):

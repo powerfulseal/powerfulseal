@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import getLogger
 from . import AbstractDriver
 from ..node import Node, NodeState
 
@@ -31,7 +31,7 @@ class NoCloudDriver(AbstractDriver):
     """
 
     def __init__(self, logger=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
 
     def sync(self):
         """ Noop

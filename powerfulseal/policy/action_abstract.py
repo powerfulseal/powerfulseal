@@ -19,7 +19,7 @@ import re
 from datetime import datetime
 import calendar
 import random
-import logging
+from powerfulseal import getLogger
 
 from abc import ABC, abstractmethod
 from ..metriccollectors.stdout_collector import StdoutCollector

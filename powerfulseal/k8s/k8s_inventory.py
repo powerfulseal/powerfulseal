@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import getLogger
 from datetime import datetime
 from .pod import Pod
 
@@ -36,7 +36,7 @@ class K8sInventory():
         self.k8s_client = k8s_client
         self._cache_namespaces = []
         self._cache_last = None
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
         self.last_pods = []
 
     def is_fresh(self, when):

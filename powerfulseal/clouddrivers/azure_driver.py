@@ -1,6 +1,6 @@
 import os
 import sys
-import logging
+from powerfulseal import getLogger
 from . import AbstractDriver
 from ..node import Node, NodeState
 
@@ -69,7 +69,7 @@ class AzureDriver(AbstractDriver):
     """
 
     def __init__(self, cluster_rg_name=None, cluster_node_rg_name=None, cloud=None, conn=None, logger=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
         self.resource_client, self.compute_client, self.network_client = create_connection_from_config()
         self.remote_servers = []
         self.cluster_rg = cluster_rg_name

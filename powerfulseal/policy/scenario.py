@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import getLogger
 
 from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_nodes import ActionNodes
@@ -35,7 +35,7 @@ class Scenario():
         self.k8s_inventory = k8s_inventory
         self.executor = executor
         self.driver = driver
-        self.logger = logger or logging.getLogger(__name__ + "." + name)
+        self.logger = logger or getLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.action_mapping = dict(
             nodeAction=self.action_nodes,

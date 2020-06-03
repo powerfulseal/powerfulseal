@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import getLogger
 import kubernetes.client
 import kubernetes.config
 from kubernetes.client.rest import ApiException
@@ -33,7 +33,7 @@ class K8sClient():
         self.client_corev1api = kubernetes.client.CoreV1Api()
         self.client_appsv1api = kubernetes.client.AppsV1Api()
 
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
         self.logger.info("Initializing with config: %s", kube_config)
 
     def make_selector(self, key, value):

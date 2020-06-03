@@ -13,4 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 
+def getLogger(name, extra=None):
+    """
+        Helper function to create consistent loggers
+    """
+    name = name.split(".")[-1]
+    if extra is not None:
+        name += "." + extra[0:15]
+    return logging.getLogger(name)

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
+from powerfulseal import getLogger
 import random
 
 import time
@@ -49,7 +49,7 @@ class LabelRunner:
         self.executor = executor
         self.min_seconds_between_runs = min_seconds_between_runs
         self.max_seconds_between_runs = max_seconds_between_runs
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
         self.namespace = namespace
         self.metric_collector = metric_collector
 

@@ -1,4 +1,4 @@
-import logging
+from powerfulseal import getLogger
 import boto3
 from . import AbstractDriver
 from ..node import Node, NodeState
@@ -45,7 +45,7 @@ class AWSDriver(AbstractDriver):
     """
 
     def __init__(self, cloud=None, conn=None, logger=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or getLogger(__name__)
         self.conn = create_connection_from_config()
         self.instances = []
 

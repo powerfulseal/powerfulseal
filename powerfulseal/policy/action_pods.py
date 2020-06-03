@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import random
+import re
 
 from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .action_nodes_pods import ActionNodesPods
@@ -36,6 +36,7 @@ class ActionPods(ActionNodesPods):
             "wait": self.action_wait,
             "kill": self.action_kill,
             "checkPodCount": self.action_check_pod_count,
+            "checkPodState": self.action_check_pod_state,
         }
 
     def match(self):
@@ -130,5 +131,26 @@ class ActionPods(ActionNodesPods):
         """
             Checks that the count of pods equals the desired count.
         """
-        expectedCount = int(params.get("expectedCount"))
-        return len(pods) == expectedCount
+        count = int(params.get("count"))
+        if len(pods) != count:
+            self.logger.error("Expected %d pods, got %d", count, len(pods))
+            return False
+        return True
+
+    def action_check_pod_state(self, pods, params):
+        """
+            Checks that all the pods are in desired state.
+        """
+        state = params.get("state")
+        success = True
+        for pod in pods:
+            if not self.match_property(
+                candidate=pod,
+                criterion=dict(
+                    name="state",
+                    value=state,
+                )
+            ):
+                self.logger.error("Expected pod in state '%s', got '%s' (%r)", state, pod.state, pod)
+                success = False
+        return success

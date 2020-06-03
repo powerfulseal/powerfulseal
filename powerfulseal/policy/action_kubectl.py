@@ -14,9 +14,11 @@
 # limitations under the License.
 
 import logging
+import copy
 
 from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_abstract import ActionAbstract
+
 
 
 class ActionKubectl(ActionAbstract):
@@ -29,3 +31,11 @@ class ActionKubectl(ActionAbstract):
 
     def execute(self):
         pass
+
+    def get_cleanup_actions(self):
+        actions = []
+        if self.schema.get("autoDelete"):
+            delete_action = copy.deepcopy(self)
+            delete_action.schema["action"] == "delete"
+            actions.append(delete_action)
+        return actions

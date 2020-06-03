@@ -616,7 +616,7 @@ def main(argv):
             logger.info("NOT starting the UI server")
 
         logger.info("STARTING AUTONOMOUS MODE")
-        PolicyRunner.run(
+        success = PolicyRunner.run(
             policy,
             inventory,
             k8s_inventory,
@@ -624,6 +624,10 @@ def main(argv):
             executor,
             metric_collector=metric_collector
         )
+        if not success:
+            logger.error("Policy runner finishes with an error")
+            return sys.exit(1)
+        return sys.exit(0)
 
     ##########################################################################
     # LABEL MODE

@@ -52,7 +52,8 @@ class ActionKubectl(ActionAbstract):
         process = subprocess.run(
             cmd,
             input=payload,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             shell=True,
             text=True,
         )

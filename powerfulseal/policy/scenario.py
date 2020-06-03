@@ -63,6 +63,9 @@ class Scenario():
         return True
 
     def cleanup(self):
+        if not self.cleanup_list:
+            self.logger.debug("No cleanup needed")
+            return
         self.logger.info("Cleanup started (%d items)", len(self.cleanup_list))
         for action in self.cleanup_list:
             self.execute_action(action)

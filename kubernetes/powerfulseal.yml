@@ -37,7 +37,7 @@ spec:
           image: store/bloomberg/powerfulseal:3.0.0
           args:
           - autonomous
-          - --policy-file=/policy_kill_random_default.yml
+          - --policy-file=/policy.yml
           volumeMounts:
             - name: policyfile
               mountPath: /policy.yml

@@ -1,6 +1,6 @@
 import os
 import sys
-from powerfulseal import getLogger
+from powerfulseal import makeLogger
 from . import AbstractDriver
 from ..node import Node, NodeState
 
@@ -69,7 +69,7 @@ class AzureDriver(AbstractDriver):
     """
 
     def __init__(self, cluster_rg_name=None, cluster_node_rg_name=None, cloud=None, conn=None, logger=None):
-        self.logger = logger or getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
         self.resource_client, self.compute_client, self.network_client = create_connection_from_config()
         self.remote_servers = []
         self.cluster_rg = cluster_rg_name
@@ -118,8 +118,8 @@ class AzureDriver(AbstractDriver):
             This can be determined by finding the resource groups that are managed_by 
             the cluater resource group ID
         """
-        self.logger.info("++ Azure cluster_rg: %s", self.cluster_rg)
-        self.logger.info("++ Azure cluster_node_rg: %s", self.cluster_node_rg)
+        self.logger.debug("++ Azure cluster_rg: %s", self.cluster_rg)
+        self.logger.debug("++ Azure cluster_node_rg: %s", self.cluster_node_rg)
 
         if self.cluster_node_rg is None:
             if self.cluster_rg is not None:
@@ -148,7 +148,7 @@ class AzureDriver(AbstractDriver):
     def sync(self):
         """ Downloads a fresh set of nodes form the API.
         """
-        self.logger.info("Synchronizing remote nodes")
+        self.logger.debug("Synchronizing remote nodes")
         """only get the resource group for the current cluster 
         """
         self.getResourceGroups()

@@ -22,7 +22,7 @@ import textwrap
 import sys
 import os
 
-from powerfulseal import getLogger
+from powerfulseal import makeLogger
 import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient
 from prometheus_client import start_http_server
@@ -46,7 +46,7 @@ def parse_kubeconfig(args):
         if not, check if there is `~/.kube/config` available
         else try to build in-cluster config
     """
-    logger = getLogger(__name__)
+    logger = makeLogger(__name__)
     kube_config = None
     expanded_home_kube_config_path = os.path.expanduser(KUBECONFIG_DEFAULT_PATH)
     if args.kubeconfig:
@@ -462,7 +462,7 @@ def main(argv):
     logging.getLogger("werkzeug").setLevel(logging.WARNING)
 
     # the main cli handler
-    logger = getLogger(__name__)
+    logger = makeLogger(__name__)
     logger.setLevel(log_level)
 
 

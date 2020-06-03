@@ -15,7 +15,7 @@
 
 import logging
 
-def getLogger(name, extra=None):
+def makeLogger(name, extra=None):
     """
         Helper function to create consistent loggers
     """

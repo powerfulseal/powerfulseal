@@ -20,7 +20,7 @@ import yaml
 from flask import Flask, jsonify, request, send_file, render_template
 from flask_cors import CORS
 
-from powerfulseal import getLogger
+from powerfulseal import makeLogger
 from powerfulseal.policy import PolicyRunner
 from powerfulseal.policy.action_nodes import ActionNodes
 from powerfulseal.policy.action_pods import ActionPods

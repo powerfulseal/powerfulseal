@@ -14,14 +14,14 @@
 # limitations under the License.
 
 
-from powerfulseal import getLogger
+from powerfulseal import makeLogger
 import ipaddress
 from .node import Node, NodeState
 
 class NodeInventory():
 
     def __init__(self, driver, restrict_to_groups=None, filters=None, logger=None):
-        self.logger = logger or getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
         self.driver = driver
         self.filters = filters or []
         self.local_ips = restrict_to_groups or {}

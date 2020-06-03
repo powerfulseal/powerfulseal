@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from powerfulseal import getLogger
+from powerfulseal import makeLogger
 import spur
 import random
 
@@ -42,7 +42,7 @@ class SSHExecutor(AbstractExecutor):
         self.ssh_kill_command = ssh_kill_command or self.DEFAULT_KILL_COMMAND
         self.override_host = override_host
         self.use_private_ip = use_private_ip
-        self.logger = logger or getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
 
     def execute(self, cmd, nodes=None, use_private_ip=None, debug=False):
         """

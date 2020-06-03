@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from powerfulseal import getLogger
+from powerfulseal import makeLogger
 import copy
 import subprocess
 
@@ -28,7 +28,7 @@ class ActionKubectl(ActionAbstract):
         self.name = name
         self.schema = schema
         self.kube_config = kube_config
-        self.logger = logger or getLogger(__name__ + "." + name)
+        self.logger = logger or makeLogger(__name__ + "." + name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.kubectl_binary = "kubectl"
 

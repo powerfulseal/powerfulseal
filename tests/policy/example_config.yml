@@ -23,7 +23,7 @@ scenarios:
   - kubectl:
       action: apply
       autoDelete: true
-      payload: >
+      payload: |
         ---
         apiVersion: v1
         kind: ConfigMap
@@ -73,7 +73,7 @@ scenarios:
                     name: sealpolicy
   - kubectl:
       action: delete
-      payload: >
+      payload: |
         ---
 
   # nodeAction performs actions on specific nodes in the cluster

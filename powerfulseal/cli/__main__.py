@@ -442,14 +442,10 @@ def main(argv):
     logging.getLogger("werkzeug").setLevel(logging.ERROR)
     try:
         import click
-        def secho(text, file=None, nl=None, err=None, color=None, **styles):
+        def echo(*args, **kwargs):
             pass
-
-        def echo(text, file=None, nl=None, err=None, color=None, **styles):
-            pass
-
         click.echo = echo
-        click.secho = secho
+        click.secho = echo
     except:
         pass
 

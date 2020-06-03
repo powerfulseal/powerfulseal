@@ -546,7 +546,7 @@ definitions:
       Kill a pod.
     additionalProperties: false
     properties:
-      killPod:
+      kill:
         type: object
         additionalProperties: false
         properties:
@@ -557,7 +557,7 @@ definitions:
           force:
             type: boolean
     required:
-    - killPod
+    - kill
 
   checkPodCount:
     type: object

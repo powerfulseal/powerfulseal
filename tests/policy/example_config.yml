@@ -41,7 +41,7 @@ scenarios:
                   - randomSample:
                       size: 1
                   actions:
-                  - killPod:
+                  - kill:
                       probability: 0.77
                       force: true
         ---
@@ -210,12 +210,12 @@ scenarios:
 
       # The actions will be executed in the order specified
       actions:
-        - killPod:
+        - kill:
             probability: 0.5
             force: true
         - wait:
             seconds: 5
-        - killPod:
+        - kill:
             probability: 1
             force: true
 

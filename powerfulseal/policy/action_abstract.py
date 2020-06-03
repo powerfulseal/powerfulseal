@@ -29,7 +29,13 @@ class ActionAbstract(ABC):
 
     @abstractmethod
     def execute(self):
+        """
+            Executes the actual action
+        """
         return True # pragma: no cover
 
     def get_cleanup_actions(self):
+        """
+            If the job requires cleanup, return actions necessary to do the cleanup.
+        """
         return [] # pragma: no cover

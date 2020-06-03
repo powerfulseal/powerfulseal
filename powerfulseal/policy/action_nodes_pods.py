@@ -111,7 +111,7 @@ class ActionNodesPods(ActionAbstract):
             satisfies the policy requirements.
         """
         now = now or datetime.now()
-        self.logger.info("Now is %r", now)
+        self.logger.debug("Now is %r", now)
 
         # check the day is permitted
         day_name = calendar.day_name[now.weekday()].lower()
@@ -155,7 +155,7 @@ class ActionNodesPods(ActionAbstract):
             ratio = criterion.get("ratio", 1)
             size = int(len(candidates)*ratio)
         if size == 0:
-            self.logger.info("RandomSample size 0")
+            self.logger.debug("RandomSample size 0")
             return []
         if size > len(candidates):
             return candidates

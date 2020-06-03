@@ -70,7 +70,7 @@ class K8sInventory():
         if self._cache_last is not None and self.is_fresh(self._cache_last):
             self.logger.debug("Using cached namespaces")
             return self._cache_namespaces
-        self.logger.info("Reading kubernetes namespaces")
+        self.logger.debug("Reading kubernetes namespaces")
         namespaces = []
         try:
             for item in self.k8s_client.list_namespaces():

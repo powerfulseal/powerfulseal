@@ -49,7 +49,7 @@ class ActionPods(ActionNodesPods):
         }
         selected = set()
         criteria = self.schema.get("matches", [])
-        self.logger.info("Criteria %r ",criteria)
+        self.logger.debug("Criteria %r ",criteria)
         for criterion in criteria:
             for action_name, action_method in mapping.items():
                 if action_name in criterion:

@@ -94,7 +94,7 @@ class NodeInventory():
         """
             Update the nodes based on the values returned from the driver
         """
-        self.logger.info("Sync Nodes")
+        self.logger.debug("Sync Nodes")
         driver = driver or self.driver
         driver.sync()
         counter = 0

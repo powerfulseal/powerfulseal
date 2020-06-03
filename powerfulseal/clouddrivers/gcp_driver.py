@@ -119,7 +119,7 @@ class GCPDriver(AbstractDriver):
             else:
                 with open(config, "r") as f:
                     default_config = json.loads(f.read())
-            self.logger.info(
+            self.logger.debug(
                 "Using Default gcloud config with project: %s and region: %s",
                 default_config['core']['project'],
                 default_config['compute']['region'])
@@ -133,7 +133,7 @@ class GCPDriver(AbstractDriver):
     def sync(self):
         """ Downloads a fresh set of nodes from the API.
         """
-        self.logger.info("Synchronizing remote nodes")
+        self.logger.debug("Synchronizing remote nodes")
         self.remote_servers = []
         self.zones = get_zones_of_region(self.conn, self.region, self.project)
         if self.zones is not None:

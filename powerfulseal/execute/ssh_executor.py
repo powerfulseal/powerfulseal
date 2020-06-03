@@ -73,7 +73,7 @@ class SSHExecutor(AbstractExecutor):
                     private_key_file=self.ssh_path_to_private_key,
                 )
 
-            self.logger.info("Executing '%s' on %s" % (cmd_full, node.name))
+            self.logger.debug("Executing '%s' on %s" % (cmd_full, node.name))
             try:
                 with shell:
                     output = shell.run(cmd_full)
@@ -107,7 +107,7 @@ class SSHExecutor(AbstractExecutor):
             container_id=container_id.replace("docker://", ""),
         )
         # Execute command
-        self.logger.info("Action execute '%s' on %r", cmd, pod)
+        self.logger.debug("Action execute '%s' on %r", cmd, pod)
         for value in self.execute(cmd, nodes=[node]).values():
             if value["ret_code"] > 0:
                 self.logger.error("Error return code: %s", value)

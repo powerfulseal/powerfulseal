@@ -137,14 +137,13 @@ def add_ssh_options(parser):
 def add_inventory_options(parser):
     # Inventory
     args = parser.add_argument_group('Inventory settings')
-    inventory_options = args.add_mutually_exclusive_group(required=True)
+    inventory_options = args.add_mutually_exclusive_group(required=False)
     inventory_options.add_argument('-i', '--inventory-file',
         default=os.environ.get("INVENTORY_FILE"),
         help=('the inventory file (in ini format) of groups '
               'of hosts to work with')
     )
     inventory_options.add_argument('--inventory-kubernetes',
-        default=os.environ.get("INVENTORY_KUBERNETES"),
         help='reads all kubernetes cluster nodes as inventory',
         action='store_true',
     )
@@ -255,7 +254,7 @@ def add_metrics_options(parser):
     args_prometheus = parser.add_argument_group('Prometheus settings')
     args_prometheus.add_argument(
         '--prometheus-host',
-        default='127.0.0.1',
+        default='0.0.0.0',
         help=(
             'Host to expose Prometheus metrics via the HTTP server when using '
             'the --prometheus-collector flag'
@@ -263,7 +262,7 @@ def add_metrics_options(parser):
     )
     args_prometheus.add_argument(
         '--prometheus-port',
-        default=8081,
+        default=9000,
         help=(
             'Port to expose Prometheus metrics via the HTTP server '
             'when using the --prometheus-collector flag'
@@ -369,12 +368,12 @@ def parse_args(args):
     web_args.add_argument(
         '--host',
         help='Specify host for the PowerfulSeal web server',
-        default=os.environ.get('HOST', '127.0.0.1')
+        default=os.environ.get('HOST', '0.0.0.0')
     )
     web_args.add_argument(
         '--port',
         help='Specify port for the PowerfulSeal web server',
-        default=int(os.environ.get('PORT', '8080')),
+        default=int(os.environ.get('PORT', '8000')),
         type=check_valid_port
     )
     web_args.add_argument(

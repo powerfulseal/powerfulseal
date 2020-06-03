@@ -452,7 +452,10 @@ def main(argv):
     # do a basic config with the server log handler
     logging.basicConfig(level=log_level, handlers=[server_log_handler])
     # this installs a stdout handler by default to the root
-    coloredlogs.install(level=log_level)
+    coloredlogs.install(
+        level=log_level,
+        fmt='%(asctime)s %(levelname)s %(name)s %(message)s'
+    )
 
     # calm down the workzeug
     logging.getLogger("werkzeug").setLevel(logging.WARNING)

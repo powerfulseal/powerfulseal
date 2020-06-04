@@ -241,6 +241,11 @@ scenarios:
       endpoint: /metrics
       # make a hundred requests to guarantee we hit every pod in the service
       count: 100
+      method: post
+      body: |
+        {
+          "payload": "nope"
+        }
 
   - probeHTTP:
       target:

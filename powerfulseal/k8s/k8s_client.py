@@ -171,3 +171,17 @@ class K8sClient():
                 self.logger.exception(e)
                 return False
         return True
+
+    def get_service(self, namespace, name):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            /CoreV1Api.md#read_namespaced_service
+        """
+        try:
+            return self.client_corev1api.read_namespaced_service(
+                namespace=namespace,
+                name=name,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise

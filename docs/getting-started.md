@@ -23,6 +23,8 @@ permalink: /getting-started
 
 ### Prerequisites
 
+#### Python
+
 You're going to need [`python`](https://www.python.org/downloads/) 3.7+.
 
 ```sh
@@ -32,7 +34,7 @@ Python 3.7.6
 
 #### Setting up a virtualenv
 
-A good practice is to always use [virtualenv](https://virtualenv.pypa.io/en/stable/). You can create and activate one like this:
+Though optional, it is a good practice is to always use [virtualenv](https://virtualenv.pypa.io/en/stable/). You can create and activate one like this:
 
 ```sh
 python -m virtualenv env
@@ -40,6 +42,8 @@ source env/bin/activate
 ```
 
 ### Installing through pip
+
+Installing from [pip](https://pypi.org/project/powerfulseal/) is easy:
 
 ```sh
 pip install powerfulseal
@@ -59,11 +63,9 @@ If you have a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/o
 powerfulseal interactive
 ```
 
-This will start a command line, interactive CLI, just like the following:
+This will start a command line, interactive CLI, just like the following. You can type commands inside of it.
 
 ```sh
-$ powerfulseal interactive
-(...)
 (seal) $
 ```
 
@@ -92,8 +94,8 @@ You can use the `docker` image in a similar fashion to running locally. You will
 Below is an example of using the `-v` flag to inject your local `kubeconfig` to the image (`-v ~/.kube:/root/.kube`)
 
 ```sh
-docker run \
-    --rm -it -v ~/.kube:/root/.kube \
+docker run -it \
+    -v ~/.kube:/root/.kube \
     docker.io/store/bloomberg/powerfulseal:2.8.0 \
         interactive --no-cloud --inventory-kubernetes
 ```

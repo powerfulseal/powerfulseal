@@ -20,6 +20,7 @@ from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_nodes import ActionNodes
 from .action_pods import ActionPods
 from .action_kubectl import ActionKubectl
+from .action_probe_http import ActionProbeHTTP
 
 
 class Scenario():
@@ -41,6 +42,7 @@ class Scenario():
             nodeAction=self.action_nodes,
             podAction=self.action_pods,
             kubectl=self.action_kubectl,
+            probeHTTP=self.action_probe_http,
         )
         self.cleanup_list = []
 
@@ -103,5 +105,13 @@ class Scenario():
             schema=schema,
             name=self.name,
             kube_config=self.k8s_inventory.k8s_client.kube_config,
+        )
+        return self.execute_action(action)
+
+    def action_probe_http(self, schema):
+        action = ActionProbeHTTP(
+            schema=schema,
+            name=self.name,
+            k8s_inventory=self.k8s_inventory,
         )
         return self.execute_action(action)

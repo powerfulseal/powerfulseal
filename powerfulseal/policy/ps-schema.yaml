@@ -293,7 +293,6 @@ definitions:
             type: string
             description: >
               Expected status code.
-            default: /healthz
           method:
             type: string
             description: >

@@ -75,10 +75,33 @@ Try listing pods from the `kube-system` namespace:
 
 For help, just type `help`. For more information about the modes, see our [docs on modes](/modes).
 
-## Docker
+## Running from Docker
 
-The automatically built docker images are now available on [docker hub](https://hub.docker.com/_/powerfulseal)
+### Download docker image
+
+For each [release](https://github.com/bloomberg/powerfulseal/releases) a `docker` image is built and published to the [docker hub](https://hub.docker.com/_/powerfulseal).
 
 ```sh
-docker pull bloomberg/powerfulseal:2.7.0
+docker pull store/bloomberg/powerfulseal:3.0.0
 ```
+
+### Run docker image
+
+You can use the `docker` image in a similar fashion to running locally. You will just need to pass it your `kubeconfig`.
+
+Below is an example of using the `-v` flag to inject your local `kubeconfig` to the image (`-v ~/.kube:/root/.kube`)
+
+```sh
+docker run \
+    --rm -it -v ~/.kube:/root/.kube \
+    docker.io/store/bloomberg/powerfulseal:2.8.0 \
+        interactive --no-cloud --inventory-kubernetes
+```
+
+To see how to use other modes, see our [docs on modes](/modes)
+
+## Tutorials
+
+Time to get busy writing some chaos experiments!
+
+[Go to tutorials now](/tutorials){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }

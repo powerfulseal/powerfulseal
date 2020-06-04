@@ -305,6 +305,10 @@ definitions:
             - post
             - patch
             - head
+          body:
+            type: string
+            description: >
+              Body of the HTTP request.
         required:
         - target
     required:

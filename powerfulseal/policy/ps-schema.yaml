@@ -307,6 +307,16 @@ definitions:
             type: string
             description: >
               Body of the HTTP request.
+          headers:
+            type: object
+            description: >
+              Give any additional headers to the request.
+            additionalProperties: false
+            properties:
+              name:
+                type: string
+              value:
+                type: string
         required:
         - target
     required:
@@ -666,6 +676,7 @@ definitions:
     type: object
     description: >
       Target the given service in a given namespace.
+      It will use directly the IP of the given service, so make sure it resolves.
     additionalProperties: false
     properties:
       service:

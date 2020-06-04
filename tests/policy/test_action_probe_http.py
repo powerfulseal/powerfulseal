@@ -16,7 +16,7 @@
 
 import random
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 
 
 # noinspection PyUnresolvedReferences
@@ -57,3 +57,24 @@ def test_get_url_service(action_probe_http):
         name=schema.get("target").get("service").get("name"),
         namespace=schema.get("target").get("service").get("namespace"),
     ),)
+
+def test_get_url_all_params(action_probe_http):
+    schema = dict(
+        target=dict(
+            url="http://10.10.10.10:80"
+        ),
+        headers=[dict(name="TEST", value="SOMETHING")],
+        method="POST",
+        body="SOMEBODY here!",
+        timeout=2000,
+    )
+    action_probe_http.schema = schema
+    mock_request = MagicMock()
+
+    with patch("requests.request", mock_request):
+        action_probe_http.execute()
+
+    assert mock_request.call_count == 1
+    args = mock_request.call_args
+    assert args.args == ('POST', 'http://10.10.10.10:80/')
+    assert args.kwargs == dict(headers={'TEST': 'SOMETHING'}, timeout=2.0, data=b'SOMEBODY here!')

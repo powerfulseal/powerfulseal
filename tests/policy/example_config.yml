@@ -254,9 +254,3 @@ scenarios:
           namespace: default
           port: 9090
           protocol: http
-
-  - probeHTTP:
-      target:
-        ingress:
-          name: some-service
-          namespace: default

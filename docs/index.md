@@ -21,13 +21,10 @@ permalink: /
 
 ## Highlights
 
-- works with `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
-- speaks `Kubernetes` natively
-- interactive and autonomous, policy-driven mode
-- web interface to interact with PowerfulSeal
-- metric collection and exposition to `Prometheus` or `Datadog`
-- minimal setup, easy yaml-based policies
-- easy to extend
+- works with `kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
+- `Prometheus` and `Datadog` metrics collection
+- `yaml` policy describing chaos experiments
+- multiple [modes](/modes)
 
 ### License
 

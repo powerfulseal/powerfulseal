@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import requests
+import time
+
 from powerfulseal import makeLogger
 
 from ..metriccollectors.stdout_collector import StdoutCollector
@@ -64,7 +67,61 @@ class ActionProbeHTTP(ActionAbstract):
         self.logger.debug("Using provided url: %s", url)
         return url
 
+    def get_headers(self, schema):
+        headers = dict()
+        for header in schema.get("headers",[]):
+            headers[header["name"]] = header["value"]
+        return headers
+
+    def make_call(self, url, method, body, headers, timeout, code):
+        self.logger.info(
+            "Making a call: %s, %s, %r, %d, %d, %s",
+            url, method, headers, timeout, code, body
+        )
+        try:
+            resp = requests.request(
+                method.upper(),
+                url,
+                headers=headers,
+                timeout=timeout/1000,
+                data=body.encode("utf-8"),
+            )
+            resp.raise_for_status()
+            self.logger.info("Response: %s", resp.text)
+            return True
+        except:
+            self.logger.exception("Exception while calling %s", url)
+        return False
+
     def execute(self):
+        count = self.schema.get("count", 1)
+        retries = self.schema.get("retries", 1)
+        delay = self.schema.get("delay", 100)
+
         url = self.get_url(self.schema)
-        self.logger.info("Using url: %s", url)
+        headers = self.get_headers(self.schema)
+        method = self.schema.get("method", "get")
+        body = self.schema.get("body", "")
+        timeout = self.schema.get("timeout", 1000)
+        code = self.schema.get("code", 200)
+
+        for _ in range(count):
+            for retry in range(retries):
+                success = self.make_call(
+                    url=url,
+                    method=method,
+                    body=body,
+                    headers=headers,
+                    timeout=timeout,
+                    code=code,
+                )
+                if not success:
+                    # if we've reached the limit, the answer is no
+                    if retry == retries - 1:
+                        return False
+                    # otherwise just wait a little
+                    time.sleep(delay/1000)
+                else:
+                    break
+
         return True

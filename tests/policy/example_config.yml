@@ -18,6 +18,10 @@ scenarios:
     with a PowerfulSeal policy, and make sure it validates against the schema.
   steps:
 
+  # wait lets you wait X amount of time
+  - wait:
+      seconds: 1.5
+
   # kubectl allows you to apply or delete an arbitrary kubernetes config
   # you can use this to setup the
   - kubectl:

@@ -678,6 +678,10 @@ definitions:
             type: string
           namespace:
             type: string
+          port:
+            type: number
+            minimum: 1
+            maximum: 65535
         required:
         - name
         - namespace

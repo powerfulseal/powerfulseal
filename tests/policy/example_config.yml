@@ -252,6 +252,7 @@ scenarios:
         service:
           name: some-service
           namespace: default
+          port: 9090
 
   - probeHTTP:
       target:

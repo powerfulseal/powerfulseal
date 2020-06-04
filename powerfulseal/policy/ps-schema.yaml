@@ -109,6 +109,7 @@ definitions:
           - "$ref": "#/definitions/kubectl"
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
+          - "$ref": "#/definitions/waitAction"
     required:
     - name
     - steps
@@ -327,6 +328,24 @@ definitions:
         - target
     required:
     - probeHTTP
+
+  waitAction:
+    description: >
+      Allows to wait a number of seconds.
+    type: object
+    additionalProperties: false
+    properties:
+      wait:
+        type: object
+        additionalProperties: false
+        properties:
+          seconds:
+            type: number
+            minimum: 0
+        required:
+        - seconds
+    required:
+    - wait
 
 
 ###################################################################################################

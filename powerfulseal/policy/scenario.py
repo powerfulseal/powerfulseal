@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 
 from powerfulseal import makeLogger
 
@@ -43,6 +44,7 @@ class Scenario():
             podAction=self.action_pods,
             kubectl=self.action_kubectl,
             probeHTTP=self.action_probe_http,
+            wait=self.action_wait,
         )
         self.cleanup_list = []
 
@@ -115,3 +117,11 @@ class Scenario():
             k8s_inventory=self.k8s_inventory,
         )
         return self.execute_action(action)
+
+    def action_wait(self, schema):
+        """ Waits x seconds, according to the policy.
+        """
+        sleep_time = schema.get("seconds", 0.0)
+        self.logger.info("Sleeping for %r seconds", sleep_time)
+        time.sleep(sleep_time)
+        return True

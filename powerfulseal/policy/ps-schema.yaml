@@ -262,6 +262,7 @@ definitions:
             type: number
             description: >
               Number of retries before failing the probe.
+              Ignored, if there are no errors on the probe.
             default: 3
             minimum: 1
           delay:
@@ -273,7 +274,7 @@ definitions:
           timeout:
             type: number
             description: >
-              Timeout in ms.
+              Request timeout in ms.
             default: 1000
             minimum: 1
           code:
@@ -292,7 +293,9 @@ definitions:
           endpoint:
             type: string
             description: >
-              Expected status code.
+              Endpoint to add to the url.
+              For example `/healthz`.
+              Works for both url and service.
           method:
             type: string
             description: >
@@ -303,6 +306,7 @@ definitions:
             - post
             - patch
             - head
+            - delete
           body:
             type: string
             description: >
@@ -671,13 +675,16 @@ definitions:
     properties:
       url:
         type: string
+        description: >
+          The fully qualified url to issue the request to.
+          For example: `http://example.com`.
     required:
     - url
 
   targetService:
     type: object
     description: >
-      Target the given service in a given namespace.
+      Target the given `kubernetes` service in a given namespace.
       It will use directly the IP of the given service, so make sure it resolves.
     additionalProperties: false
     properties:
@@ -687,19 +694,27 @@ definitions:
         properties:
           name:
             type: string
+            description: >
+              Name of the kubernetes service.
           namespace:
             type: string
+            description: >
+              Namespace of the kubernetes service.
           port:
             type: number
             minimum: 1
             maximum: 65535
             default: 80
+            description: >
+              Port number to hit. Independent of what the service defines.
           protocol:
             type: string
             enum:
             - http
             - https
             default: http
+            description: >
+              Protocol to use for the probe.
         required:
         - name
         - namespace

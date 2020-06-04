@@ -335,7 +335,7 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__endpoint"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__endpoint">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>Expected status code.</p>
+                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>Endpoint to add to the url. For example <code>/healthz</code>. Works for both url and service.</p>
 </span>
 
             
@@ -421,7 +421,7 @@
 
             <div class="enum-value" id="scenarios_array_items__steps_array_items__option1__probeHTTP__method_enum">
                 <h4>Must be one of:</h4>
-                <ul class="list-group"><li class="list-group-item">"get"</li><li class="list-group-item">"post"</li><li class="list-group-item">"patch"</li><li class="list-group-item">"head"</li></ul>
+                <ul class="list-group"><li class="list-group-item">"get"</li><li class="list-group-item">"post"</li><li class="list-group-item">"patch"</li><li class="list-group-item">"head"</li><li class="list-group-item">"delete"</li></ul>
                 </div>
               </div>
             </div>
@@ -438,7 +438,7 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__retries"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__retries">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 3</span><span class="description"><p>Number of retries before failing the probe.</p>
+                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 3</span><span class="description"><p>Number of retries before failing the probe. Ignored, if there are no errors on the probe.</p>
 </span>
 
             <p><span class="badge badge-light restriction numeric-restriction" id="scenarios_array_items__steps_array_items__option1__probeHTTP__retries_number">Value must be greater or equal to <code>1</code></span></p>
@@ -486,7 +486,8 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__target__option1__url"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__target__option1__url">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: string</span>
+                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>The fully qualified url to issue the request to. For example: <code>http://example.com</code>.</p>
+</span>
 
             
               </div>
@@ -494,7 +495,7 @@
         </div>
     </div>
             </div><div class="tab-pane fade card-body "
-                 id="tab-pane_scenarios_array_items__steps_array_items__option1__probeHTTP__target__option2" role="tabpanel"><span class="badge badge-dark value-type">Type: object</span><span class="description"><p>Target the given service in a given namespace. It will use directly the IP of the given service, so make sure it resolves.</p>
+                 id="tab-pane_scenarios_array_items__steps_array_items__option1__probeHTTP__target__option2" role="tabpanel"><span class="badge badge-dark value-type">Type: object</span><span class="description"><p>Target the given <code>kubernetes</code> service in a given namespace. It will use directly the IP of the given service, so make sure it resolves.</p>
 </span>
 
             <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service">
@@ -523,7 +524,8 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__name"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__name">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: string</span>
+                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>Name of the kubernetes service.</p>
+</span>
 
             
               </div>
@@ -541,7 +543,8 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__namespace"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__namespace">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: string</span>
+                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>Namespace of the kubernetes service.</p>
+</span>
 
             
               </div>
@@ -559,7 +562,8 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__port"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__port">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 80</span>
+                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 80</span><span class="description"><p>Port number to hit. Independent of what the service defines.</p>
+</span>
 
             <p><span class="badge badge-light restriction numeric-restriction" id="scenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__port_number">Value must be greater or equal to <code>1</code> and lesser or equal to <code>65535</code></span></p>
               </div>
@@ -577,7 +581,8 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__protocol"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__protocol">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: enum (of string)</span> <span class="badge badge-success default-value">Default: "http"</span>
+                <span class="badge badge-dark value-type">Type: enum (of string)</span> <span class="badge badge-success default-value">Default: "http"</span><span class="description"><p>Protocol to use for the probe.</p>
+</span>
 
             <div class="enum-value" id="scenarios_array_items__steps_array_items__option1__probeHTTP__target__option2__service__protocol_enum">
                 <h4>Must be one of:</h4>
@@ -607,7 +612,7 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__timeout"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__timeout">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 1000</span><span class="description"><p>Timeout in ms.</p>
+                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 1000</span><span class="description"><p>Request timeout in ms.</p>
 </span>
 
             <p><span class="badge badge-light restriction numeric-restriction" id="scenarios_array_items__steps_array_items__option1__probeHTTP__timeout_number">Value must be greater or equal to <code>1</code></span></p>

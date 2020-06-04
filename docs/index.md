@@ -28,7 +28,7 @@ permalink: /
 
 ## Policies
 
-This following policy will kill a single pod, and then check that the service continues responding to HTTP probes.
+Just to give you a taste, here's an example policy. It will kill a single pod, and then check that the service continues responding to HTTP probes, to verify its resiliency to one of its pods going down.
 
 ```yaml
 scenarios:

@@ -59,7 +59,7 @@ To collect metrics, run PowerfulSeal with the `--datadog-collector` flag.
 
 ### Use Case: Prometheus + Grafana + AlertManager
 
-[![Grafana example example](https://raw.githubusercontent.com/bloomberg/powerfulseal/master/media/grafana.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/grafana.png)
+[![Grafana example example](./media/grafana.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/grafana.png)
 
 A common use case is to use a combination of Prometheus, Grafana and AlertManager in order to increase visibility of potential issues. 
 
@@ -105,7 +105,7 @@ In order to configure this integration, follow the steps below. (The below instr
 
 ### Use Case: Datadog
 
-[![Datadog example example](https://raw.githubusercontent.com/bloomberg/powerfulseal/master/media/datadog.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/datadog.png)
+[![Datadog example example](./media/datadog.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/datadog.png)
 
 It's common to use Datadog in order to increase visibility of potential issues. 
 

@@ -8,7 +8,7 @@ __PowerfulSeal__ adds chaos to your Kubernetes clusters, so that you can detect 
 
 
 <p align="center">
-  <img src="media/powerful-seal.png" alt="Powerful Seal Logo" width="200"></a>
+  <img src="docs/media/powerful-seal.png" alt="Powerful Seal Logo" width="200"></a>
   <br>
   Embrace the inevitable failure. <strong>Embrace The Seal</strong>.
   <br>

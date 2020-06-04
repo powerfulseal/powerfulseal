@@ -15,6 +15,7 @@ import pytest
 from mock import MagicMock
 
 from powerfulseal.policy.action_kubectl import ActionKubectl
+from powerfulseal.policy.action_probe_http import ActionProbeHTTP
 from powerfulseal.policy.action_nodes import ActionNodes
 from powerfulseal.policy.action_pods import ActionPods
 from powerfulseal.policy.action_nodes_pods import ActionNodesPods
@@ -122,5 +123,21 @@ def action_kubectl():
             action="apply",
             payload="---\n"
         ),
+        logger=logger,
+    )
+
+
+@pytest.fixture
+def action_probe_http():
+    logger = MagicMock()
+    k8s_inventory = MagicMock()
+    return ActionProbeHTTP(
+        name="test probe http action",
+        schema=dict(
+            target=dict(
+                url="http://example.com"
+            )
+        ),
+        k8s_inventory=k8s_inventory,
         logger=logger,
     )

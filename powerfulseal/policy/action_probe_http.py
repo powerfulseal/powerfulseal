@@ -118,7 +118,9 @@ class ActionProbeHTTP(ActionAbstract):
                 if not success:
                     # if we've reached the limit, the answer is no
                     if retry == retries - 1:
+                        self.logger.error("No more retries allowed. Failing step")
                         return False
+                    self.logger.warning("Error calling. Sleeping %s and retrying", delay)
                     # otherwise just wait a little
                     time.sleep(delay/1000)
                 else:

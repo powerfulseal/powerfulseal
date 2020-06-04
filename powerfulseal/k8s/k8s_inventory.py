@@ -142,3 +142,13 @@ class K8sInventory():
         Retrieves all pods for all namespaces
         """
         return self.find_pods("")
+
+    def get_service(self, name, namespace):
+        try:
+            return self.k8s_client.get_service(
+                name=name,
+                namespace=namespace,
+            )
+        except Exception as e:
+            self.logger.exception(e)
+        return None

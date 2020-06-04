@@ -105,10 +105,10 @@ definitions:
           The sequence of events to prepare, validate, execute and analyse the chaos engineering experiment.
         items:
           oneOf:
+          - "$ref": "#/definitions/probeHTTP"
           - "$ref": "#/definitions/kubectl"
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
-          - "$ref": "#/definitions/probeHTTP"
     required:
     - name
     - steps

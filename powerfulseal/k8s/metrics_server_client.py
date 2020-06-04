@@ -71,7 +71,6 @@ class MetricsServerClient:
         """
         Returns CPU in number of cores (e.g., "120n" => 0.0000012)
         """
-        print(cpu)
         if len(cpu) < 2 or is_numeric(cpu[-1]):
             return float(cpu)
 

@@ -29,7 +29,6 @@ def test_creates_cleanup_action(action_kubectl):
     cleanup = action_kubectl.get_cleanup_actions()
     assert len(cleanup) == 1
     job = cleanup[0]
-    print(job)
     assert job is not action_kubectl
     assert job.schema is not action_kubectl.schema
     assert job.schema["payload"] == action_kubectl.schema["payload"]

@@ -308,15 +308,17 @@ definitions:
             description: >
               Body of the HTTP request.
           headers:
-            type: object
             description: >
               Give any additional headers to the request.
-            additionalProperties: false
-            properties:
-              name:
-                type: string
-              value:
-                type: string
+            type: array
+            items:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
         required:
         - target
     required:

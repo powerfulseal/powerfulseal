@@ -23,8 +23,35 @@ permalink: /
 
 - works with `kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
 - `Prometheus` and `Datadog` metrics collection
-- `yaml` policy describing chaos experiments
+- `yaml` [policies](#policies) describing chaos experiments
 - multiple [modes](/modes)
+
+## Policies
+
+This following policy will kill a single pod, and then check that the service continues responding to HTTP probes.
+
+```yaml
+scenarios:
+- name: Kill one pod in my namespace, make sure the service responds
+  steps:
+  # kill a pod from `myapp` namespace
+  - podAction:
+      matches:
+        - namespace: myapp
+      filters:
+        - randomSample:
+            size: 1
+      actions:
+        - kill:
+            probability: 0.75
+  # check my service continues working
+  - probeHTTP:
+      target:
+        service:
+          name: my-service
+          namespace: myapp
+      endpoint: /healthz
+```
 
 ### License
 

@@ -682,6 +682,13 @@ definitions:
             type: number
             minimum: 1
             maximum: 65535
+            default: 80
+          protocol:
+            type: string
+            enum:
+            - http
+            - https
+            default: http
         required:
         - name
         - namespace

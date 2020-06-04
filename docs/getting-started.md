@@ -102,8 +102,8 @@ docker run -it \
 
 To see how to use other modes, see our [docs on modes](/modes)
 
-## Tutorials
+## Modes of operation
 
-Time to get busy writing some chaos experiments!
+You just learned how to start the interactive mode, but it's just a beginning. Powerfulseal supports multiple modes of operation.
 
-[Go to tutorials now](/tutorials){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Learn about modes now](/modes){: .btn .btn-secondary .fs-5 .mb-4 .mb-md-0 .mr-2 }

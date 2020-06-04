@@ -295,6 +295,16 @@ definitions:
             description: >
               Expected status code.
             default: /healthz
+          method:
+            type: string
+            description: >
+              HTTP method to use.
+            default: get
+            enum:
+            - get
+            - post
+            - patch
+            - head
         required:
         - target
     required:

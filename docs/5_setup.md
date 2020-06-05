@@ -61,3 +61,8 @@ It's easy to use `minikube` with the Seal. It should run well on the default set
 --ssh-password `minikube ssh-password` \
 --override-ssh-host `minikube ip` \
 ```
+
+
+## Kubectl
+
+In order to use `kubectl` action, you're going to need `kubectl` accessible in your path. The official images ship with the latest minor version of `kubectl` inside of the container.

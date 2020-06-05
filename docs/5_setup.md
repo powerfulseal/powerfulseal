@@ -18,22 +18,24 @@ has_children: true
 
 ---
 
-The setup depends on whether you run `PowerfulSeal` inside or outside of your cluster.
+`PowerfulSeal` has two main modes of operation: through `Kubernetes` or through `SSH`.
+
+`Kubernetes` mode is the default, and it's easier to use. It kills pods by deleting them through the API.
+
+`SSH` works by SSH-ing into the machine itself and executing command like `docker kill <pod ip>`. The pods then show as crashing. Unfortunately, it requires `SSH` access to all machines you're going to be doing chaos on, which is sometimes troublesome.
 
 
-## Running inside of the cluster
+## Running on Kubernetes
 
-If you're running inside of the cluster (for example from [the docker image](https://github.com/bloomberg/powerfulseal/tree/master/build)), the setup is pretty easy.
+Running on `Kubernetes` is easy. You can do that by:
 
-You can see an example of how to do it [in ./kubernetes](https://github.com/bloomberg/powerfulseal/tree/master/kubernetes). The setup involves:
-
-- creating [RBAC rules](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/rbac.yml) to allow the seal to list, get and delete pods,
-- creating a [powerfulseal configmap and deployment](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/powerfulseal.yml)
+- creating [RBAC rules](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/rbac.yml) to allow the seal to list, get and delete pods and nodes,
+  - you might need to adjust it depending on what you are planning to do with the Seal
+- creating a [configmap and deployment](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/powerfulseal.yml)
   - your scenarios will live in the configmap
   - if you'd like to use the UI, you'll probably also need a service and ingress
-  - make sure to use `--use-pod-delete-instead-of-ssh-kill` flag to not need to configure SSH access for killing pods
-- profit!
-  - the Seal will self-discover the way to connect to `Kubernetes` and start executing your policy
+
+That's it. The Seal will self-discover the way to connect to `Kubernetes` and start executing your policy
 
 
 ## Running outside of the cluster
@@ -42,7 +44,7 @@ If you're running outside of your cluster, the setup will involve:
 
 - pointing PowerfulSeal at your Kubernetes cluster by giving it a Kubernetes config file
 - pointing PowerfulSeal at your cloud by specifying the cloud driver to use and providing credentials
-- making sure the seal can SSH into the nodes in order to execute `docker kill` command
+- making sure the Seal can `SSH` into the nodes in order to execute `docker kill` command
 - writing a set of policies
 
 It should look something like [this](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/setup.png).
@@ -50,7 +52,7 @@ It should look something like [this](https://github.com/bloomberg/powerfulseal/b
 
 ## Minikube
 
-It's easy to use `minikube` with the `seal`. It should run well on the default settings. If you choose to use SSH access, you're going to need these options:
+It's easy to use `minikube` with the Seal. It should run well on the default settings. If you choose to use SSH access, you're going to need these options:
 
 ```sh
 --ssh-allow-missing-host-keys \

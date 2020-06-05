@@ -15,14 +15,22 @@ rules:
   - ""
   resources:
   - pods
-  - nodes
   verbs:
-  - '*'
+  - get
+  - list
+  - delete
 - apiGroups:
   - ""
   resources:
-  - deployments
+  - nodes
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
   - namespaces
+  - deployments
   verbs:
   - get
   - list

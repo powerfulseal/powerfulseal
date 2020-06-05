@@ -26,6 +26,8 @@ permalink: /
 - `yaml` [policies](#policies) describing chaos experiments
 - multiple [modes](./modes)
 
+---
+
 ## Policies
 
 Just to give you a taste, here's an example policy. It will kill a single pod, and then check that the service continues responding to HTTP probes, to verify its resiliency to one of its pods going down.
@@ -52,6 +54,10 @@ scenarios:
           namespace: myapp
       endpoint: /healthz
 ```
+
+[Learn how to write your own policies](./policies){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+
+---
 
 ### License
 

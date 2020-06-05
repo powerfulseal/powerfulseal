@@ -75,7 +75,7 @@ Try listing pods from the `kube-system` namespace:
 (seal) $ pods kube-system
 ```
 
-For help, just type `help`. For more information about the modes, see our [docs on modes](/modes).
+For help, just type `help`. For more information about the modes, see our [docs on modes](./modes).
 
 ## Running from Docker
 
@@ -100,10 +100,10 @@ docker run -it \
         interactive --no-cloud --inventory-kubernetes
 ```
 
-To see how to use other modes, see our [docs on modes](/modes)
+To see how to use other modes, see our [docs on modes](./modes)
 
 ## Modes of operation
 
 You just learned how to start the interactive mode, but it's just a beginning. Powerfulseal supports multiple modes of operation.
 
-[Learn about modes now](/modes){: .btn .btn-secondary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Learn about modes now](./modes){: .btn .btn-secondary .fs-5 .mb-4 .mb-md-0 .mr-2 }

@@ -21,6 +21,7 @@ has_children: true
 
 ## Syntax
 
-Policies describe the chaos experiments for powerfulseal to execute in autonomous mode.
+Policies describe the chaos experiments for powerfulseal to execute in autonomous mode. The syntax is formally defined [here](https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/policy/ps-schema.yaml). If you want to browse the available options, see below:
 
-[See the syntax here](./schema){: .btn .btn-secondary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Browse the syntax documentation](./schema){: .btn .btn-secondary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+

@@ -14,10 +14,10 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import makeLogger
 from powerfulseal.metriccollectors.collector import AbstractCollector
 
-logger = logging.getLogger(__name__)
+logger = makeLogger(__name__)
 
 
 class StdoutCollector(AbstractCollector):
@@ -26,25 +26,25 @@ class StdoutCollector(AbstractCollector):
     """
 
     def add_pod_killed_metric(self, pod):
-        logger.info("Pod killed - namespace: %s - name: %s", pod.namespace, pod.name)
+        logger.debug("Pod killed - namespace: %s - name: %s", pod.namespace, pod.name)
 
     def add_pod_kill_failed_metric(self, pod):
-        logger.info("Pod killed - namespace: %s - name: %s", pod.namespace, pod.name)
+        logger.debug("Pod killed - namespace: %s - name: %s", pod.namespace, pod.name)
 
     def add_node_stopped_metric(self, node):
-        logger.info("Node stopped - uid: %s - name: %s", node.id, node.name)
+        logger.debug("Node stopped - uid: %s - name: %s", node.id, node.name)
 
     def add_node_stop_failed_metric(self, node):
-        logger.info("Node stop failed - uid: %s - name: %s", node.id, node.name)
+        logger.debug("Node stop failed - uid: %s - name: %s", node.id, node.name)
 
     def add_execute_failed_metric(self, node):
-        logger.info("Execute failed - uid: %s - name: %s", node.id, node.name)
+        logger.debug("Execute failed - uid: %s - name: %s", node.id, node.name)
 
     def add_filtered_to_empty_set_metric(self):
-        logger.info("Filtered to empty set")
+        logger.debug("Filtered to empty set")
 
     def add_probability_filter_passed_no_nodes_filter(self):
-        logger.info("Probability filter passed no nodes")
+        logger.debug("Probability filter passed no nodes")
 
     def add_matched_to_empty_set_metric(self, source):
-        logger.info("Matched to empty set - source: %s", source)
+        logger.debug("Matched to empty set - source: %s", source)

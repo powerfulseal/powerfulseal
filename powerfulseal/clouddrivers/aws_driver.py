@@ -1,4 +1,4 @@
-import logging
+from powerfulseal import makeLogger
 import boto3
 from . import AbstractDriver
 from ..node import Node, NodeState
@@ -45,14 +45,14 @@ class AWSDriver(AbstractDriver):
     """
 
     def __init__(self, cloud=None, conn=None, logger=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
         self.conn = create_connection_from_config()
         self.instances = []
 
     def sync(self):
         """ Downloads a fresh set of nodes form the API.
         """
-        self.logger.info("Synchronizing remote nodes")
+        self.logger.debug("Synchronizing remote nodes")
         self.remote_servers = self.conn.instances.all()
         self.amount_of_servers = list(self.conn.instances.all())
         self.logger.info("Fetched %s remote servers" % len(self.amount_of_servers))

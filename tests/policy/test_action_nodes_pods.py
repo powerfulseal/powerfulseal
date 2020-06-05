@@ -86,7 +86,6 @@ def some_datetime():
 ])
 def test_filter_day_time_day_of_the_week(noop_scenario, some_datetime, day, should_pass):
     some_datetime = some_datetime.replace(day=day)
-    print("new datetime", some_datetime)
     criterion = {
         "onlyDays": [
             "friday",
@@ -123,7 +122,6 @@ def test_filter_day_time_of_day(noop_scenario, some_datetime, hour, minute,secon
         minute=minute,
         second=second,
     )
-    print("new datetime", some_datetime)
     criterion = {
         "onlyDays": [
             "friday",

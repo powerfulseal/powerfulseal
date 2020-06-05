@@ -13,9 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
+from powerfulseal import makeLogger
 import spur
-import random
 
 from .abstract_executor import AbstractExecutor
 
@@ -26,7 +25,7 @@ class KubernetesExecutor(AbstractExecutor):
 
     def __init__(self, k8s_client, logger=None):
         self.k8s_client = k8s_client
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
 
     def kill_pod(self, pod, inventory, signal=None):
         return self.k8s_client.delete_pods([pod])

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
+from powerfulseal import makeLogger
 
 import requests
 
@@ -35,7 +35,7 @@ class MetricsServerClient:
 
     def __init__(self, base_path, logger=None):
         self.base_path = base_path or ''
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
 
     def get_pod_metrics(self):
         response = requests.get(self.base_path + POD_METRICS_PATH)
@@ -71,7 +71,6 @@ class MetricsServerClient:
         """
         Returns CPU in number of cores (e.g., "120n" => 0.0000012)
         """
-        print(cpu)
         if len(cpu) < 2 or is_numeric(cpu[-1]):
             return float(cpu)
 

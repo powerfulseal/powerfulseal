@@ -14,9 +14,11 @@
 import pytest
 from mock import MagicMock
 
-from powerfulseal.policy.node_scenario import NodeScenario
-from powerfulseal.policy.pod_scenario import PodScenario
-from powerfulseal.policy.scenario import Scenario
+from powerfulseal.policy.action_kubectl import ActionKubectl
+from powerfulseal.policy.action_probe_http import ActionProbeHTTP
+from powerfulseal.policy.action_nodes import ActionNodes
+from powerfulseal.policy.action_pods import ActionPods
+from powerfulseal.policy.action_nodes_pods import ActionNodesPods
 from powerfulseal.execute import SSHExecutor
 
 
@@ -32,10 +34,10 @@ def dummy_object():
     return make_dummy_object()
 
 
-# Scenario fixtures
+# ActionNodesPods fixtures
 @pytest.fixture
 def noop_scenario():
-    scenario = Scenario(
+    scenario = ActionNodesPods(
         name="test scenario",
         schema={}
     )
@@ -47,7 +49,7 @@ def noop_scenario():
 
 @pytest.fixture
 def no_filtered_items_scenario():
-    scenario = Scenario(
+    scenario = ActionNodesPods(
         name="test scenario",
         schema={}
     )
@@ -58,7 +60,7 @@ def no_filtered_items_scenario():
     return scenario
 
 
-# Pod Scenario Fixtures
+# Pod ActionNodesPods Fixtures
 EXAMPLE_POD_SCHEMA = {
     "match": [
         {
@@ -76,7 +78,7 @@ def pod_scenario():
     inventory = MagicMock()
     k8s_inventory = MagicMock()
     executor = SSHExecutor()
-    return PodScenario(
+    return ActionPods(
         name="test scenario",
         schema=EXAMPLE_POD_SCHEMA,
         inventory=inventory,
@@ -85,7 +87,7 @@ def pod_scenario():
     )
 
 
-# Node Scenario Fixtures
+# Node ActionNodesPods Fixtures
 EXAMPLE_NODE_SCHEMA = {
     "match": [
         {
@@ -103,10 +105,39 @@ def node_scenario():
     inventory = MagicMock()
     driver = MagicMock()
     executor = MagicMock()
-    return NodeScenario(
+    return ActionNodes(
         name="test scenario",
         schema=EXAMPLE_NODE_SCHEMA,
         inventory=inventory,
         driver=driver,
         executor=executor,
+    )
+
+
+@pytest.fixture
+def action_kubectl():
+    logger = MagicMock()
+    return ActionKubectl(
+        name="test kubectl action",
+        schema=dict(
+            action="apply",
+            payload="---\n"
+        ),
+        logger=logger,
+    )
+
+
+@pytest.fixture
+def action_probe_http():
+    logger = MagicMock()
+    k8s_inventory = MagicMock()
+    return ActionProbeHTTP(
+        name="test probe http action",
+        schema=dict(
+            target=dict(
+                url="http://example.com"
+            )
+        ),
+        k8s_inventory=k8s_inventory,
+        logger=logger,
     )

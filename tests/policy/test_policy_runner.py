@@ -31,7 +31,7 @@ def test_example_config_validates():
     assert PolicyRunner.is_policy_valid(policy)
 
 
-def test_parses_a_whole_config_correctly(monkeypatch):
+def test_parses_config_correctly(monkeypatch):
     sleep_mock = MagicMock()
     monkeypatch.setattr("time.sleep", sleep_mock)
     filename = pkg_resources.resource_filename("tests.policy", "example_config2.yml")
@@ -40,12 +40,9 @@ def test_parses_a_whole_config_correctly(monkeypatch):
     k8s_inventory = MagicMock()
     driver = MagicMock()
     executor = MagicMock()
-    LOOPS = policy.get("config").get("loopsNumber")
-    nodes, pods = PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
+    LOOPS = policy.get("config").get("runStrategy").get("runs")
+    PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
     assert sleep_mock.call_count == LOOPS
     for call in sleep_mock.call_args_list:
         args, _ = call
-        assert 77 <= args[0] <= 100
-    assert inventory.sync.call_count == LOOPS
-    assert len(nodes) == 2
-    assert len(pods) == 1
+        assert 77 <= args[0] <= 78

@@ -13,25 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import random
+import re
 
 from powerfulseal.metriccollectors.collector import POD_SOURCE
-from .scenario import Scenario
+from .action_nodes_pods import ActionNodesPods
 
 
-class PodScenario(Scenario):
+class ActionPods(ActionNodesPods):
     """ Pod scenario handler.
 
-        Adds metching for k8s-specific things and pod-specific actions
+        Adds matching for k8s-specific things and pod-specific actions
     """
 
     def __init__(self, name, schema, inventory, k8s_inventory, executor,
                  logger=None, metric_collector=None):
-        Scenario.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
+        ActionNodesPods.__init__(self, name, schema, logger=logger, metric_collector=metric_collector)
         self.inventory = inventory
         self.k8s_inventory = k8s_inventory
         self.executor = executor
+        self.action_mapping = {
+            "wait": self.action_wait,
+            "kill": self.action_kill,
+            "checkPodCount": self.action_check_pod_count,
+            "checkPodState": self.action_check_pod_state,
+        }
 
     def match(self):
         """ Makes a union of all the pods matching any of the policy criteria.
@@ -42,22 +48,24 @@ class PodScenario(Scenario):
             "labels": self.match_labels,
         }
         selected = set()
-        criteria = self.schema.get("match", [])
+        criteria = self.schema.get("matches", [])
+        self.logger.debug("Criteria %r ",criteria)
         for criterion in criteria:
-            for key, method in mapping.items():
-                if key in criterion:
-                    params = criterion.get(key)
-                    for pod in method(params):
+            for action_name, action_method in mapping.items():
+                if action_name in criterion:
+                    self.logger.info("Matching %r %r", action_name, criterion)
+                    params = criterion.get(action_name)
+                    for pod in action_method(params):
                         self.logger.debug("Matching %r", pod)
                         selected.add(pod)
         if len(selected) == 0:
             self.metric_collector.add_matched_to_empty_set_metric(POD_SOURCE)
         return list(selected)
 
-    def match_namespace(self, params):
+    def match_namespace(self, param):
         """ Matches pods for a namespace
         """
-        namespace = params.get("name")
+        namespace = param
         pods = self.k8s_inventory.find_pods(
             namespace=namespace,
         )
@@ -92,38 +100,57 @@ class PodScenario(Scenario):
         )
         return pods
 
-    def action_kill(self, pod, params):
+    def action_kill(self, pods, params):
         """ Kills a pod by executing a docker kill on one of the containers or pod delete
         """
         probability = params.get("probability", 1)
         force = params.get("force", True)
         signal = "SIGKILL" if force else "SIGTERM"
-        if probability >= random.random():
-            # kill the pod
-            success = None
-            try:
-                success = self.executor.kill_pod(pod, self.inventory, signal)
-            except:
-                success = False
-                self.logger.exception("Exception while killing pod")
-            # update the metrics
-            if success:
-                self.metric_collector.add_pod_killed_metric(pod)
-                self.logger.info("Pod killed: %s", pod)
+        success = True
+        for pod in pods:
+            if probability < random.random():
+                self.logger.info("Pod got lucky - not killing")
             else:
-                self.metric_collector.add_pod_kill_failed_metric(pod)
-                self.logger.error("Pod NOT killed: %s", pod)
-            return success
-        else:
-            self.logger.info("Pod got lucky - not killing")
+                ret_val = True
+                try:
+                    ret_val = self.executor.kill_pod(pod, self.inventory, signal)
+                except:
+                    self.logger.exception("Exception while killing pod")
+                    ret_val = False
+                # update the metrics
+                if ret_val:
+                    self.metric_collector.add_pod_killed_metric(pod)
+                    self.logger.info("Pod killed: %s", pod)
+                else:
+                    self.metric_collector.add_pod_kill_failed_metric(pod)
+                    self.logger.error("Pod NOT killed: %s", pod)
+                    success = False
+        return success
 
-    def act(self, items):
-        """ Executes all the supported actions on the list of pods.
+    def action_check_pod_count(self, pods, params):
         """
-        actions = self.schema.get("actions", [])
-        mapping = {
-            "wait": self.action_wait,
-            "kill": self.action_kill,
-        }
-        return self.act_mapping(items, actions, mapping)
+            Checks that the count of pods equals the desired count.
+        """
+        count = int(params.get("count"))
+        if len(pods) != count:
+            self.logger.error("Expected %d pods, got %d", count, len(pods))
+            return False
+        return True
 
+    def action_check_pod_state(self, pods, params):
+        """
+            Checks that all the pods are in desired state.
+        """
+        state = params.get("state")
+        success = True
+        for pod in pods:
+            if not self.match_property(
+                candidate=pod,
+                criterion=dict(
+                    name="state",
+                    value=state,
+                )
+            ):
+                self.logger.error("Expected pod in state '%s', got '%s' (%r)", state, pod.state, pod)
+                success = False
+        return success

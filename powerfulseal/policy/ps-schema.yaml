@@ -20,22 +20,16 @@ properties:
     type: object
     "$ref": "#/definitions/config"
     description: General configuration of this policy.
-  nodeScenarios:
+  scenarios:
     type: array
     description: >
-      An array of scenarios manipulating the nodes in the cluster.
-      The scenarios are executed one by one in the specified order.
+      An array of scenarios, each describing a complete `chaos experiment`.
     items:
       type: object
-      "$ref": "#/definitions/nodeScenario"
-  podScenarios:
-    type: array
-    description: >
-      An array of scenarios manipulating the pods in the cluster.
-      The scenarios are executed one by one in the specified order.
-    items:
-      type: object
-      "$ref": "#/definitions/podScenario"
+      "$ref": "#/definitions/scenario"
+required:
+- scenarios
+additionalProperties: false
 
 
 ###################################################################################################
@@ -49,10 +43,28 @@ definitions:
     type: object
     additionalProperties: false
     properties:
-      loopsNumber:
+      runStrategy:
+        type: object
+        "$ref": "#/definitions/runStrategy"
+
+  runStrategy:
+    description: "Configure how the scenarios are run"
+    type: object
+    additionalProperties: false
+    properties:
+      strategy:
+        type: string
         description: >
-          If set, will execute the given scenarios once, and then exit.
-          Use this option for one-off experiments, rather than a process running continuosly on the cluster.
+          Affects how the scenarios are executed.
+          The default `round-robin` iterates over the every scenario in the order they were defined.
+          `random` picks a random scenario from the available pool every time.
+        default: round-robin
+        enum:
+        - round-robin
+        - random
+      runs:
+        description: >
+          If set, it will exit after the given number of scenario runs. By default, it continues forever.
         type: number
         minimum: 1
       minSecondsBetweenRuns:
@@ -61,7 +73,7 @@ definitions:
           This sets the MIN number of seconds that it will wait.
         type: number
         minimum: 0
-        default: 0
+        default: 30
       maxSecondsBetweenRuns:
         description: >
           The Seal waits a randomized amount of time before executing the scenarios.
@@ -70,90 +82,270 @@ definitions:
         minimum: 0
         default: 300
 
-  nodeScenario:
+  scenario:
     description: >
-      Describe a node scenario. It's a scenario that can match, filter and action on nodes in your kubernetes cluster.
+      A scenario contains all the steps necessary to prepare, implement and validate a chaos engineering experiment.
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+        description: >
+          A brief, descriptive name of the scenario. Will be used to identify the scenario in logs.
+        minLength: 3
+        maxLength: 80
+      description:
+        type: string
+        description: >
+          A longer description, helping to understand what the scenario is doing when reading the yaml file.
+          Optional.
+      steps:
+        type: array
+        description: >
+          The sequence of events to prepare, validate, execute and analyse the chaos engineering experiment.
+        items:
+          oneOf:
+          - "$ref": "#/definitions/probeHTTP"
+          - "$ref": "#/definitions/kubectl"
+          - "$ref": "#/definitions/podAction"
+          - "$ref": "#/definitions/nodeAction"
+          - "$ref": "#/definitions/waitAction"
+    required:
+    - name
+    - steps
+
+  nodeAction:
+    description: >
+      Match, filter and action on nodes in your kubernetes cluster.
       It can integrate with your cloud provider and take nodes up and down to simulate VMs going down.
       If you're running in SSH mode, it can also execute various commands on hosts. And much more!
       See below for mode details.
     type: object
     additionalProperties: false
     properties:
-      name:
-        type: string
-      description:
-        type: string
-      match:
-        type: array
-        items:
-          oneOf:
-          - "$ref": "#/definitions/filterPropertyNode"
-      filters:
-        type: array
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/filterPropertyNode"
-          - "$ref": "#/definitions/filterDayTime"
-          - "$ref": "#/definitions/filterRandomSample"
-          - "$ref": "#/definitions/filterProbability"
-      actions:
-        type: array
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/actionStartNode"
-          - "$ref": "#/definitions/actionStopNode"
-          - "$ref": "#/definitions/actionExecuteNode"
-          - "$ref": "#/definitions/actionWait"
+      nodeAction:
+        type: object
+        additionalProperties: false
+        properties:
+          matches:
+            type: array
+            description: >
+              An array of match criteria to select a set of nodes. Will be deduplicated.
+            items:
+              oneOf:
+              - "$ref": "#/definitions/filterPropertyNode"
+          filters:
+            type: array
+            description: >
+              An array of filters, which will be applied in the defined order.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/filterPropertyNode"
+              - "$ref": "#/definitions/filterDayTime"
+              - "$ref": "#/definitions/filterRandomSample"
+              - "$ref": "#/definitions/filterProbability"
+          actions:
+            type: array
+            description: >
+              An array of actions, which will be executed on each node.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/actionStartNode"
+              - "$ref": "#/definitions/actionStopNode"
+              - "$ref": "#/definitions/actionExecuteNode"
+              - "$ref": "#/definitions/actionWait"
+        required:
+        - matches
+        - actions
     required:
-    - name
-    - match
-    - filters
-    - actions
+    - nodeAction
 
-  podScenario:
+  podAction:
     description: >
-      Describe a pod scenario. It's a scenario that can match, filter and action on pods in your kubernetes cluster.
-      You can filter by selectors, namespaces, deployments etc.
-      Then you can filter the pods based on various criteria, like state or IP.
-      Then you can action on each of them, by executing the configured actions.
+      Match, filter and action on pods in your kubernetes cluster.
+      Matchers create the initial set.
+      That set is de-duplicated and passed on to the filters.
+      Filters can exclude items.
+      Whatever is passed through the filters will then be actioned with every action in the action array.
       See below for the details of the configuration available.
     type: object
     additionalProperties: false
     properties:
-      name:
-        type: string
-      description:
-        type: string
-      match:
-        type: array
-        items:
-          oneOf:
-          - "$ref": "#/definitions/matchPodNamespace"
-          - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
-          - "$ref": "#/definitions/matchPodLabelsAndNamespace"
-      filters:
-        type: array
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/filterPropertyPod"
-          - "$ref": "#/definitions/filterDayTime"
-          - "$ref": "#/definitions/filterRandomSample"
-          - "$ref": "#/definitions/filterProbability"
-      actions:
-        type: array
-        items:
-          type: object
-          oneOf:
-          - "$ref": "#/definitions/actionKillPod"
-          - "$ref": "#/definitions/actionWait"
+      podAction:
+        type: object
+        additionalProperties: false
+        properties:
+          matches:
+            type: array
+            description: >
+              An array of match criteria to select a set of pods. Will be deduplicated.
+            items:
+              oneOf:
+              - "$ref": "#/definitions/matchPodNamespace"
+              - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
+              - "$ref": "#/definitions/matchPodLabelsAndNamespace"
+          filters:
+            type: array
+            description: >
+              An array of filters to only select certain pods from the initial set.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/filterPropertyPod"
+              - "$ref": "#/definitions/filterDayTime"
+              - "$ref": "#/definitions/filterRandomSample"
+              - "$ref": "#/definitions/filterProbability"
+          actions:
+            type: array
+            description: >
+              An array of actions to be applied to each pod from the set.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/actionKillPod"
+              - "$ref": "#/definitions/actionWait"
+              - "$ref": "#/definitions/checkPodState"
+              - "$ref": "#/definitions/checkPodCount"
+        required:
+        - matches
+        - actions
     required:
-    - name
-    - match
-    - filters
-    - actions
+    - podAction
+
+  kubectl:
+    description: >
+      Allows to execute a `kubectl apply` or `kubectl delete` command as part of the scenario.
+    type: object
+    additionalProperties: false
+    properties:
+      kubectl:
+        type: object
+        additionalProperties: false
+        properties:
+          action:
+            type: string
+            enum:
+            - apply
+            - delete
+          payload:
+            type: string
+            description: >
+              Free-form, kubectl-compatible payload, which will be passed to kubectl as is.
+          autoDelete:
+            type: boolean
+            description:
+              When set to true, all the `kubectl apply` commands will be `kubectl delete`ed at the end of the scenario.
+            default: true
+        required:
+        - action
+        - payload
+    required:
+    - kubectl
+
+  probeHTTP:
+    description: >
+      Issue an HTTP request and validate the response.
+    type: object
+    additionalProperties: false
+    properties:
+      probeHTTP:
+        type: object
+        additionalProperties: false
+        properties:
+          target:
+            type: object
+            oneOf:
+            - "$ref": "#/definitions/targetURL"
+            - "$ref": "#/definitions/targetService"
+          retries:
+            type: number
+            description: >
+              Number of retries before failing the probe.
+              Ignored, if there are no errors on the probe.
+            default: 3
+            minimum: 1
+          delay:
+            type: number
+            description: >
+              Delay in ms between retries.
+            default: 100
+            minimum: 1
+          timeout:
+            type: number
+            description: >
+              Request timeout in ms.
+            default: 1000
+            minimum: 1
+          code:
+            type: number
+            description: >
+              Expected status code.
+            default: 200
+            minimum: 1
+            maximum: 599
+          count:
+            type: number
+            description: >
+              Number of requests to make.
+            default: 1
+            minimum: 1
+          endpoint:
+            type: string
+            description: >
+              Endpoint to add to the url.
+              For example `/healthz`.
+              Works for both url and service.
+          method:
+            type: string
+            description: >
+              HTTP method to use.
+            default: get
+            enum:
+            - get
+            - post
+            - patch
+            - head
+            - delete
+          body:
+            type: string
+            description: >
+              Body of the HTTP request.
+          headers:
+            description: >
+              Give any additional headers to the request.
+            type: array
+            items:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
+        required:
+        - target
+    required:
+    - probeHTTP
+
+  waitAction:
+    description: >
+      Allows to wait a number of seconds.
+    type: object
+    additionalProperties: false
+    properties:
+      wait:
+        type: object
+        additionalProperties: false
+        properties:
+          seconds:
+            type: number
+            minimum: 0
+        required:
+        - seconds
+    required:
+    - wait
 
 
 ###################################################################################################
@@ -163,20 +355,18 @@ definitions:
   matchPodNamespace:
     type: object
     additionalProperties: false
+    description: >
+      Pick all pods for a deployment in a namespace.
     properties:
       namespace:
-        type: object
-        additionalProperties: false
-        properties:
-          name:
-            type: string
-        required:
-        - name
+        type: string
     required:
     - namespace
 
   matchPodDeploymentAndNamespace:
     type: object
+    description: >
+      Pick all pods for a deployment in a namespace.
     additionalProperties: false
     properties:
       deployment:
@@ -195,6 +385,8 @@ definitions:
 
   matchPodLabelsAndNamespace:
     type: object
+    description: >
+      Pick all pods matching the particular set of labels in a namespace.
     additionalProperties: false
     properties:
       labels:
@@ -218,6 +410,9 @@ definitions:
 
   filterRandomSample:
     type: object
+    description: >
+      Take a random sample.
+      Either a specific size (up to N), or a ratio (0.5 == 50%) of the initial size.
     additionalProperties: false
     properties:
       randomSample:
@@ -226,28 +421,31 @@ definitions:
         properties:
           size:
             type: number
+            minimum: 1
           ratio:
             type: number
+            minimum: 0
+            maximum: 1
     required:
     - randomSample
 
   filterProbability:
     type: object
+    description: >
+      Only pass the filter with a desired probability.
     additionalProperties: false
     properties:
       probability:
-        type: object
-        additionalProperties: false
-        properties:
-          probabilityPassAll:
-            type: number
-        required:
-        - probabilityPassAll
+        type: number
+        minimum: 0
+        maximum: 1
     required:
     - probability
 
   filterDayTime:
     type: object
+    description: >
+      Only pass the filter during specific time of the day and week.
     additionalProperties: false
     properties:
       dayTime:
@@ -281,9 +479,11 @@ definitions:
 
   filterPropertyNode:
     type: object
+    description: >
+      Select nodes by property values.
     additionalProperties: false
     properties:
-      property:
+      propertyNode:
         type: object
         additionalProperties: false
         properties:
@@ -297,17 +497,23 @@ definitions:
             - state
           value:
             type: string
+          negative:
+            type: boolean
+            description: Set to true to negate the match (logical NOT)
+            default: false
         required:
         - name
         - value
     required:
-    - property
+    - propertyNode
 
   filterPropertyPod:
     type: object
+    description: >
+      Select pods by property values.
     additionalProperties: false
     properties:
-      property:
+      propertyPod:
         type: object
         additionalProperties: false
         properties:
@@ -318,11 +524,15 @@ definitions:
             - state
           value:
             type: string
+          negative:
+            type: boolean
+            description: Set to true to negate the match (logical NOT)
+            default: false
         required:
         - name
         - value
     required:
-    - property
+    - propertyPod
 
 
 ###################################################################################################
@@ -331,6 +541,8 @@ definitions:
 
   actionStartNode:
     type: object
+    description: >
+      Start a node.
     additionalProperties: false
     properties:
       start:
@@ -343,6 +555,8 @@ definitions:
 
   actionStopNode:
     type: object
+    description: >
+      Stop a node.
     additionalProperties: false
     properties:
       stop:
@@ -356,6 +570,8 @@ definitions:
 
   actionExecuteNode:
     type: object
+    description: >
+      Executes arbitrary command on a particular node. Use with caution.
     additionalProperties: false
     properties:
       execute:
@@ -371,6 +587,8 @@ definitions:
 
   actionWait:
     type: object
+    description: >
+      Wait some seconds.
     additionalProperties: false
     properties:
       wait:
@@ -379,6 +597,7 @@ definitions:
         properties:
           seconds:
             type: number
+            minimum: 0
         required:
         - seconds
     required:
@@ -386,6 +605,8 @@ definitions:
 
   actionKillPod:
     type: object
+    description: >
+      Kill a pod.
     additionalProperties: false
     properties:
       kill:
@@ -394,10 +615,48 @@ definitions:
         properties:
           probability:
             type: number
+            minimum: 0
+            maximum: 1
           force:
             type: boolean
     required:
     - kill
+
+  checkPodCount:
+    type: object
+    description: >
+      Count the pods and fail if they don't match the desired number.
+    additionalProperties: false
+    properties:
+      checkPodCount:
+        type: object
+        additionalProperties: false
+        properties:
+          count:
+            type: number
+        required:
+        - count
+    required:
+    - checkPodCount
+
+  checkPodState:
+    type: object
+    description: >
+      Check that all pods are in the desired state, fail otherwise.
+    additionalProperties: false
+    properties:
+      checkPodState:
+        type: object
+        additionalProperties: false
+        properties:
+          state:
+            description: >
+              Status, as returned by kubernetes (`Running`, `Terminating`, etc).
+            type: string
+        required:
+        - state
+    required:
+    - checkPodState
 
 
 ###################################################################################################
@@ -406,15 +665,77 @@ definitions:
 
   time:
     type: object
+    description: >
+      Describes a time of the day, in the local timezone.
     additionalProperties: false
     properties:
       hour:
         type: number
+        minimum: 0
+        maximum: 23
       minute:
         type: number
+        minimum: 0
+        maximum: 59
       second:
         type: number
+        minimum: 0
+        maximum: 59
     required:
     - hour
     - minute
     - second
+
+  targetURL:
+    type: object
+    description: >
+      A target of a static URL.
+    additionalProperties: false
+    properties:
+      url:
+        type: string
+        description: >
+          The fully qualified url to issue the request to.
+          For example: `http://example.com`.
+    required:
+    - url
+
+  targetService:
+    type: object
+    description: >
+      Target the given `kubernetes` service in a given namespace.
+      It will use directly the IP of the given service, so make sure it resolves.
+    additionalProperties: false
+    properties:
+      service:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+            description: >
+              Name of the kubernetes service.
+          namespace:
+            type: string
+            description: >
+              Namespace of the kubernetes service.
+          port:
+            type: number
+            minimum: 1
+            maximum: 65535
+            default: 80
+            description: >
+              Port number to hit. Independent of what the service defines.
+          protocol:
+            type: string
+            enum:
+            - http
+            - https
+            default: http
+            description: >
+              Protocol to use for the probe.
+        required:
+        - name
+        - namespace
+    required:
+    - service

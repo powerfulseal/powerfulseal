@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
+from powerfulseal import makeLogger
 import spur
 import random
 
@@ -42,7 +42,7 @@ class SSHExecutor(AbstractExecutor):
         self.ssh_kill_command = ssh_kill_command or self.DEFAULT_KILL_COMMAND
         self.override_host = override_host
         self.use_private_ip = use_private_ip
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
 
     def execute(self, cmd, nodes=None, use_private_ip=None, debug=False):
         """
@@ -73,7 +73,7 @@ class SSHExecutor(AbstractExecutor):
                     private_key_file=self.ssh_path_to_private_key,
                 )
 
-            self.logger.info("Executing '%s' on %s" % (cmd_full, node.name))
+            self.logger.debug("Executing '%s' on %s" % (cmd_full, node.name))
             try:
                 with shell:
                     output = shell.run(cmd_full)
@@ -107,7 +107,7 @@ class SSHExecutor(AbstractExecutor):
             container_id=container_id.replace("docker://", ""),
         )
         # Execute command
-        self.logger.info("Action execute '%s' on %r", cmd, pod)
+        self.logger.debug("Action execute '%s' on %r", cmd, pod)
         for value in self.execute(cmd, nodes=[node]).values():
             if value["ret_code"] > 0:
                 self.logger.error("Error return code: %s", value)

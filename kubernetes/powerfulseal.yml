@@ -2,29 +2,25 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: policy
-  namespace: default
+  name: sealpolicy
 data:
-  policy_kill_random_default.yml: |-
-    config: 
-      minSecondsBetweenRuns: 1
-      maxSecondsBetweenRuns: 10
-    nodeScenarios: []
-    podScenarios:
-      - name: "delete random pods in default namespace"
-        match:
-          - labels:
-              namespace: "default"
-              selector: "app=hello"
+  policy.yml: |-
+    scenarios:
+    - name: "delete a random pod in default namespace"
+      steps:
+      - matches:
+        - labels:
+            namespace: "default"
+            selector: "app=hello"
         filters:
-          - randomSample:
-              size: 1
+        - randomSample:
+            size: 1
         actions:
-          - kill:
-              probability: 0.77
-              force: true    
+        - kill:
+            probability: 0.77
+            force: true
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: powerfulseal
@@ -38,20 +34,15 @@ spec:
       serviceAccountName: powerfulseal
       containers:
         - name: powerfulseal
-          image: store/bloomberg/powerfulseal:2.8.0
-          args: 
+          image: store/bloomberg/powerfulseal:3.0.0
+          args:
           - autonomous
-          - --inventory-kubernetes 
-          - --no-cloud
-          - --policy-file=/root/policy_kill_random_default.yml
-          - --use-pod-delete-instead-of-ssh-kill
-          volumeMounts: 
+          - --policy-file=/policy.yml
+          volumeMounts:
             - name: policyfile
-              mountPath: /root/policy_kill_random_default.yml
-              subPath: policy_kill_random_default.yml
+              mountPath: /policy.yml
+              subPath: policy.yml
       volumes:
         - name: policyfile
-          configMap: 
-            name: policy
-
-    
+          configMap:
+            name: sealpolicy

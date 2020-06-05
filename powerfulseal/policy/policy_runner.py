@@ -19,17 +19,18 @@ import time
 import jsonschema
 import yaml
 import pkgutil
-import logging
-from .pod_scenario import PodScenario
-from .node_scenario import NodeScenario
+from powerfulseal import makeLogger
+from .scenario import Scenario
 
-logger = logging.getLogger(__name__)
+logger = makeLogger(__name__)
 
 
 class PolicyRunner():
     """ Reads, validates and executes a JSON schema-compliant policy
     """
-    DEFAULT_POLICY = {}
+    DEFAULT_POLICY = {
+        "scenarios": []
+    }
 
     @classmethod
     def get_schema(cls):
@@ -58,42 +59,38 @@ class PolicyRunner():
             metric_collector=None):
         """ Runs a policy forever
         """
-        config = policy.get("config", {})
+        config = policy.get("config", {}).get("runStrategy", {})
+        should_randomize = config.get("strategy") == "random"
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
-        loops = config.get("loopsNumber", None)
-        node_scenarios = [
-            NodeScenario(
-                name=item.get("name"),
-                schema=item,
-                inventory=inventory,
-                driver=driver,
-                executor=executor,
-                metric_collector=metric_collector
-            )
-            for item in policy.get("nodeScenarios", [])
-        ]
-        pod_scenarios = [
-            PodScenario(
+        loops = config.get("runs", None)
+        scenarios = [
+            Scenario(
                 name=item.get("name"),
                 schema=item,
                 inventory=inventory,
                 k8s_inventory=k8s_inventory,
+                driver=driver,
                 executor=executor,
                 metric_collector=metric_collector
             )
-            for item in policy.get("podScenarios", [])
+            for item in policy.get("scenarios", [])
         ]
         while loops is None or loops > 0:
-            for scenario in node_scenarios:
-                scenario.execute()
-            for scenario in pod_scenarios:
-                scenario.execute()
-            sleep_time = int(random.uniform(wait_min, wait_max))
-            logger.info("Sleeping for %s seconds", sleep_time)
-            time.sleep(sleep_time)
+            if not scenarios:
+                return True
+            if should_randomize:
+                random.shuffle(scenarios)
+            for scenario in scenarios:
+                ret = scenario.execute()
+                if not ret:
+                    logger.error("Exiting early")
+                    return False
+                sleep_time = int(random.uniform(wait_min, wait_max))
+                logger.info("Sleeping for %s seconds", sleep_time)
+                time.sleep(sleep_time)
+                if loops is not None:
+                    loops -= 1
             inventory.sync()
-            if loops is not None:
-                loops -= 1
         logger.info("All done here!")
-        return node_scenarios, pod_scenarios
+        return True

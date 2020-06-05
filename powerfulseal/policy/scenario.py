@@ -13,216 +13,115 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import time
-import re
-from datetime import datetime
-import calendar
-import random
-import logging
 
-from abc import ABC, abstractmethod
-from powerfulseal.metriccollectors.stdout_collector import StdoutCollector
+from powerfulseal import makeLogger
+
+from ..metriccollectors.stdout_collector import StdoutCollector
+from .action_nodes import ActionNodes
+from .action_pods import ActionPods
+from .action_kubectl import ActionKubectl
+from .action_probe_http import ActionProbeHTTP
 
 
-class Scenario(ABC):
-    """ Basic class to represent a single testing scenario.
-
-        Scenarios consist of 3 lists of things:
-            - matches - to create the intial set of items
-            - filters - to filter out the set
-            - actions - to execute on all of the remaining items
-
-        The scenarios are described using a yaml schema, that conforms
-        to powerfulseal/policy/ps-schema.yaml JSON schema.
-
-        This is a base class, containing some shared filters, shouldn't be
-        used by itself. It's extended for both node and pod scenarios.
+class Scenario():
+    """
+        A Scenario represents a complete chaos engineering experiment.
     """
 
-    def __init__(self, name, schema, logger=None, metric_collector=None):
+    def __init__(self, name, schema, inventory, k8s_inventory,
+        driver, executor, logger=None, metric_collector=None):
         self.name = name
         self.schema = schema
-        self.logger = logger or logging.getLogger(__name__ + "." + name)
+        self.inventory = inventory
+        self.k8s_inventory = k8s_inventory
+        self.executor = executor
+        self.driver = driver
+        self.logger = logger or makeLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
-        self.property_rewrite = {
-            "group": "groups",
-        }
+        self.action_mapping = dict(
+            nodeAction=self.action_nodes,
+            podAction=self.action_pods,
+            kubectl=self.action_kubectl,
+            probeHTTP=self.action_probe_http,
+            wait=self.action_wait,
+        )
+        self.cleanup_list = []
 
     def execute(self):
-        """ Main entry point to starting a scenario.
-
-            It calls .match() to compute the intial set of items,
-            then goes through all the filters in sequence,
-            and finally executes all the actions on all remaining items.
         """
-        initial_set = self.match()
-        self.logger.debug("Initial set: %r", initial_set)
-        self.logger.info("Initial set length: %d", len(initial_set))
-        if initial_set:
-            filtered_set = self.filter(initial_set)
-            self.logger.debug("Filtered set: %r", filtered_set)
-            self.logger.info("Filtered set length: %d", len(filtered_set))
-            if filtered_set:
-                self.act(filtered_set)
-        else:
-            self.metric_collector.add_filtered_to_empty_set_metric()
-        self.logger.debug("Done")
-
-    def match(self):
-        """ Reads the policy and returns the initial set of items.
+            Main entry point to starting a scenario.
         """
-        pass # pragma: no cover
+        steps = self.schema.get("steps", [])
+        self.logger.info("Starting scenario '%s' (%d steps)", self.name, len(steps))
+        for step in steps:
+            for action_name, action_method in self.action_mapping.items():
+                if action_name in step:
+                    ret = action_method(schema=step.get(action_name))
+                    if not ret:
+                        self.logger.warning("Step returned failure %s. Finishing scenario early", step)
+                        self.cleanup()
+                        return False
+        self.logger.info("Scenario finished")
+        self.cleanup()
+        return True
 
-    def match_property(self, candidate, criterion):
-        """ Helper method to match a property following some criterion.
-            Turns the value into a regular expression.
-        """
-        if not criterion:
-            return False
-        attr = criterion.get("name")
-        attr = self.property_rewrite.get(attr, attr)
-        value = getattr(candidate, attr)
-        expr = re.compile(criterion.get("value"))
-        if type(value) is list:
-            return any([
-                expr.match(str(v))
-                for v in value
-            ])
-        else:
-            value = str(value)
-        return expr.match(value)
+    def cleanup(self):
+        if not self.cleanup_list:
+            self.logger.debug("No cleanup needed")
+            return
+        self.logger.info("Cleanup started (%d items)", len(self.cleanup_list))
+        for action in self.cleanup_list:
+            self.execute_action(action)
+        self.cleanup_list = []
+        self.logger.info("Cleanup done")
 
-    def filter(self, items):
-        """ Applies various filters based on the given policy.
-        """
-        filters = self.schema.get("filters", [])
-        mapping = {
-            "property": self.filter_property,
-            "dayTime": self.filter_day_time,
-            "randomSample": self.filter_random_sample,
-            "probability": self.filter_probability,
-        }
-        return self.filter_mapping(items, filters, mapping)
+    def execute_action(self, action):
+        ret_val = action.execute()
+        for action in action.get_cleanup_actions():
+            self.cleanup_list.append(action)
+        return ret_val
 
-    def filter_property(self, candidates, criterion):
-        """ Filters out things which don't match their property filters.
-        """
-        return [
-            candidate for candidate in candidates
-            if self.match_property(candidate, criterion)
-        ]
-
-    def filter_day_time(self, candidates, criterion, now=None):
-        """ Passed unchanged list of candidates, if the execution time
-            satisfies the policy requirements.
-        """
-        now = now or datetime.now()
-        self.logger.info("Now is %r", now)
-
-        # check the day is permitted
-        day_name = calendar.day_name[now.weekday()].lower()
-        permitted_days = criterion.get("onlyDays", [])
-        if permitted_days and day_name not in permitted_days:
-            self.logger.info("Not allowed on %s", day_name)
-            return []
-
-        # check the time is not too early
-        start = criterion.get("startTime", {})
-        start_date = now.replace(
-            hour=start.get("hour", 10),
-            minute=start.get("minute", 0),
-            second=start.get("second", 0),
+    def action_nodes(self, schema):
+        action = ActionNodes(
+            schema=schema,
+            name=self.name,
+            inventory=self.inventory,
+            driver=self.driver,
+            executor=self.executor,
         )
-        if now < start_date:
-            self.logger.info("Too early")
-            return []
+        return self.execute_action(action)
 
-        # check the time is not too late
-        end = criterion.get("endTime", {})
-        end_date = now.replace(
-            hour=end.get("hour", 15),
-            minute=end.get("minute", 59),
-            second=end.get("second", 59),
+    def action_pods(self, schema):
+        action = ActionPods(
+            schema=schema,
+            name=self.name,
+            inventory=self.inventory,
+            k8s_inventory=self.k8s_inventory,
+            executor=self.executor,
         )
-        if now > end_date:
-            self.logger.info("Too late")
-            return []
+        return self.execute_action(action)
 
-        return candidates
+    def action_kubectl(self, schema):
+        action = ActionKubectl(
+            schema=schema,
+            name=self.name,
+            kube_config=self.k8s_inventory.k8s_client.kube_config,
+        )
+        return self.execute_action(action)
 
-    def filter_random_sample(self, candidates, criterion):
-        """ Returns a random sample from the initial list.
-            It supports policy `size` and `ratio` features.
-        """
-        if not criterion:
-            return []
-        size = criterion.get("size")
-        if size is None:
-            ratio = criterion.get("ratio", 1)
-            size = int(len(candidates)*ratio)
-        if size == 0:
-            self.logger.info("RandomSample size 0")
-            return []
-        return random.sample(candidates, size)
+    def action_probe_http(self, schema):
+        action = ActionProbeHTTP(
+            schema=schema,
+            name=self.name,
+            k8s_inventory=self.k8s_inventory,
+        )
+        return self.execute_action(action)
 
-    def filter_probability(self, candidates, criterion):
-        """ Returns the initial set unchanged with given probability.
-            Returns empty list otherwise.
-        """
-        proba = float(criterion.get("probabilityPassAll", 0.5))
-        if random.random() > proba:
-            self.metric_collector.add_probability_filter_passed_no_nodes_filter()
-            return []
-        return candidates
-
-    def filter_mapping(self, items, filters, mapping):
-        """ Executes filters mapped to methods, based on policy keywords.
-        """
-        for criterion in filters:
-            filter_method = None
-            filter_params = None
-            for filter_type in mapping.keys():
-                if filter_type in criterion:
-                    filter_method = mapping.get(filter_type)
-                    filter_params = criterion.get(filter_type)
-                    len_before = len(items)
-                    items = filter_method(items, filter_params)
-                    len_after = len(items)
-                    self.logger.debug("Filter %s: %d -> %d items", filter_type, len_before, len_after)
-                    break
-            if not items:
-                self.logger.info("Empty set after %r", criterion)
-                break
-
-        if not items:
-            self.metric_collector.add_filtered_to_empty_set_metric()
-
-        return items
-
-    def act(self, items):
-        """ Execute policy's actions on the items,
-        """
-        pass # pragma: no cover
-
-    def action_wait(self, item, params):
+    def action_wait(self, schema):
         """ Waits x seconds, according to the policy.
         """
-        sleep_time = params.get("seconds", 0)
-        self.logger.info("Action sleep for %s seconds", sleep_time)
+        sleep_time = schema.get("seconds", 0.0)
+        self.logger.info("Sleeping for %r seconds", sleep_time)
         time.sleep(sleep_time)
-
-    def act_mapping(self, items, actions, mapping):
-        """ Executes all the actions on the list of pods.
-        """
-        for action in actions:
-            for key, method in mapping.items():
-                if key in action:
-                    params = action.get(key)
-                    for item in items:
-                        method(item, params)
-                        # special case - if we're waiting, only do that on first item
-                        if key == "wait":
-                            break
-
-
+        return True

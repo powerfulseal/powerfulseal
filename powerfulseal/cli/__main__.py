@@ -22,6 +22,7 @@ import textwrap
 import sys
 import os
 
+from powerfulseal import makeLogger
 import powerfulseal.version
 from powerfulseal.k8s.metrics_server_client import MetricsServerClient
 from prometheus_client import start_http_server
@@ -45,7 +46,7 @@ def parse_kubeconfig(args):
         if not, check if there is `~/.kube/config` available
         else try to build in-cluster config
     """
-    logger = logging.getLogger(__name__)
+    logger = makeLogger(__name__)
     kube_config = None
     expanded_home_kube_config_path = os.path.expanduser(KUBECONFIG_DEFAULT_PATH)
     if args.kubeconfig:
@@ -136,14 +137,13 @@ def add_ssh_options(parser):
 def add_inventory_options(parser):
     # Inventory
     args = parser.add_argument_group('Inventory settings')
-    inventory_options = args.add_mutually_exclusive_group(required=True)
+    inventory_options = args.add_mutually_exclusive_group(required=False)
     inventory_options.add_argument('-i', '--inventory-file',
         default=os.environ.get("INVENTORY_FILE"),
         help=('the inventory file (in ini format) of groups '
               'of hosts to work with')
     )
     inventory_options.add_argument('--inventory-kubernetes',
-        default=os.environ.get("INVENTORY_KUBERNETES"),
         help='reads all kubernetes cluster nodes as inventory',
         action='store_true',
     )
@@ -254,7 +254,7 @@ def add_metrics_options(parser):
     args_prometheus = parser.add_argument_group('Prometheus settings')
     args_prometheus.add_argument(
         '--prometheus-host',
-        default='127.0.0.1',
+        default='0.0.0.0',
         help=(
             'Host to expose Prometheus metrics via the HTTP server when using '
             'the --prometheus-collector flag'
@@ -262,7 +262,7 @@ def add_metrics_options(parser):
     )
     args_prometheus.add_argument(
         '--prometheus-port',
-        default=8081,
+        default=9000,
         help=(
             'Port to expose Prometheus metrics via the HTTP server '
             'when using the --prometheus-collector flag'
@@ -368,12 +368,12 @@ def parse_args(args):
     web_args.add_argument(
         '--host',
         help='Specify host for the PowerfulSeal web server',
-        default=os.environ.get('HOST', '127.0.0.1')
+        default=os.environ.get('HOST', '0.0.0.0')
     )
     web_args.add_argument(
         '--port',
         help='Specify port for the PowerfulSeal web server',
-        default=int(os.environ.get('PORT', '8080')),
+        default=int(os.environ.get('PORT', '8000')),
         type=check_valid_port
     )
     web_args.add_argument(
@@ -437,6 +437,19 @@ def main(argv):
     ##########################################################################
     # LOGGING
     ##########################################################################
+    # this is to calm down the flask stdout
+    # calm down the workzeug
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)
+    try:
+        import click
+        def echo(*args, **kwargs):
+            pass
+        click.echo = echo
+        click.secho = echo
+    except:
+        pass
+
+    # parse the verbosity flags
     if args.silent == 1:
         log_level = logging.WARNING
     elif args.silent == 2:
@@ -452,18 +465,15 @@ def main(argv):
     # do a basic config with the server log handler
     logging.basicConfig(level=log_level, handlers=[server_log_handler])
     # this installs a stdout handler by default to the root
-    coloredlogs.install(level=log_level)
-
-    # calm down the workzeug
-    logging.getLogger("werkzeug").setLevel(logging.WARNING)
+    coloredlogs.install(
+        level=log_level,
+        fmt='%(asctime)s %(levelname)s %(name)s %(message)s'
+    )
 
     # the main cli handler
-    logger = logging.getLogger(__name__)
+    logger = makeLogger(__name__)
     logger.setLevel(log_level)
-
-
-
-    logger.info("modules %s : verbosity %s : log level %s : handler level %s ", __name__, args.verbose, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
+    logger.info("verbosity: %s; log level: %s; handler level: %s", args.verbose, logging.getLevelName(logger.getEffectiveLevel()), logging.getLevelName(log_level) )
 
     ##########################################################################
     # KUBERNETES
@@ -499,7 +509,7 @@ def main(argv):
         logger.info("Building GCP driver")
         driver = GCPDriver(config=args.gcp_config_file)
     else:
-        logger.info("No driver - some functionality disabled")
+        logger.info("No cloud driver - some functionality disabled")
         driver = NoCloudDriver()
 
     ##########################################################################
@@ -511,7 +521,7 @@ def main(argv):
             args.inventory_file
         )
     else:
-        logger.info("Attempting to read the inventory from kubernetes")
+        logger.debug("Attempting to read the inventory from kubernetes")
         groups_to_restrict_to = k8s_client.get_nodes_groups()
 
     logger.debug("Restricting inventory to %s" % groups_to_restrict_to)
@@ -581,7 +591,7 @@ def main(argv):
         if flask_debug is not None or (flask_env is not None and flask_env != "production"):
             logger.error("PROMETHEUS METRICS NOT SUPPORTED WHEN USING FLASK RELOAD. NOT STARTING THE SERVER")
         else:
-            logger.info("Starting prometheus metrics server on %s", args.prometheus_port)
+            logger.info("Starting prometheus metrics server (%s:%s)", args.prometheus_host, args.prometheus_port)
             start_http_server(args.prometheus_port, args.prometheus_host)
             metric_collector = PrometheusCollector()
     elif args.datadog_collector:
@@ -604,7 +614,7 @@ def main(argv):
         # run the metrics server if requested
         if not args.headless:
             # start the server
-            logger.info("Starting the UI server")
+            logger.info("Starting the UI server (%s:%s)", args.host, args.port)
             start_server(
                 host=args.host,
                 port=args.port,
@@ -616,7 +626,7 @@ def main(argv):
             logger.info("NOT starting the UI server")
 
         logger.info("STARTING AUTONOMOUS MODE")
-        PolicyRunner.run(
+        success = PolicyRunner.run(
             policy,
             inventory,
             k8s_inventory,
@@ -624,6 +634,10 @@ def main(argv):
             executor,
             metric_collector=metric_collector
         )
+        if not success:
+            logger.error("Policy runner finishes with an error")
+            return sys.exit(1)
+        return sys.exit(0)
 
     ##########################################################################
     # LABEL MODE

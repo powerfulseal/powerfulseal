@@ -11,20 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
-import random
-import time
 import threading
 from datetime import datetime
+import logging
 
 import jsonschema
 import yaml
 from flask import Flask, jsonify, request, send_file, render_template
 from flask_cors import CORS
 
+from powerfulseal import makeLogger
 from powerfulseal.policy import PolicyRunner
-from powerfulseal.policy.node_scenario import NodeScenario
-from powerfulseal.policy.pod_scenario import PodScenario
+from powerfulseal.policy.action_nodes import ActionNodes
+from powerfulseal.policy.action_pods import ActionPods
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 

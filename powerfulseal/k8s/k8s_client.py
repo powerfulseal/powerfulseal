@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import makeLogger
 import kubernetes.client
 import kubernetes.config
 from kubernetes.client.rest import ApiException
@@ -29,10 +29,11 @@ class K8sClient():
             kubernetes.config.load_kube_config(config_file=kube_config)
         else:
             kubernetes.config.load_incluster_config()
+        self.kube_config = kube_config
         self.client_corev1api = kubernetes.client.CoreV1Api()
-        self.client_extensionsv1beta1api = kubernetes.client.ExtensionsV1beta1Api()
+        self.client_appsv1api = kubernetes.client.AppsV1Api()
 
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
         self.logger.info("Initializing with config: %s", kube_config)
 
     def make_selector(self, key, value):
@@ -59,7 +60,6 @@ class K8sClient():
         nodes = self.list_nodes()
         groups = dict()
         for node in nodes:
-            name = node.metadata.name
             labels = node.metadata.labels
             addresses = node.status.addresses
             ips = []
@@ -111,11 +111,15 @@ class K8sClient():
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
             ExtensionsV1beta1Api.md#list_namespaced_deployment
         """
-        selector = self.selector_or_labels(labels, selector)
-        return self.client_extensionsv1beta1api.list_namespaced_deployment(
-            namespace=namespace,
-            label_selector=selector,
-        ).items
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            return self.client_appsv1api.list_namespaced_deployment(
+                namespace=namespace,
+                label_selector=selector,
+            ).items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
 
     def get_deployment(self, namespace, name):
         """
@@ -123,7 +127,7 @@ class K8sClient():
             ExtensionsV1beta1Api.md#read_namespaced_deployment
         """
         try:
-            return self.client_extensionsv1beta1api.read_namespaced_deployment(
+            return self.client_appsv1api.read_namespaced_deployment(
                 namespace=namespace,
                 name=name,
             )
@@ -137,14 +141,18 @@ class K8sClient():
             CoreV1Api.md#list_namespaced_pod
             If deployment_name is provided, it will ignore selector, and use the deployment's
         """
-        selector = self.selector_or_labels(labels, selector)
-        if deployment_name:
-            deployment = self.get_deployment(namespace, deployment_name)
-            selector = self.dict_to_selector(deployment.spec.selector.match_labels)
-        return self.client_corev1api.list_namespaced_pod(
-            namespace=namespace,
-            label_selector=selector,
-        ).items
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            if deployment_name:
+                deployment = self.get_deployment(namespace, deployment_name)
+                selector = self.dict_to_selector(deployment.spec.selector.match_labels)
+            return self.client_corev1api.list_namespaced_pod(
+                namespace=namespace,
+                label_selector=selector,
+            ).items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
 
     def delete_pods(self, pods):
         """
@@ -163,3 +171,17 @@ class K8sClient():
                 self.logger.exception(e)
                 return False
         return True
+
+    def get_service(self, namespace, name):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            /CoreV1Api.md#read_namespaced_service
+        """
+        try:
+            return self.client_corev1api.read_namespaced_service(
+                namespace=namespace,
+                name=name,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise

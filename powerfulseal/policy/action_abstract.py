@@ -13,13 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 
-def makeLogger(name, extra=None):
-    """
-        Helper function to create consistent loggers
-    """
-    name = name.split(".")[-1]
-    if extra is not None:
-        name += "." + extra[0:15]
-    return logging.getLogger(name)
+import time
+import re
+from datetime import datetime
+import calendar
+import random
+from powerfulseal import makeLogger
+
+from abc import ABC, abstractmethod
+from ..metriccollectors.stdout_collector import StdoutCollector
+
+
+class ActionAbstract(ABC):
+
+    @abstractmethod
+    def execute(self):
+        """
+            Executes the actual action
+        """
+        return True # pragma: no cover
+
+    def get_cleanup_actions(self):
+        """
+            If the job requires cleanup, return actions necessary to do the cleanup.
+        """
+        return [] # pragma: no cover

@@ -1,8 +1,7 @@
 import json
-import logging
+from powerfulseal import makeLogger
 import subprocess
 import sys
-import time
 
 import googleapiclient.discovery
 from oauth2client.client import GoogleCredentials
@@ -31,7 +30,7 @@ def get_all_ips(instance):
     try:
         ip_list.append(instance["networkInterfaces"][0]
                        ["accessConfigs"][0]["natIP"])  # Public
-    except Exception as e:
+    except Exception:
         pass
 
     ip_list.append(instance["networkInterfaces"][0]["networkIP"])  # Private
@@ -57,7 +56,7 @@ def create_node_from_server(server):
     # temporal workaround
     try:
         public_ip = server["networkInterfaces"][0]["accessConfigs"][0]["natIP"]
-    except Exception as e:
+    except Exception:
         public_ip = 'None'
 
     return Node(
@@ -111,7 +110,7 @@ class GCPDriver(AbstractDriver):
     """
 
     def __init__(self, cloud=None, conn=None, logger=None, config=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
         self.conn = create_connection_from_config()
         self.remote_servers = []
         try:
@@ -120,13 +119,13 @@ class GCPDriver(AbstractDriver):
             else:
                 with open(config, "r") as f:
                     default_config = json.loads(f.read())
-            self.logger.info(
+            self.logger.debug(
                 "Using Default gcloud config with project: %s and region: %s",
                 default_config['core']['project'],
                 default_config['compute']['region'])
             self.region = default_config['compute']['region']
             self.project = default_config['core']['project']
-        except Exception as ex:
+        except Exception:
             self.logger.error("gcloud config file isn't valid")
             self.logger.info("Exiting")
             sys.exit(0)
@@ -134,7 +133,7 @@ class GCPDriver(AbstractDriver):
     def sync(self):
         """ Downloads a fresh set of nodes from the API.
         """
-        self.logger.info("Synchronizing remote nodes")
+        self.logger.debug("Synchronizing remote nodes")
         self.remote_servers = []
         self.zones = get_zones_of_region(self.conn, self.region, self.project)
         if self.zones is not None:

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import logging
+from powerfulseal import makeLogger
 from openstack import connection, config
 from . import AbstractDriver
 from ..node import Node, NodeState
@@ -69,7 +69,7 @@ class OpenStackDriver(AbstractDriver):
     """
 
     def __init__(self, cloud=None, conn=None, logger=None):
-        self.logger = logger or logging.getLogger(__name__)
+        self.logger = logger or makeLogger(__name__)
         self.conn = conn or create_connection_from_config(cloud)
         self.remote_servers = []
 

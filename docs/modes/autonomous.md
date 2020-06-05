@@ -87,5 +87,5 @@ PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Fe
 - viewing the policy
 
 
-[![web interface](./media/web.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/web.png)
+[![web interface](./media/web.png)](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/web.png)
 

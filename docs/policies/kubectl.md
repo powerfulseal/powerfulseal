@@ -7,7 +7,7 @@ parent: Writing policies
 nav_order: 1
 ---
 
-# Setup things to test
+# New pod startup SLO
 {: .no_toc }
 
 ## Table of contents

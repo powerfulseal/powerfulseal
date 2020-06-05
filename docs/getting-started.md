@@ -77,6 +77,7 @@ Try listing pods from the `kube-system` namespace:
 
 For help, just type `help`. For more information about the modes, see our [docs on modes](./modes).
 
+
 ## Running from Docker
 
 ### Download docker image
@@ -97,13 +98,101 @@ Below is an example of using the `-v` flag to inject your local `kubeconfig` to 
 docker run -it \
     -v ~/.kube:/root/.kube \
     docker.io/store/bloomberg/powerfulseal:2.8.0 \
-        interactive --no-cloud --inventory-kubernetes
+    interactive
 ```
 
 To see how to use other modes, see our [docs on modes](./modes)
 
+
+## Hello world!
+
+Write the following hello world policy to `policy.yml`:
+
+```yaml
+scenarios:
+- name: Hello chaos!
+  description: >
+    Verifies that after a pod is killed,
+    it's succesfully rescheduled after 30 seconds.
+  steps:
+  # kill a kube-system pod
+  - podAction:
+      matches:
+        - namespace: kube-system
+      filters:
+        - randomSample:
+            size: 1
+      actions:
+        - kill:
+            probability: 1
+  - wait:
+      seconds: 30
+  # kill a kube-system pod
+  - podAction:
+      matches:
+        - namespace: kube-system
+      actions:
+        - checkPodState:
+            state: Running
+```
+
+You can then run the hello world policy in autonomus mode:
+
+```sh
+powerfulseal autonomous --policy-file ./policy.yaml
+```
+
+You will see an output similar to the following one. Note, that the Seal killed a pod, and then verified that it was successfuly restarted. By default, it will continue to run this experiment over and over, so feel free to press `Ctrl-C` to kill it.
+
+```sh
+$ powerfulseal autonomous --policy-file stuff/policy1.yml
+2020-06-05 12:42:03 INFO __main__ verbosity: None; log level: INFO; handler level: INFO
+2020-06-05 12:42:03 INFO __main__ Creating kubernetes client with config /Users/chaos/.kube/config (path found for backwards compatibility)
+2020-06-05 12:42:03 INFO k8s_client Initializing with config: /Users/chaos/.kube/config
+2020-06-05 12:42:03 INFO __main__ No cloud driver - some functionality disabled
+2020-06-05 12:42:04 INFO __main__ Using stdout metrics collector
+2020-06-05 12:42:04 INFO __main__ Starting the UI server (0.0.0.0:8000)
+2020-06-05 12:42:04 INFO __main__ STARTING AUTONOMOUS MODE
+2020-06-05 12:42:04 INFO scenario.Hello chaos! Starting scenario 'Hello chaos!' (3 steps)
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Matching 'namespace' {'namespace': 'kube-system'}
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Matched 37 pods in namespace kube-system
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Filtered set length: 1
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Pod killed: [pod #32 name=kube-state-metrics-7b4944dfbb-zrlrz namespace=kube-system containers=1 ...]
+2020-06-05 12:42:04 INFO scenario.Hello chaos! Sleeping for 30 seconds
+2020-06-05 12:42:34 INFO action_nodes_pods.Hello chaos! Matching 'namespace' {'namespace': 'kube-system'}
+2020-06-05 12:42:35 INFO action_nodes_pods.Hello chaos! Matched 37 pods in namespace kube-system
+2020-06-05 12:42:35 INFO action_nodes_pods.Hello chaos! Filtered set length: 37
+2020-06-05 12:42:35 INFO scenario.Hello chaos! Scenario finished
+```
+
+We just verified experimentally, that the `kubernetes` cluster was able to successfully restart a pod within 30 seconds. Now, what would happen if you changed the wait to 1 second?
+
+```yaml
+...
+  - wait:
+      seconds: 1
+```
+
+Most likely this:
+
+```
+...
+2020-06-05 12:53:26 INFO action_nodes_pods.Hello chaos! Pod killed: [pod #14 name=kube-apiserver-metrics-pkh6n namespace=kube-system containers=1 ...]
+2020-06-05 12:53:26 INFO scenario.Hello chaos! Sleeping for 1 seconds
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Matching 'namespace' {'namespace': 'kube-system'}
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Matched 37 pods in namespace kube-system
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Initial set length: 37
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Filtered set length: 37
+2020-06-05 12:53:27 ERROR action_nodes_pods.Hello chaos! Expected pod in state 'Running', got 'ContainerCreating' ([pod #14 name=kube-apiserver-metrics-f98lw namespace=kube-system containers=1 ...])
+2020-06-05 12:53:27 WARNING scenario.Hello chaos! Step returned failure {'podAction': {'matches': [{'namespace': 'kube-system'}], 'actions': [{'checkPodState': {'state': 'Running'}}]}}. Finishing scenario early
+2020-06-05 12:53:27 ERROR policy_runner Exiting early
+2020-06-05 12:53:27 ERROR __main__ Policy runner finishes with an error
+```
+
+OK, so that's a taste of what powerfulseal policies are capable of. Learn more about [policies here](./policies).
+
 ## Modes of operation
 
-You just learned how to start the interactive mode, but it's just a beginning. Powerfulseal supports multiple modes of operation.
+Powerfulseal supports multiple modes of operation.
 
 [Learn about modes now](./modes){: .btn .btn-secondary .fs-5 .mb-4 .mb-md-0 .mr-2 }

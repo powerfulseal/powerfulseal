@@ -44,6 +44,7 @@ scenarios:
             size: 1
       actions:
         - kill:
+            force: true
 
   # wait the minimal time for the SLO
   - wait:

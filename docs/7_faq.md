@@ -23,8 +23,9 @@ permalink: /faq
 
 We found these two links to be a good start:
 
-- http://principlesofchaos.org/
-- https://github.com/dastergon/awesome-chaos-engineering
+- [http://principlesofchaos.org/](http://principlesofchaos.org/)
+- [https://github.com/dastergon/awesome-chaos-engineering](https://github.com/dastergon/awesome-chaos-engineering)
+
 
 ### How is it different from Chaos Monkey ?
 
@@ -38,6 +39,7 @@ The Seal does:
 The Seal doesn't:
   - need external dependencies (db, Spinnaker), apart from SSH, cloud and Kubernetes API access
   - need you to setup ```cron```
+  - rely on randomness for all of your experiments
 
 ### Can I contribute to The Seal ?
 

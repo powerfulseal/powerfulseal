@@ -4,6 +4,7 @@ title: Pods reschedule SLO
 description: ""
 permalink: /pods-rescheduled
 parent: Writing policies
+nav_order: 2
 ---
 
 # Pods reschedule SLO

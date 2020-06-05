@@ -4,6 +4,7 @@ title: Taking VMs down
 description: ""
 permalink: /master-node
 parent: Writing policies
+nav_order: 3
 ---
 
 # Taking VMs down

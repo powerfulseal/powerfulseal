@@ -127,7 +127,7 @@ scenarios:
             probability: 1
   - wait:
       seconds: 30
-  # kill a kube-system pod
+  # make sure all pods are running in the namespace
   - podAction:
       matches:
         - namespace: kube-system

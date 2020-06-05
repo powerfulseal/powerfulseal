@@ -38,7 +38,7 @@ scenarios:
   # kill a pod
   - podAction:
       matches:
-        - namespace: kube-system
+        - namespace: some-namespace
       filters:
         - randomSample:
             size: 1
@@ -52,7 +52,7 @@ scenarios:
   # make sure all pods are running in the namespace
   - podAction:
       matches:
-        - namespace: kube-system
+        - namespace: some-namespace
       actions:
         - checkPodState:
             state: Running

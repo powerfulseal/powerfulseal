@@ -49,7 +49,7 @@ scenarios:
 
 ```yaml
 scenarios:
-- name: Verify there only running pods
+- name: Count pods with a specific label
   steps:
   - podAction:
       matches:

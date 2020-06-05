@@ -36,7 +36,7 @@ script:
 # push images to DockerHub and PyPI on tags
 deploy:
   - provider: script
-    script: bash docker_deploy.sh
+    script: bash build/docker_deploy.sh
     skip_cleanup: true
     on:
       tags: true

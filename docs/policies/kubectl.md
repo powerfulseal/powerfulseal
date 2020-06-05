@@ -27,17 +27,18 @@ Let's say we want to make sure that a new pod you create responds quickly enough
 
 ```yaml
 scenarios:
-- name: Deploy a deployment, make sure it responds on its service within 30 seconds
+- name: Test deployment SLO
   description: >
-    Verifies that after a pod is killed,
-    it's succesfully rescheduled after 30 seconds.
+    Verifies that after a new deployment and a service are scheduled,
+    it can be called within 30 seconds.
   steps:
 
-  # you can use this to setup the
+  # you can use this to setup kubernetes artifacts
   - kubectl:
-      action: apply
       # with auto delete, it will delete what's created here at the end of scenario
       autoDelete: true
+      # equivalent to `kubectl apply -f -`
+      action: apply
       payload: |
         ---
         apiVersion: v1
@@ -47,18 +48,10 @@ scenarios:
         data:
           policy.yml: |-
             scenarios:
-            - name: "delete a random pod in default namespace"
+            - name: "noop"
               steps:
-              - podAction:
-                  matches:
-                  - namespace: "default"
-                  filters:
-                  - randomSample:
-                      size: 1
-                  actions:
-                  - kill:
-                      probability: 0.77
-                      force: true
+              - wait:
+                  seconds: 1000
         ---
         apiVersion: apps/v1
         kind: Deployment
@@ -71,7 +64,6 @@ scenarios:
               labels:
                 name: powerfulseal
             spec:
-              serviceAccountName: powerfulseal
               containers:
                 - name: powerfulseal
                   image: store/bloomberg/powerfulseal:3.0.0
@@ -94,7 +86,7 @@ scenarios:
         spec:
         ports:
         - name: powerfulseal
-            port: 8080
+            port: 8000
         selector:
             name: powerfulseal
 
@@ -102,12 +94,12 @@ scenarios:
   - wait:
       seconds: 30
 
-  # make sure all pods are running in the namespace
+  # make sure the service responds
   - probeHTTP:
       target:
         service:
           name: some-service
           namespace: default
-          port: 9090
+          port: 8000
           protocol: http
 ```

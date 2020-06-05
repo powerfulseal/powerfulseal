@@ -20,7 +20,7 @@
 - `yaml` [policies](https://bloomberg.github.io/powerfulseal/policies) describing chaos experiments
 - multiple [modes](https://bloomberg.github.io/powerfulseal/modes)
 
-## Documentation
+## [Documentation](https://bloomberg.github.io/powerfulseal)
 
 [Powerfulseal documentation](https://bloomberg.github.io/powerfulseal) is included in the docs directory. It can be hosted locally with jekyll by running jekyll serve from the docs directory.
 

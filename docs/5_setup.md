@@ -33,7 +33,7 @@ You can see an example of how to do it [in ./kubernetes](https://github.com/bloo
   - if you'd like to use the UI, you'll probably also need a service and ingress
   - make sure to use `--use-pod-delete-instead-of-ssh-kill` flag to not need to configure SSH access for killing pods
 - profit!
-  - the Seal will self-discover the way to connect to `kubernetes` and start executing your policy
+  - the Seal will self-discover the way to connect to `Kubernetes` and start executing your policy
 
 
 ## Running outside of the cluster

@@ -57,7 +57,7 @@ To see the syntax of the commands, you can always run:
 powerfulseal --help
 ```
 
-If you have a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) file ready (for example in `~/.kube/config`) and working with `kubernetes`, you can start the seal on defaults:
+If you have a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) file ready (for example in `~/.kube/config`) and working with `Kubernetes`, you can start the seal on defaults:
 
 ```sh
 powerfulseal interactive
@@ -165,7 +165,7 @@ $ powerfulseal autonomous --policy-file stuff/policy1.yml
 2020-06-05 12:42:35 INFO scenario.Hello chaos! Scenario finished
 ```
 
-We just verified experimentally, that the `kubernetes` cluster was able to successfully restart a pod within 30 seconds. Now, what would happen if you changed the wait to 1 second?
+We just verified experimentally, that the `Kubernetes` cluster was able to successfully restart a pod within 30 seconds. Now, what would happen if you changed the wait to 1 second?
 
 ```yaml
 ...

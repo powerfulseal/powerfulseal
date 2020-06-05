@@ -21,7 +21,7 @@ permalink: /
 
 ## Highlights
 
-- works with `kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
+- works with `Kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
 - `Prometheus` and `Datadog` metrics collection
 - `yaml` [policies](#policies) describing chaos experiments
 - multiple [modes](./modes)

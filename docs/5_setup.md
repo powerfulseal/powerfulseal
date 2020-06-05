@@ -48,62 +48,14 @@ If you're running outside of your cluster, the setup will involve:
 It should look something like [this](https://github.com/bloomberg/powerfulseal/blob/master/media/setup.png).
 
 
-## Minikube setup
+## Minikube
 
-It is possible to test a subset of Seal's functionality using a [`minikube`](https://kubernetes.io/docs/setup/minikube/) setup.
-
-To achieve that, please inspect the [Makefile](https://github.com/bloomberg/powerfulseal/blob/master/Makefile). You will need to override the ssh host, specify the correct username and use minikube's ssh keys.
-
-
-If you'd like to test out the interactive mode, start with this:
+It's easy to use `minikube` with the `seal`. It should run well on the default settings. If you choose to use SSH access, you're going to need these options:
 
 ```sh
-seal \
-  -vv \
-  interactive \
-    --no-cloud \
-    --inventory-kubernetes \
-    --ssh-allow-missing-host-keys \
-    --remote-user docker \
-    --ssh-path-to-private-key `minikube ssh-key` \
-    --ssh-password `minikube ssh-password` \
-    --override-ssh-host `minikube ip`
-```
-
-For label mode, try something like this:
-
-```sh
-seal \
-  -vv \
-  label \
-    --no-cloud \
-    --min-seconds-between-runs 3 \
-    --max-seconds-between-runs 10 \
-    --inventory-kubernetes \
-    --ssh-allow-missing-host-keys \
-    --remote-user docker \
-    --ssh-path-to-private-key `minikube ssh-key` \
-    --ssh-password `minikube ssh-password` \
-    --override-ssh-host `minikube ip`
-```
-
-For autonomous mode, this should get you started:
-
-```sh
-seal \
-  -vv \
-  autonomous \
-    --no-cloud \
-    --policy-file ./examples/policy_kill_random_default.yml \
-    --inventory-kubernetes \
-    --prometheus-collector \
-    --prometheus-host 0.0.0.0 \
-    --prometheus-port 9999 \
-    --ssh-allow-missing-host-keys \
-    --remote-user docker \
-    --ssh-path-to-private-key `minikube ssh-key` \
-    --ssh-password `minikube ssh-password` \
-    --override-ssh-host `minikube ip` \
-    --host 0.0.0.0 \
-    --port 30100
+--ssh-allow-missing-host-keys \
+--remote-user docker \
+--ssh-path-to-private-key `minikube ssh-key` \
+--ssh-password `minikube ssh-password` \
+--override-ssh-host `minikube ip` \
 ```

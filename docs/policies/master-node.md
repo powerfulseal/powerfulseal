@@ -59,6 +59,8 @@ If you'd like to modify the state of VMs, you're going to need to configure a cl
         url: "http://load-balancer.example.com"
       # we can allow some retries, if needed
       retries: 3
+      # we can also make more requests to make sure we hit all instances
+      count: 100
 
   # restart the node which are down
   - nodeAction:

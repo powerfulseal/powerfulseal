@@ -30,6 +30,9 @@ spec:
     metadata:
       labels:
         name: powerfulseal
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9000'
     spec:
       serviceAccountName: powerfulseal
       containers:
@@ -38,6 +41,7 @@ spec:
           args:
           - autonomous
           - --policy-file=/policy.yml
+          - --prometheus-collector
           volumeMounts:
             - name: policyfile
               mountPath: /policy.yml

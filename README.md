@@ -72,6 +72,7 @@ powerfulseal autonomous --policy-file ./policy.yaml
 - https://www.infoq.com/news/2018/01/powerfulseal-chaos-kubernetes
 - [PowerfulSeal presentation at KubeCon 2017 Austin](https://youtu.be/00BMn0UjsG4)
 
+---
 
 ## Footnotes
 

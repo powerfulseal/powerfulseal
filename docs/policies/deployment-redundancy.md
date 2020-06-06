@@ -68,3 +68,36 @@ scenarios:
           namespace: example
           port: 8000
 ```
+
+## Another policy
+
+Let's say that you have three pods in the deployment. If you'd like to be sure that your policy handles a situation when one of them was already down, you can pick a third of the running ones:
+
+
+```yaml
+scenarios:
+- name: Deployment redundancy 2
+  steps:
+  - podAction:
+      matches:
+        - deployment:
+            name: mydeployment
+            namespace: example
+      filters:
+        - property:
+            name: state
+            value: Running
+        - randomSample:
+            ratio: 0.34
+      actions:
+        - kill:
+            force: false
+
+  # make sure the service responds
+  - probeHTTP:
+      target:
+        service:
+          name: myservice
+          namespace: example
+          port: 8000
+```

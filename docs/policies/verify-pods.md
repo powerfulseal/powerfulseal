@@ -34,7 +34,7 @@ scenarios:
         - namespace: "*"
       filters:
         # pods not running
-        - propertyPod:
+        - property:
             name: state
             value: Running
             negative: true

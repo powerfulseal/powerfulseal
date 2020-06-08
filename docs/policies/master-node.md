@@ -39,12 +39,12 @@ If you'd like to modify the state of VMs, you're going to need to configure a cl
   - nodeAction:
       # pick all master VMs
       matches:
-        - propertyNode:
+        - property:
             name: "name"
             value: ".*master.*"
       filters:
         # only pick the VMs which are in UP state
-        - propertyNode:
+        - property:
             name: "state"
             value: "UP"
         # and only pick a single VM
@@ -67,12 +67,12 @@ If you'd like to modify the state of VMs, you're going to need to configure a cl
   - nodeAction:
       # pick all master VMs
       matches:
-        - propertyNode:
+        - property:
             name: "name"
             value: ".*master.*"
       filters:
         # filter down to only the VMs which are in DOWN state
-        - propertyNode:
+        - property:
             name: "state"
             value: "DOWN"
       actions:

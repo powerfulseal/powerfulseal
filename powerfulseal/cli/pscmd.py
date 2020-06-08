@@ -449,4 +449,8 @@ class PSCmd(cmd.Cmd):
             return print("Cancelling")
 
         # kill the pod
-        return self.executor.kill_pod(pod, self.inventory)
+        success = self.executor.kill_pod(pod, self.inventory)
+        if success:
+            print("Done")
+        else:
+            print(colored("Could not delete the pod", "red"))

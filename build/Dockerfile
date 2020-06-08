@@ -8,6 +8,10 @@ RUN apt-get update && \
     apt-get autoclean && \
     apt-get autoremove
 
+ARG http_proxy
+ARG https_proxy
+ARG no_proxy
+
 # copy powerfulseal package
 WORKDIR /powerfulseal
 COPY Makefile LICENSE README.md setup.py setup.cfg MANIFEST.in /powerfulseal/

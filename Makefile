@@ -1,6 +1,8 @@
 INOTIFY_CALL ?= inotifywait -e modify -r ./powerfulseal ./tests
 TOX_CALL ?= tox -r
 SCHEMA_FILE=powerfulseal/policy/ps-schema.yaml
+local_proxy ?= ""
+local_no_proxy ?= ""
 
 name ?= powerfulseal
 version ?= `python setup.py --version`
@@ -26,6 +28,13 @@ clean:
 build:
 	docker build -t $(tag) -f ./build/Dockerfile .
 
+build-local:
+	docker build -t $(tag) \
+  --build-arg http_proxy=${local_proxy} \
+  --build-arg https_proxy=${local_proxy} \
+  --build-arg no_proxy=${local_no_proxy} \
+	-f ./build/Dockerfile .
+
 tag:
 	docker tag $(tag) $(namespace)$(tag)
 
@@ -43,4 +52,4 @@ docs: $(SCHEMA_FILE)
 	generate-schema-doc --no-minify --expand-buttons tmp.json docs/schema/index.html
 	rm tmp.json
 
-.PHONY: test watch upload clean build tag push version
+.PHONY: test watch upload clean build build-local tag push version

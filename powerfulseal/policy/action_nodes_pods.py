@@ -77,7 +77,7 @@ class ActionNodesPods(ActionAbstract):
         name = criterion.get("name")
         value = getattr(candidate, name)
         negative = criterion.get("negative", False)
-        expr = re.compile(criterion.get("value"))
+        expr = re.compile(criterion.get("value"), re.IGNORECASE)
         # support single values or list of values
         if type(value) is not list:
             value = [value]

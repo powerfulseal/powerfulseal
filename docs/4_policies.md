@@ -73,6 +73,7 @@ If you'd like to run an experiment as part of your CI pipeline, you might want t
 config:
   runStrategy:
     runs: 1
+scenarios: []
 ```
 
 ### Order of scenarios
@@ -84,6 +85,7 @@ By default, the seal runs the scenarios in the order specified (`round-robin`). 
 config:
   runStrategy:
     strategy: random
+scenarios: []
 ```
 
 ## Examples

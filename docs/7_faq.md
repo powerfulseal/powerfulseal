@@ -23,7 +23,7 @@ permalink: /faq
 
 We found these two links to be a good start:
 
-- [http://principlesofchaos.org/](http://principlesofchaos.org/)
+- [https://principlesofchaos.org/](https://principlesofchaos.org/)
 - [https://github.com/dastergon/awesome-chaos-engineering](https://github.com/dastergon/awesome-chaos-engineering)
 
 

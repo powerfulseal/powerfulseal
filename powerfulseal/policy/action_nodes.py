@@ -46,6 +46,7 @@ class ActionNodes(ActionNodesPods):
                 if self.match_property(node, match):
                     self.logger.debug("Matching %r", node)
                     selected_nodes.add(node)
+                self.logger.debug("Doesn't match property %r: %r", match, node)
         if len(selected_nodes) == 0:
             self.metric_collector.add_matched_to_empty_set_metric(NODE_SOURCE)
         return list(selected_nodes)

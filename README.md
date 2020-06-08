@@ -12,17 +12,17 @@
   <br>
 </p>
 
+## [Documentation](https://bloomberg.github.io/powerfulseal)
+
+Please refer to the [Powerfulseal documentation](https://bloomberg.github.io/powerfulseal) to learn how to use it.
 
 ## Highlights
 
 - works with `Kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
+- `yaml` [policies](https://bloomberg.github.io/powerfulseal/policies) describing complete chaos experiments
 - `Prometheus` and `Datadog` metrics collection
-- `yaml` [policies](https://bloomberg.github.io/powerfulseal/policies) describing chaos experiments
-- multiple [modes](https://bloomberg.github.io/powerfulseal/modes)
+- multiple [modes](https://bloomberg.github.io/powerfulseal/modes) for differnt use cases
 
-## [Documentation](https://bloomberg.github.io/powerfulseal)
-
-[Powerfulseal documentation](https://bloomberg.github.io/powerfulseal) is included in the docs directory. It can be hosted locally with jekyll by running jekyll serve from the docs directory.
 
 ## Hello world!
 
@@ -57,7 +57,7 @@ Assuming that's in `policy.yml`, you can run it like this:
 powerfulseal autonomous --policy-file ./policy.yaml
 ```
 
-[Learn more](https://bloomberg.github.io/powerfulseal).
+[Learn more](https://bloomberg.github.io/powerfulseal)
 
 
 ## Read about the PowerfulSeal

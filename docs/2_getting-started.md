@@ -34,7 +34,7 @@ Python 3.7.6
 
 #### Setting up a virtualenv
 
-Though optional, it is a good practice is to always use [virtualenv](https://virtualenv.pypa.io/en/stable/). You can create and activate one like this:
+Though optional, it is a good practice to use a [virtualenv](https://virtualenv.pypa.io/en/stable/). You can create and activate one like this:
 
 ```sh
 python -m virtualenv env

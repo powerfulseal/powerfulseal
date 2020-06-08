@@ -50,6 +50,11 @@ If you're running outside of your cluster, the setup will involve:
 It should look something like [this](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/setup.png).
 
 
+## Cloud drivers
+
+In order to interact with VMs, you're going to need to configure a cloud driver. [Learn more](./cloud-provider-requirements)
+
+
 ## Minikube
 
 It's easy to use `minikube` with the Seal. It should run well on the default settings. If you choose to use SSH access, you're going to need these options:

@@ -63,7 +63,7 @@ If you have a [`kubeconfig`](https://kubernetes.io/docs/concepts/configuration/o
 powerfulseal interactive
 ```
 
-This will start a command line, interactive CLI, just like the following. You can type commands inside of it.
+This will start a command line, [interactive CLI](./interactive-mode), just like the following. You can type commands inside of it.
 
 ```sh
 (seal) $
@@ -136,7 +136,7 @@ scenarios:
             state: Running
 ```
 
-You can then run the hello world policy in autonomus mode:
+You can then run the hello world policy in [autonomus mode](./autonomous-mode) (the most flexible and powerful mode). Run the following command:
 
 ```sh
 powerfulseal autonomous --policy-file ./policy.yaml

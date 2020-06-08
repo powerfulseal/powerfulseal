@@ -53,6 +53,6 @@ docs: $(SCHEMA_FILE)
 	rm tmp.json
 
 validate-examples:
-	python docs/extract-examples.py | xargs -L 1 python -m powerfulseal validate --policy-file
+	python examples/extract-examples.py | xargs -L 1 powerfulseal validate --policy-file
 
 .PHONY: test watch upload clean build build-local tag push version validate-examples

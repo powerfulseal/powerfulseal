@@ -4,8 +4,7 @@ EXAMPLES_DIR = "./examples/"
 EXAMPLE_NAME_TEMPLATE = "example-policy{}.yml"
 VALID_BEGINNGINGS = ["scenarios", "config"]
 
-cwd = os.path.dirname(os.path.realpath(__file__))
-
+cwd = os.path.dirname(os.path.realpath(__file__)) + "/../docs/"
 
 files = []
 for (dirpath, dirnames, filenames) in os.walk(cwd):

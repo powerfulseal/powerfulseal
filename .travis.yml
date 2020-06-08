@@ -21,15 +21,15 @@ install:
 script:
   - tox -vv
   - docker --version
+  - make docs
   - make build
   - docker images
   - docker run `make version` --help
-  - make docs
 
 # push images to DockerHub and PyPI on tags
 deploy:
   - provider: script
-    script: bash docker_deploy.sh
+    script: bash build/docker_deploy.sh
     skip_cleanup: true
     on:
       tags: true

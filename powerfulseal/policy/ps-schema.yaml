@@ -703,7 +703,7 @@ definitions:
   targetService:
     type: object
     description: >
-      Target the given `kubernetes` service in a given namespace.
+      Target the given `Kubernetes` service in a given namespace.
       It will use directly the IP of the given service, so make sure it resolves.
     additionalProperties: false
     properties:

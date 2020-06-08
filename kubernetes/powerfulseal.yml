@@ -30,14 +30,18 @@ spec:
     metadata:
       labels:
         name: powerfulseal
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9000'
     spec:
       serviceAccountName: powerfulseal
       containers:
         - name: powerfulseal
-          image: store/bloomberg/powerfulseal:3.0.0
+          image: store/bloomberg/powerfulseal:3.0.0rc0
           args:
           - autonomous
           - --policy-file=/policy.yml
+          - --prometheus-collector
           volumeMounts:
             - name: policyfile
               mountPath: /policy.yml

@@ -9,14 +9,16 @@ parent: Modes
 
 # Label Mode
 
-Label mode is a more imperative alternative to autonomous mode, allowing you to specify which specific _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
+Label mode is a more imperative alternative to autonomous mode, allowing you to specify _per-pod_ whether a pod should be killed, the days/times it can be killed and the probability of it being killed.
 
 Label mode is a good way to have more granular control over which pods are killed at the expense of greater verbosity. This trade-off is especially useful if you have a large number of pods (in the hundreds or even greater magnitudes) but only want to run PowerfulSeal on a few pods, or if your Kubernetes cluster has pods where you want full confidence that PowerfulSeal would not kill.
+
+__note__: while called _label_ mode, you can use both labels and annotations to mark pods for destruction.
 
 
 ## Usage
 
-Labels can be manually set using the `kubectl label pods [POD NAME] [LABEL]` command. Once labels are set, label mode can be run by using the `--label` flag. You may also wish to set the `--min-seconds-between-runs` and `--max-seconds-between-runs` flags which default to `0` and `300` respectively.
+Labels can be manually set using the `kubectl label pods [POD NAME] [LABEL]` or `kubectl annotate pods [POD NAME] [LABEL]` command. Once labels are set, label mode can be run by using the `--label` flag. You may also wish to set the `--min-seconds-between-runs` and `--max-seconds-between-runs` flags which default to `0` and `300` respectively.
 
 To reduce the processing time needed to filter a large number of pods, you can instruct PowerfulSeal to only look up pods under a specific namespace by using the `--kubernetes-namespace` argument. This behaves similar to `kubectl`, where not specifying the argument defaults PowerfulSeal to the `default` namespace, whereas specifying an empty value (`--kubernetes-namespace=`) retrieves all pods across all namespaces.
 
@@ -30,11 +32,11 @@ Suppose we have pods `my-app-1`, `my-app-2`, etc. under the `default` namespace 
 
 1. To allow PowerfulSeal to act on the pod, run `kubectl label pods my-app-1 seal/enabled=true`
 2. To next increase the randomness of when the pod can fail (reflecting the unexpectedness of real world failures), run `kubectl label pods my-app-1 seal/kill-probability=0.5`
-3. Finally, to ensure we're present in the office if the resilience of the system fails, we can set labels so that our pod is only killed during working hours with `seal/days="mon,tue,way,thu,fri"`, `seal/start-time=10-00-00` and `seal/end-time=17-30-00`
+3. Finally, to ensure we're present in the office if the resilience of the system fails, we can set annotations so that our pod is only killed during working hours with `seal/days="mon,tue,way,thu,fri"`, `seal/start-time=10-00-00` and `seal/end-time=17-30-00`. Note, that commas are not allowed in labels, so you need to use `kube annotate pods my-pod seal/days="mon,tue,way,thu,fri"` to achieve this.
 
 All of these labels are optional. For additional labels and their defaults, see the reference below.
 
-To finally get PowerfulSeal running, assuming our `kube-config` is at `~/.kube/config` and we'e using the `no-cloud` driver, run: `powerfulseal label --inventory--kubernetes --kube-config ~/.kube/config`.
+To finally get PowerfulSeal running, assuming our `kube-config` is at `~/.kube/config` driver, run: `powerfulseal label --kube-config ~/.kube/config`.
 
 If we were to change the namespace of the `my-app-*` pods to, for example, `production`, PowerfulSeal can be either run with the `--kubernetes-namespace=production` argument to get all pods with the `production` namespace, or `--kubernetes-namespace=` to get all pods across all namespaces (not recommended due to poor performance when is a large number of pods).
 

@@ -17,12 +17,6 @@ parent: Setup
 {:toc}
 
 ---
-## SSH
-
-In all cases, the SSH Keys must be set up for SSH Client access of the nodes.  
-
-> Note: With GCP, running ```gcloud compute config-ssh``` makes SSHing to node instances easier by adding an alias for each instance to the user SSH configuration (~/.ssh/config) file and then being able to use the generated file with ```--ssh-path-to-private-key``` argument.
-
 
 ## Azure
 
@@ -60,3 +54,6 @@ Having configuration ready and ssh connection to the node instances working, you
 ```powerfulseal interactive --kubeconfig ~/.kube/config --gcp --inventory-kubernetes --ssh-allow-missing-host-keys --ssh-path-to-private-key ~/.ssh/google_compute_engine --remote-user myuser```
 
 > Note: In case of running inside Pyenv and getting ```python2 command not found``` error when running gcloud (and you want to run ```PowerfulSeal``` with Python 3+), [this](https://github.com/pyenv/pyenv/issues/1159#issuecomment-453906182) might be useful, as gcloud requires Python2.
+
+
+> Note: With GCP, running ```gcloud compute config-ssh``` makes SSHing to node instances easier by adding an alias for each instance to the user SSH configuration (~/.ssh/config) file and then being able to use the generated file with ```--ssh-path-to-private-key``` argument.

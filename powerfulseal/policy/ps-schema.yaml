@@ -483,7 +483,7 @@ definitions:
       Select nodes by property values.
     additionalProperties: false
     properties:
-      propertyNode:
+      property:
         type: object
         additionalProperties: false
         properties:
@@ -505,7 +505,7 @@ definitions:
         - name
         - value
     required:
-    - propertyNode
+    - property
 
   filterPropertyPod:
     type: object
@@ -513,7 +513,7 @@ definitions:
       Select pods by property values.
     additionalProperties: false
     properties:
-      propertyPod:
+      property:
         type: object
         additionalProperties: false
         properties:
@@ -532,7 +532,7 @@ definitions:
         - name
         - value
     required:
-    - propertyPod
+    - property
 
 
 ###################################################################################################

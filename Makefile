@@ -52,4 +52,7 @@ docs: $(SCHEMA_FILE)
 	generate-schema-doc --no-minify --expand-buttons tmp.json docs/schema/index.html
 	rm tmp.json
 
-.PHONY: test watch upload clean build build-local tag push version
+validate-examples:
+	python examples/extract-examples.py | xargs -L 1 powerfulseal validate --policy-file
+
+.PHONY: test watch upload clean build build-local tag push version validate-examples

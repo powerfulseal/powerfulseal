@@ -36,12 +36,12 @@ scenarios:
   - nodeAction:
       # pick all master VMs
       matches:
-        - propertyNode:
+        - property:
             name: "name"
             value: ".*master.*"
       filters:
         # only pick the VMs which are in UP state
-        - propertyNode:
+        - property:
             name: "state"
             value: "UP"
         # and only pick a single VM

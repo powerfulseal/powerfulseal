@@ -25,6 +25,9 @@ class NodeState(IntEnum):
     UP = 2
     DOWN = 3
 
+    def __str__(self):
+        return '{0}'.format(self.name)
+
 
 class Node(object):
     """

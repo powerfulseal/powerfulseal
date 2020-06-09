@@ -67,6 +67,7 @@ def test_get_url_all_params(action_probe_http):
         method="POST",
         body="SOMEBODY here!",
         timeout=2000,
+        insecure=True,
     )
     action_probe_http.schema = schema
     mock_request = MagicMock()
@@ -77,7 +78,7 @@ def test_get_url_all_params(action_probe_http):
     assert mock_request.call_count == 1
     args = mock_request.call_args
     assert args.args == ('POST', 'http://10.10.10.10:80/')
-    assert args.kwargs == dict(headers={'TEST': 'SOMETHING'}, timeout=2.0, data=b'SOMEBODY here!', proxies={'http': '', 'https': ''})
+    assert args.kwargs == dict(headers={'TEST': 'SOMETHING'}, verify=False, timeout=2.0, data=b'SOMEBODY here!', proxies={'http': '', 'https': ''})
 
 def test_get_url_proxy(action_probe_http):
     schema = dict(
@@ -95,4 +96,4 @@ def test_get_url_proxy(action_probe_http):
     assert mock_request.call_count == 1
     args = mock_request.call_args
     assert args.args == ('GET', 'http://10.10.10.10:80/')
-    assert args.kwargs == dict(headers={}, timeout=1.0, data=b'', proxies={'http': "http://some.proxy.com:8080", 'https': "http://some.proxy.com:8080"})
+    assert args.kwargs == dict(headers={}, timeout=1.0, data=b'', verify=True, proxies={'http': "http://some.proxy.com:8080", 'https': "http://some.proxy.com:8080"})

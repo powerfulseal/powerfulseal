@@ -63,7 +63,7 @@ scenarios:
               serviceAccountName: powerfulseal
               containers:
                 - name: powerfulseal
-                  image: store/bloomberg/powerfulseal:3.0.0rc2
+                  image: store/bloomberg/powerfulseal:3.0.0rc3
                   args:
                   - autonomous
                   - --policy-file=/policy.yml
@@ -257,6 +257,7 @@ scenarios:
         value: some value
       - name: Host
         value: some other value
+      insecure: true
 
   - probeHTTP:
       target:

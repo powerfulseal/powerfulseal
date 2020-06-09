@@ -330,6 +330,12 @@ definitions:
               Proxy to use with the requests.
               If not set no proxy will be used.
               NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.
+          insecure:
+            type: boolean
+            description: >
+              If you'd like to skip the SSL validation.
+              For example for self-signed certs.
+            default: false
         required:
         - target
     required:

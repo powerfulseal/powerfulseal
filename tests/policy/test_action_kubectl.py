@@ -15,8 +15,11 @@
 
 
 import random
+import subprocess
+import os
+
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 
 
 # noinspection PyUnresolvedReferences
@@ -40,3 +43,31 @@ def test_doesnt_create_cleanup_action(action_kubectl):
     action_kubectl.schema["autoDelete"] = False
     action_kubectl.execute()
     assert action_kubectl.get_cleanup_actions() == []
+
+
+def test_passes_http_proxy(action_kubectl):
+    proxy_value = "someproxy.com:8080"
+    action_kubectl.schema["proxy"] = proxy_value
+    action_kubectl.schema["action"] = "apply"
+    action_kubectl.schema["payload"] = "payload"
+    mock_run = MagicMock()
+
+    with patch("subprocess.run", mock_run):
+        action_kubectl.execute()
+
+    assert mock_run.call_count == 1
+    args = mock_run.call_args
+    env = os.environ.copy()
+    env["HTTP_PROXY"] = proxy_value
+    env["HTTPS_PROXY"] = proxy_value
+    env["http_proxy"] = proxy_value
+    env["https_proxy"] = proxy_value
+    assert args.args == ('kubectl apply -f -',)
+    assert args.kwargs == dict(
+        input="payload",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
+        text=True,
+        env=env
+    )

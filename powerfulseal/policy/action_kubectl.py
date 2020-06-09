@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from powerfulseal import makeLogger
+import os
 import copy
 import subprocess
 
@@ -30,25 +31,31 @@ class ActionKubectl(ActionAbstract):
         self.kube_config = kube_config
         self.logger = logger or makeLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
-        self.kubectl_binary = "kubectl"
+        self.kubectl_binary = self.schema.get("kubectlBinary", "kubectl")
 
     def execute(self):
         return self.execute_kubectl(
             action=self.schema.get("action"),
             payload=self.schema.get("payload"),
+            proxy=self.schema.get("proxy", ""),
         )
 
     def make_kubectl_command(self, action):
-        return "{kubectl} {kube_config} {action} -f -".format(
+        return "{kubectl} {kube_config}{action} -f -".format(
             kubectl=self.kubectl_binary,
-            kube_config="--kubeconfig {}".format(self.kube_config) if self.kube_config else "",
+            kube_config="--kubeconfig {} ".format(self.kube_config) if self.kube_config else "",
             action=action,
         )
 
-    def execute_kubectl(self, action, payload):
+    def execute_kubectl(self, action, payload, proxy):
         cmd = self.make_kubectl_command(action)
         self.logger.debug("Command: %r", cmd)
         self.logger.debug("Payload: %r", payload)
+        self.logger.debug("Proxy: %r", proxy)
+        env = os.environ.copy()
+        for variant in ["http_proxy", "https_proxy"]:
+            env[variant.lower()] = proxy
+            env[variant.upper()] = proxy
         process = subprocess.run(
             cmd,
             input=payload,
@@ -56,6 +63,7 @@ class ActionKubectl(ActionAbstract):
             stderr=subprocess.PIPE,
             shell=True,
             text=True,
+            env=env,
         )
         if process.stdout:
             self.logger.info(process.stdout)

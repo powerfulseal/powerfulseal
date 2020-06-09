@@ -70,7 +70,7 @@ class ActionNodes(ActionNodesPods):
     def action_stop(self, items, params):
         """ Action to stop a node.
         """
-        auto_restart = self.schema.get("autoRestart", True)
+        auto_restart = params.get("autoRestart", True)
         success = True
         for item in items:
             self.logger.info("Action stop on %r", item)
@@ -78,7 +78,12 @@ class ActionNodes(ActionNodesPods):
                 self.driver.stop(item)
                 if auto_restart:
                     start = copy.deepcopy(self)
-                    start.schema["action"] = "start"
+                    start.schema["actions"] = [
+                        dict(action=dict(
+                            start=dict(
+                            )
+                        ))
+                    ]
                     self.cleanup_actions.append(start)
                 self.metric_collector.add_node_stopped_metric(item)
             except:

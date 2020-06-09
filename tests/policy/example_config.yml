@@ -151,6 +151,8 @@ scenarios:
       actions:
         - stop:
             force: false
+        - stop:
+            autoRestart: false
         - wait:
             seconds: 30
         - start:

@@ -12,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import copy
+
 from powerfulseal.metriccollectors.collector import NODE_SOURCE
 from .action_nodes_pods import ActionNodesPods
 
@@ -34,6 +37,7 @@ class ActionNodes(ActionNodesPods):
             "wait": self.action_wait,
             "execute": self.action_execute,
         }
+        self.cleanup_actions = []
 
     def match(self):
         """ Makes a union of all the nodes matching any of the policy criteria.
@@ -66,11 +70,16 @@ class ActionNodes(ActionNodesPods):
     def action_stop(self, items, params):
         """ Action to stop a node.
         """
+        auto_restart = self.schema.get("autoRestart", True)
         success = True
         for item in items:
             self.logger.info("Action stop on %r", item)
             try:
                 self.driver.stop(item)
+                if auto_restart:
+                    start = copy.deepcopy(self)
+                    start.schema["action"] = "start"
+                    self.cleanup_actions.append(start)
                 self.metric_collector.add_node_stopped_metric(item)
             except:
                 self.metric_collector.add_node_stop_failed_metric(item)
@@ -93,3 +102,6 @@ class ActionNodes(ActionNodesPods):
                     self.metric_collector.add_execute_failed_metric(item)
                     success = False
         return success
+
+    def get_cleanup_actions(self):
+        return self.cleanup_actions

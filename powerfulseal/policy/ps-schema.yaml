@@ -571,6 +571,11 @@ definitions:
         properties:
           force:
             type: boolean
+          autoRestart:
+            type: boolean
+            description:
+              When set to true, the node will be restarted at the end of the scenario.
+            default: true
     required:
     - stop
 

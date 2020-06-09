@@ -1,7 +1,7 @@
 ---
 layout: default
 title: In-depth topics
-nav_order: 10
+nav_order: 6
 description: ""
 permalink: /in-depth-topics
 ---
@@ -59,7 +59,7 @@ To collect metrics, run PowerfulSeal with the `--datadog-collector` flag.
 
 ### Use Case: Prometheus + Grafana + AlertManager
 
-[![Grafana example example](https://raw.githubusercontent.com/bloomberg/powerfulseal/master/media/grafana.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/grafana.png)
+[![Grafana example example](./media/grafana.png)](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/grafana.png)
 
 A common use case is to use a combination of Prometheus, Grafana and AlertManager in order to increase visibility of potential issues. 
 
@@ -79,7 +79,7 @@ In order to configure this integration, follow the steps below. (The below instr
         labels:
           name: powerfulseal
     ``` 
-2. Add an alert file (e.g., `seal.alerts.yml`) to your Prometheus configuration path with your alerting rules ([example here](https://github.com/bloomberg/powerfulseal/blob/master/examples/seal.alerts.yml))
+2. Add an alert file (e.g., `seal.alerts.yml`) to your Prometheus configuration path with your alerting rules ([example here](https://github.com/bloomberg/powerfulseal/blob/master/docs/examples/seal.alerts.yml))
 3. Update `alertmanager.yml` to handle the alerting rules, for example:
     ```yaml
     global:
@@ -101,11 +101,11 @@ In order to configure this integration, follow the steps below. (The below instr
         email_configs:
     ```
 4. Start PowerfulSeal with the `--prometheus-collector`, `--prometheus-host` and `--prometheus-port` flags, and restart Prometheus. Metrics should begin to appear.
-5. Ensure Grafana has your Prometheus server added as a data source and create a new Grafana dashboard with the metrics ([example here](https://github.com/bloomberg/powerfulseal/blob/master/examples/grafana.json) - note that the data source name may need to be changed)
+5. Ensure Grafana has your Prometheus server added as a data source and create a new Grafana dashboard with the metrics ([example here](https://github.com/bloomberg/powerfulseal/blob/master/examples/docs/grafana.json) - note that the data source name may need to be changed)
 
 ### Use Case: Datadog
 
-[![Datadog example example](https://raw.githubusercontent.com/bloomberg/powerfulseal/master/media/datadog.png)](https://github.com/bloomberg/powerfulseal/blob/master/media/datadog.png)
+[![Datadog example example](./media/datadog.png)](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/datadog.png)
 
 It's common to use Datadog in order to increase visibility of potential issues. 
 
@@ -113,7 +113,7 @@ In order to configure this properly, follow the steps below. (The below instruct
 
 1. Start PowerfulSeal with the `--datadog-collector` flag. Metrics should begin to appear on Datadog.
 
-2. Create a new dashboard with the collected metrics ([example here](https://github.com/bloomberg/powerfulseal/blob/master/examples/datadog.json)).
+2. Create a new dashboard with the collected metrics ([example here](https://github.com/bloomberg/powerfulseal/blob/master/examples/docs/datadog.json)).
 
 3. Configure alerting with [Monitors](https://docs.datadoghq.com/monitors/), to give you the ability to know when critical changes are occurring.
 

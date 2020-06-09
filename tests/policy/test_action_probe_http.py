@@ -77,4 +77,22 @@ def test_get_url_all_params(action_probe_http):
     assert mock_request.call_count == 1
     args = mock_request.call_args
     assert args.args == ('POST', 'http://10.10.10.10:80/')
-    assert args.kwargs == dict(headers={'TEST': 'SOMETHING'}, timeout=2.0, data=b'SOMEBODY here!')
+    assert args.kwargs == dict(headers={'TEST': 'SOMETHING'}, timeout=2.0, data=b'SOMEBODY here!', proxies={'http': '', 'https': ''})
+
+def test_get_url_proxy(action_probe_http):
+    schema = dict(
+        target=dict(
+            url="http://10.10.10.10:80"
+        ),
+        proxy="http://some.proxy.com:8080"
+    )
+    action_probe_http.schema = schema
+    mock_request = MagicMock()
+
+    with patch("requests.request", mock_request):
+        action_probe_http.execute()
+
+    assert mock_request.call_count == 1
+    args = mock_request.call_args
+    assert args.args == ('GET', 'http://10.10.10.10:80/')
+    assert args.kwargs == dict(headers={}, timeout=1.0, data=b'', proxies={'http': "http://some.proxy.com:8080", 'https': "http://some.proxy.com:8080"})

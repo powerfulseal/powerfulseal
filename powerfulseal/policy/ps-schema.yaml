@@ -324,6 +324,12 @@ definitions:
                   type: string
                 value:
                   type: string
+          proxy:
+            type: string
+            description: >
+              Proxy to use with the requests.
+              If not set no proxy will be used.
+              NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.
         required:
         - target
     required:
@@ -483,7 +489,7 @@ definitions:
       Select nodes by property values.
     additionalProperties: false
     properties:
-      propertyNode:
+      property:
         type: object
         additionalProperties: false
         properties:
@@ -505,7 +511,7 @@ definitions:
         - name
         - value
     required:
-    - propertyNode
+    - property
 
   filterPropertyPod:
     type: object
@@ -513,7 +519,7 @@ definitions:
       Select pods by property values.
     additionalProperties: false
     properties:
-      propertyPod:
+      property:
         type: object
         additionalProperties: false
         properties:
@@ -532,7 +538,7 @@ definitions:
         - name
         - value
     required:
-    - propertyPod
+    - property
 
 
 ###################################################################################################
@@ -703,7 +709,7 @@ definitions:
   targetService:
     type: object
     description: >
-      Target the given `kubernetes` service in a given namespace.
+      Target the given `Kubernetes` service in a given namespace.
       It will use directly the IP of the given service, so make sure it resolves.
     additionalProperties: false
     properties:

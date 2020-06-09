@@ -63,7 +63,7 @@ scenarios:
               serviceAccountName: powerfulseal
               containers:
                 - name: powerfulseal
-                  image: store/bloomberg/powerfulseal:3.0.0
+                  image: store/bloomberg/powerfulseal:3.0.0rc1
                   args:
                   - autonomous
                   - --policy-file=/policy.yml
@@ -85,19 +85,19 @@ scenarios:
       # Choose the initial set of nodes to operate on.
       # Note that this will be an union of all the notes you match (logical OR)
       matches:
-        - propertyNode:
+        - property:
             name: "name"
             value: "minion-*"
-        - propertyNode:
+        - property:
             name: "ip"
             value: "127.0.0.1"
-        - propertyNode:
+        - property:
             name: "group"
             value: "minion"
-        - propertyNode:
+        - property:
             name: "az"
             value: "AZ1|AZ2"
-        - propertyNode:
+        - property:
             name: "state"
             value: "UP"
 
@@ -105,19 +105,19 @@ scenarios:
       # used mutiple times, and piped from one to the next.
       filters:
         # property filters (all the property filters support regexp)
-        - propertyNode:
+        - property:
             name: "name"
             value: "minion-*"
-        - propertyNode:
+        - property:
             name: "ip"
             value: "127.0.0.1"
-        - propertyNode:
+        - property:
             name: "group"
             value: "minion"
-        - propertyNode:
+        - property:
             name: "az"
             value: "AZ1|AZ2"
-        - propertyNode:
+        - property:
             name: "state"
             value: "UP"
         # time of execution filters
@@ -179,10 +179,10 @@ scenarios:
 
       filters:
         # property filters (all the property filters support regexp)
-        - propertyPod:
+        - property:
             name: "name"
             value: "application-X-*"
-        - propertyPod:
+        - property:
             name: "state"
             value: "Running"
         # time of execution filters

@@ -257,6 +257,7 @@ scenarios:
         value: some value
       - name: Host
         value: some other value
+      insecure: true
 
   - probeHTTP:
       target:

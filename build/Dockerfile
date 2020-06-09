@@ -16,6 +16,7 @@ ARG no_proxy
 WORKDIR /powerfulseal
 COPY Makefile LICENSE README.md setup.py setup.cfg MANIFEST.in /powerfulseal/
 COPY powerfulseal/ /powerfulseal/powerfulseal/
+COPY docs/schema/ /powerfulseal/docs/schema/
 
 # install it with pip
 RUN pip install . && pip list .

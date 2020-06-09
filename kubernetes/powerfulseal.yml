@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sealpolicy
+  namespace: powerfulseal
 data:
   policy.yml: |-
     scenarios:
@@ -24,6 +25,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: powerfulseal
+  namespace: powerfulseal
 spec:
   replicas: 1
   template:

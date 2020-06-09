@@ -78,3 +78,29 @@ If you'd like to modify the state of VMs, you're going to need to configure a cl
       actions:
         - start
 ```
+
+
+## Auto-restart
+
+By default, VMs stopped by the Seal will be auto-restarted at the end of scenario (or if there is a failure, in the cleanup). You can disable that by setting `autoRestart` to false.
+
+
+```yaml
+- name: Take machines down, and don't bring them back up
+  steps:
+
+  # take down a single master VM
+  - nodeAction:
+      # pick all master VMs
+      matches:
+        - property:
+            name: "name"
+            value: ".*master.*"
+      filters:
+        - randomSample:
+            size: 1
+      actions:
+        - stop:
+            autoRestart: false
+
+```

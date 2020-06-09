@@ -238,6 +238,18 @@ definitions:
             description:
               When set to true, all the `kubectl apply` commands will be `kubectl delete`ed at the end of the scenario.
             default: true
+          proxy:
+            type: string
+            description: >
+              Proxy to use with the kubectl command.
+              If not set no proxy will be used.
+              NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.
+            default: ""
+          kubectlBinary:
+            type: string
+            description: >
+              The path to the binary of kubectl.
+            default: "kubectl"
         required:
         - action
         - payload

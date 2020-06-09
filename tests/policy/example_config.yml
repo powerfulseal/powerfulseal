@@ -80,6 +80,13 @@ scenarios:
       payload: |
         ---
 
+  - kubectl:
+      action: apply
+      proxy: someproxy.com:8080
+      kubectlBinary: /some/path/binary
+      payload: |
+        ---
+
   # nodeAction performs actions on specific nodes in the cluster
   - nodeAction:
       # Choose the initial set of nodes to operate on.

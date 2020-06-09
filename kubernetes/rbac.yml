@@ -23,12 +23,7 @@ rules:
   - ""
   resources:
   - nodes
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - ""
-  resources:
+  - services
   - namespaces
   - deployments
   verbs:

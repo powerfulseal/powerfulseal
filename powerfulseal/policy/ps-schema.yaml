@@ -324,6 +324,12 @@ definitions:
                   type: string
                 value:
                   type: string
+          proxy:
+            type: string
+            description: >
+              Proxy to use with the requests.
+              If not set no proxy will be used.
+              NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.
         required:
         - target
     required:

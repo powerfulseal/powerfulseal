@@ -66,7 +66,7 @@ scenarios:
             spec:
               containers:
                 - name: powerfulseal
-                  image: store/bloomberg/powerfulseal:3.0.0rc0
+                  image: store/bloomberg/powerfulseal:3.0.0rc1
                   args:
                   - autonomous
                   - --policy-file=/policy.yml

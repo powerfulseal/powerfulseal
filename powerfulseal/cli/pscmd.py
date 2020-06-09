@@ -437,8 +437,8 @@ class PSCmd(cmd.Cmd):
                 break
         if pod is None:
             return print("Pod number not found.")
-        if pod.state == 'Pending':
-            return print("Can't kill pod on pending state")
+        if pod.state.lower() != 'running':
+            return print("Can't kill pod with state", pod.state)
 
         # check with the user
         ans = False

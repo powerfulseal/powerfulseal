@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
-
 from powerfulseal.metriccollectors.collector import NODE_SOURCE
 from .action_nodes_pods import ActionNodesPods
 
@@ -77,13 +75,28 @@ class ActionNodes(ActionNodesPods):
             try:
                 self.driver.stop(item)
                 if auto_restart:
-                    start = copy.deepcopy(self)
-                    start.schema["actions"] = [
+                    schema = dict()
+                    schema["matches"] = self.schema.get("matches", {})
+                    filters = []
+                    for f in schema.get("filters", []):
+                        print(f)
+                        if "dayTime" not in f:
+                            filters.append(f)
+                    if filters:
+                        schema["filters"] = filters
+                    schema["actions"] = [
                         dict(action=dict(
                             start=dict(
                             )
                         ))
                     ]
+                    start = ActionNodes(
+                        name=self.name,
+                        schema=schema,
+                        inventory=self.inventory,
+                        driver=self.driver,
+                        executor=self.executor
+                    )
                     self.cleanup_actions.append(start)
                 self.metric_collector.add_node_stopped_metric(item)
             except:

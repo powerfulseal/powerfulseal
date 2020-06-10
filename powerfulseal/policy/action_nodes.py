@@ -84,10 +84,7 @@ class ActionNodes(ActionNodesPods):
                     if filters:
                         schema["filters"] = filters
                     schema["actions"] = [
-                        dict(action=dict(
-                            start=dict(
-                            )
-                        ))
+                        dict(start=dict())
                     ]
                     start = ActionNodes(
                         name=self.name,

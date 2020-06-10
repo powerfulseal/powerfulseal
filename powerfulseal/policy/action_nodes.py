@@ -79,7 +79,6 @@ class ActionNodes(ActionNodesPods):
                     schema["matches"] = self.schema.get("matches", {})
                     filters = []
                     for f in schema.get("filters", []):
-                        print(f)
                         if "dayTime" not in f:
                             filters.append(f)
                     if filters:

@@ -72,19 +72,20 @@ class ActionKubectl(ActionAbstract):
             self.logger.info(process.stderr)
         self.logger.info("Return code: %d", process.returncode)
 
+        # cleanup action
+        is_apply = self.schema.get("action") == "apply"
+        is_autodelete = self.schema.get("autoDelete", True) is True
+        if is_apply and is_autodelete:
+            self.cleanup_actions.append(ActionKubectl(
+                name=self.name,
+                schema=dict(
+                    action="delete",
+                    payload=self.schema.get("payload"),
+                ),
+                kube_config=self.kube_config,
+                metric_collector=self.metric_collector,
+            ))
         if process.returncode == 0:
-            is_apply = self.schema.get("action") == "apply"
-            is_autodelete = self.schema.get("autoDelete", True) is True
-            if is_apply and is_autodelete:
-                self.cleanup_actions.append(ActionKubectl(
-                    name=self.name,
-                    schema=dict(
-                        action="delete",
-                        payload=self.schema.get("payload"),
-                    ),
-                    kube_config=self.kube_config,
-                    metric_collector=self.metric_collector,
-                ))
             return True
         return False
 

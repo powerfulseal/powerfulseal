@@ -40,6 +40,7 @@ class ActionNodes(ActionNodesPods):
     def match(self):
         """ Makes a union of all the nodes matching any of the policy criteria.
         """
+        self.inventory.sync()
         selected_nodes = set()
         criteria = self.schema.get("matches", [])
         for node in self.inventory.find_nodes():

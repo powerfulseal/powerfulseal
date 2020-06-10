@@ -163,7 +163,12 @@ def test_action_stop_creates_cleanup_action(node_scenario):
     assert cleanup[0].schema is not node_scenario.schema
     assert cleanup[0].schema != node_scenario.schema
     assert cleanup[0].schema.get("matches") == node_scenario.schema.get("matches")
-    assert cleanup[0].schema.get("filters") == node_scenario.schema.get("filters")
+    assert cleanup[0].schema.get("filters") == [{
+        "property": {
+            "name": "state",
+            "value": "DOWN"
+        }
+    }]
     assert "start" in cleanup[0].schema["actions"][0]
 
 

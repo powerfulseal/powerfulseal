@@ -77,12 +77,12 @@ class ActionNodes(ActionNodesPods):
                 if auto_restart:
                     schema = dict()
                     schema["matches"] = self.schema.get("matches", {})
-                    filters = []
-                    for f in schema.get("filters", []):
-                        if "dayTime" not in f:
-                            filters.append(f)
-                    if filters:
-                        schema["filters"] = filters
+                    schema["filters"] = [
+                        dict(property=dict(
+                            name="state",
+                            value="DOWN"
+                        ))
+                    ]
                     schema["actions"] = [
                         dict(start=dict())
                     ]

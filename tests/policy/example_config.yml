@@ -63,7 +63,7 @@ scenarios:
               serviceAccountName: powerfulseal
               containers:
                 - name: powerfulseal
-                  image: store/bloomberg/powerfulseal:3.0.0rc3
+                  image: store/bloomberg/powerfulseal:3.0.0rc4
                   args:
                   - autonomous
                   - --policy-file=/policy.yml
@@ -77,6 +77,13 @@ scenarios:
                     name: sealpolicy
   - kubectl:
       action: delete
+      payload: |
+        ---
+
+  - kubectl:
+      action: apply
+      proxy: someproxy.com:8080
+      kubectlBinary: /some/path/binary
       payload: |
         ---
 

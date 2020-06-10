@@ -12,6 +12,12 @@ ARG http_proxy
 ARG https_proxy
 ARG no_proxy
 
+# download kubectl
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl \
+    && chmod +x ./kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl \
+    && kubectl version --client
+
 # copy powerfulseal package
 WORKDIR /powerfulseal
 COPY Makefile LICENSE README.md setup.py setup.cfg MANIFEST.in /powerfulseal/
@@ -21,11 +27,6 @@ COPY docs/ /powerfulseal/docs/
 # install it with pip
 RUN pip install . && pip list .
 
-# download kubectl
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl \
-    && chmod +x ./kubectl \
-    && mv ./kubectl /usr/local/bin/kubectl \
-    && kubectl version --client
 
 # the actual image we will be pushing up
 FROM python:3.7-slim-buster

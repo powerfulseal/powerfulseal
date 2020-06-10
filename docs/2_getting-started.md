@@ -85,7 +85,7 @@ For help, just type `help`. For more information about the modes, see our [docs 
 For each [release](https://github.com/bloomberg/powerfulseal/releases) a `docker` image is built and published to the [docker hub](https://hub.docker.com/_/powerfulseal).
 
 ```sh
-docker pull store/bloomberg/powerfulseal:3.0.0rc5
+docker pull store/bloomberg/powerfulseal:3.0.0rc6
 ```
 
 ### Run docker image

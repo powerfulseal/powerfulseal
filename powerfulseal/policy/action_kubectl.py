@@ -32,6 +32,7 @@ class ActionKubectl(ActionAbstract):
         self.logger = logger or makeLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.kubectl_binary = self.schema.get("kubectlBinary", "kubectl")
+        self.cleanup_actions = []
 
     def execute(self):
         return self.execute_kubectl(
@@ -71,15 +72,22 @@ class ActionKubectl(ActionAbstract):
             self.logger.info(process.stderr)
         self.logger.info("Return code: %d", process.returncode)
 
+        # cleanup action
+        is_apply = self.schema.get("action") == "apply"
+        is_autodelete = self.schema.get("autoDelete", True) is True
+        if is_apply and is_autodelete:
+            self.cleanup_actions.append(ActionKubectl(
+                name=self.name,
+                schema=dict(
+                    action="delete",
+                    payload=self.schema.get("payload"),
+                ),
+                kube_config=self.kube_config,
+                metric_collector=self.metric_collector,
+            ))
         if process.returncode == 0:
             return True
         return False
 
     def get_cleanup_actions(self):
-        actions = []
-        if str(self.schema.get("autoDelete", True)).lower() != "false":
-            delete_action = copy.deepcopy(self)
-            delete_action.schema["autoDelete"] = False
-            delete_action.schema["action"] = "delete"
-            actions.append(delete_action)
-        return actions
+        return self.cleanup_actions

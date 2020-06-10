@@ -91,6 +91,5 @@ class PolicyRunner():
                 time.sleep(sleep_time)
                 if loops is not None:
                     loops -= 1
-            inventory.sync()
         logger.info("All done here!")
         return True

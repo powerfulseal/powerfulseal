@@ -27,8 +27,16 @@ from tests.fixtures import action_kubectl
 
 
 def test_creates_cleanup_action(action_kubectl):
+    action_kubectl.schema["action"] = "apply"
     action_kubectl.schema["autoDelete"] = True
-    action_kubectl.execute()
+
+    process = MagicMock()
+    process.returncode = 0
+    mock_run = MagicMock(return_value=process)
+    with patch("subprocess.run", mock_run):
+        assert action_kubectl.execute()
+
+    assert mock_run.call_count == 1
     cleanup = action_kubectl.get_cleanup_actions()
     assert len(cleanup) == 1
     job = cleanup[0]
@@ -36,7 +44,25 @@ def test_creates_cleanup_action(action_kubectl):
     assert job.schema is not action_kubectl.schema
     assert job.schema["payload"] == action_kubectl.schema["payload"]
     assert job.schema["action"] == "delete"
-    assert job.schema["autoDelete"] == False
+
+def test_creates_cleanup_action_failure(action_kubectl):
+    action_kubectl.schema["action"] = "apply"
+    action_kubectl.schema["autoDelete"] = True
+
+    process = MagicMock()
+    process.returncode = 1
+    mock_run = MagicMock(return_value=process)
+    with patch("subprocess.run", mock_run):
+        assert not action_kubectl.execute()
+
+    assert mock_run.call_count == 1
+    cleanup = action_kubectl.get_cleanup_actions()
+    assert len(cleanup) == 1
+    job = cleanup[0]
+    assert job is not action_kubectl
+    assert job.schema is not action_kubectl.schema
+    assert job.schema["payload"] == action_kubectl.schema["payload"]
+    assert job.schema["action"] == "delete"
 
 
 def test_doesnt_create_cleanup_action(action_kubectl):

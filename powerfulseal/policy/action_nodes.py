@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
-
 from powerfulseal.metriccollectors.collector import NODE_SOURCE
 from .action_nodes_pods import ActionNodesPods
 
@@ -42,6 +40,7 @@ class ActionNodes(ActionNodesPods):
     def match(self):
         """ Makes a union of all the nodes matching any of the policy criteria.
         """
+        self.inventory.sync()
         selected_nodes = set()
         criteria = self.schema.get("matches", [])
         for node in self.inventory.find_nodes():
@@ -77,13 +76,24 @@ class ActionNodes(ActionNodesPods):
             try:
                 self.driver.stop(item)
                 if auto_restart:
-                    start = copy.deepcopy(self)
-                    start.schema["actions"] = [
-                        dict(action=dict(
-                            start=dict(
-                            )
+                    schema = dict()
+                    schema["matches"] = self.schema.get("matches", {})
+                    schema["filters"] = [
+                        dict(property=dict(
+                            name="state",
+                            value="DOWN"
                         ))
                     ]
+                    schema["actions"] = [
+                        dict(start=dict())
+                    ]
+                    start = ActionNodes(
+                        name=self.name,
+                        schema=schema,
+                        inventory=self.inventory,
+                        driver=self.driver,
+                        executor=self.executor
+                    )
                     self.cleanup_actions.append(start)
                 self.metric_collector.add_node_stopped_metric(item)
             except:

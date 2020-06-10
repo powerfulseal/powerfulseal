@@ -39,7 +39,7 @@ spec:
       serviceAccountName: powerfulseal
       containers:
         - name: powerfulseal
-          image: store/bloomberg/powerfulseal:3.0.0rc4
+          image: store/bloomberg/powerfulseal:3.0.0rc8
           args:
           - autonomous
           - --policy-file=/policy.yml

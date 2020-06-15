@@ -94,4 +94,4 @@ class PrometheusCollector(AbstractCollector):
 
     def add_scenario_counter_metric(self, name, result):
         res = "success" if result else "fail"
-        SCENARIO_RUNS_TOTAL.labels(name, name, res).inc()
+        SCENARIO_RUNS_TOTAL.labels(name, res).inc()

@@ -48,3 +48,6 @@ class StdoutCollector(AbstractCollector):
 
     def add_matched_to_empty_set_metric(self, source):
         logger.debug("Matched to empty set - source: %s", source)
+
+    def add_scenario_counter_metric(self, name, result):
+        logger.debug("Scenario %s result: %s", name, result)

@@ -6,6 +6,9 @@ config:
     minSecondsBetweenRuns: 77
     maxSecondsBetweenRuns: 78
 
+  exitStrategy:
+    strategy: fail-fast
+
 # scenarios is an array of chaos experiment descriptions
 scenarios:
 

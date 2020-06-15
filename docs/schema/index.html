@@ -29,7 +29,48 @@
                 <span class="badge badge-dark value-type">Type: object</span><span class="description"><p>General configuration of this policy.</p>
 </span>
 
-            <div class="accordion" id="accordionconfig__runStrategy">
+            <div class="accordion" id="accordionconfig__exitStrategy">
+        <div class="card">
+            <div class="card-header" id="headingconfig__exitStrategy">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#config__exitStrategy"
+                            aria-expanded="False" aria-controls="config__exitStrategy" onclick="setAnchor('#config__exitStrategy')"><span class="property-name">exitStrategy</span></button>
+                </h2>
+            </div>
+
+            <div id="config__exitStrategy"
+                 class="collapse property-definition-div" aria-labelledby="headingconfig__exitStrategy"
+                 data-parent="#accordionconfig__exitStrategy">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: object</span><span class="description"><p>Configure how exit is configured</p>
+</span>
+
+            <div class="accordion" id="accordionconfig__exitStrategy__strategy">
+        <div class="card">
+            <div class="card-header" id="headingconfig__exitStrategy__strategy">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#config__exitStrategy__strategy"
+                            aria-expanded="False" aria-controls="config__exitStrategy__strategy" onclick="setAnchor('#config__exitStrategy__strategy')"><span class="property-name">strategy</span></button>
+                </h2>
+            </div>
+
+            <div id="config__exitStrategy__strategy"
+                 class="collapse property-definition-div" aria-labelledby="headingconfig__exitStrategy__strategy"
+                 data-parent="#accordionconfig__exitStrategy__strategy">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: enum (of string)</span> <span class="badge badge-success default-value">Default: "report"</span><span class="description"><p>Affects what PowerfulSeal does when errors occur. The default <code>report</code> logs an error message, updates metrics and carries on. <code>fail-fast</code> fails and exits immediately on first exit (useful when running as a job).</p>
+</span>
+
+            <div class="enum-value" id="config__exitStrategy__strategy_enum">
+                <h4>Must be one of:</h4>
+                <ul class="list-group"><li class="list-group-item">"report"</li><li class="list-group-item">"fail-fast"</li></ul>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionconfig__runStrategy">
         <div class="card">
             <div class="card-header" id="headingconfig__runStrategy">
                 <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#config__runStrategy"

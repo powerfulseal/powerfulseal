@@ -46,6 +46,9 @@ definitions:
       runStrategy:
         type: object
         "$ref": "#/definitions/runStrategy"
+      exitStrategy:
+        type: object
+        "$ref": "#/definitions/exitStrategy"
 
   runStrategy:
     description: "Configure how the scenarios are run"
@@ -81,6 +84,22 @@ definitions:
         type: number
         minimum: 0
         default: 300
+
+  exitStrategy:
+    description: "Configure how exit is configured"
+    type: object
+    additionalProperties: false
+    properties:
+      strategy:
+        type: string
+        description: >
+          Affects what PowerfulSeal does when errors occur.
+          The default `report` logs an error message, updates metrics and carries on.
+          `fail-fast` fails and exits immediately on first exit (useful when running as a job).
+        default: report
+        enum:
+        - report
+        - fail-fast
 
   scenario:
     description: >

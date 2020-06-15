@@ -40,6 +40,7 @@ The metric collectors collect the following events:
 | seal_empty_filter_total | N/A | Cases where filtering returns an empty result | If the user's policy is designed to model common levels of failures, then having no nodes/pods after filtering could mean that insufficient resources have been provisioned for the system to withstand failure. |
 | seal_probability_filter_not_passed_total | N/A | Cases where the probability filter decides to skip all nodes | Useful to track long-term in order to ensure that probability distribution is as expected. |
 | seal_empty_match_total | source (either `nodes` or `pods`) | Cases where matching returns an empty result | See `seal_empty_filter_total` |
+| add_scenario_counter_metric | name of the scenario, success or fail | Counts scenarios and their results | Can be used to alert on when a scenario starts failing |
 
 ### Usage
 

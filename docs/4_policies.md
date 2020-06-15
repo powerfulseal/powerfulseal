@@ -88,6 +88,19 @@ config:
 scenarios: []
 ```
 
+### Exit strategy
+
+By default, if a scenario fails, the seal will report the error so that you can alert on it, and keep going.
+
+If you'd like it to exit (for example if you're running it as a job), you can use the `fail-fast` exit strategy:
+
+```yaml
+config:
+  exitStrategy:
+    strategy: fail-fast
+scenarios: []
+```
+
 ## Examples
 
 To see examples of policies, use the menu on the left.

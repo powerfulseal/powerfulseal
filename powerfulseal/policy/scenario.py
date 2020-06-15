@@ -60,9 +60,11 @@ class Scenario():
                     ret = action_method(schema=step.get(action_name))
                     if not ret:
                         self.logger.warning("Step returned failure %s. Finishing scenario early", step)
+                        self.metric_collector.add_scenario_counter_metric(self.name, False)
                         self.cleanup()
                         return False
         self.logger.info("Scenario finished")
+        self.metric_collector.add_scenario_counter_metric(self.name, True)
         self.cleanup()
         return True
 

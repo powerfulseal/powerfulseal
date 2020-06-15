@@ -64,6 +64,8 @@ class PolicyRunner():
         wait_min = config.get("minSecondsBetweenRuns", 0)
         wait_max = config.get("maxSecondsBetweenRuns", 300)
         loops = config.get("runs", None)
+        exitConfig = policy.get("config", {}).get("exitStrategy", {})
+        exitStrategy = exitConfig.get("strategy", "report")
         scenarios = [
             Scenario(
                 name=item.get("name"),
@@ -84,8 +86,11 @@ class PolicyRunner():
             for scenario in scenarios:
                 ret = scenario.execute()
                 if not ret:
-                    logger.error("Exiting early")
-                    return False
+                    if exitStrategy == "fail-fast":
+                        logger.error("Exiting early")
+                        return False
+                    else:
+                        logger.error("Scenario failed, reporting and carrying on")
                 sleep_time = int(random.uniform(wait_min, wait_max))
                 logger.info("Sleeping for %s seconds", sleep_time)
                 time.sleep(sleep_time)

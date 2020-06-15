@@ -54,6 +54,11 @@ MATCHED_TO_EMPTY_SET = Counter(MATCHED_TO_EMPTY_SET_METRIC_NAME,
                                'returns an empty result',
                                ['source'])
 
+SCENARIO_RUNS_METRIC_NAME = 'seal_scenario_runs_total'
+SCENARIO_RUNS_TOTAL = Counter(SCENARIO_RUNS_METRIC_NAME,
+                           'Counter of runs of scenarios (both success and failure)',
+                           ['name', 'result'])
+
 
 class PrometheusCollector(AbstractCollector):
     def __init__(self):
@@ -86,3 +91,7 @@ class PrometheusCollector(AbstractCollector):
 
     def add_matched_to_empty_set_metric(self, source):
         MATCHED_TO_EMPTY_SET.labels(source).inc()
+
+    def add_scenario_counter_metric(self, name, result):
+        res = "success" if result else "fail"
+        SCENARIO_RUNS_TOTAL.labels(name, name, res).inc()

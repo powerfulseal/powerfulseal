@@ -46,6 +46,9 @@ definitions:
       runStrategy:
         type: object
         "$ref": "#/definitions/runStrategy"
+      exitStrategy:
+        type: object
+        "$ref": "#/definitions/exitStrategy"
 
   runStrategy:
     description: "Configure how the scenarios are run"
@@ -81,6 +84,22 @@ definitions:
         type: number
         minimum: 0
         default: 300
+
+  exitStrategy:
+    description: "Configure how exit is configured"
+    type: object
+    additionalProperties: false
+    properties:
+      strategy:
+        type: string
+        description: >
+          Affects what PowerfulSeal does when errors occur.
+          The default `report` logs an error message, updates metrics and carries on.
+          `fail-fast` fails and exits immediately on first exit (useful when running as a job).
+        default: report
+        enum:
+        - report
+        - fail-fast
 
   scenario:
     description: >
@@ -238,6 +257,18 @@ definitions:
             description:
               When set to true, all the `kubectl apply` commands will be `kubectl delete`ed at the end of the scenario.
             default: true
+          proxy:
+            type: string
+            description: >
+              Proxy to use with the kubectl command.
+              If not set no proxy will be used.
+              NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.
+            default: ""
+          kubectlBinary:
+            type: string
+            description: >
+              The path to the binary of kubectl.
+            default: "kubectl"
         required:
         - action
         - payload
@@ -330,6 +361,12 @@ definitions:
               Proxy to use with the requests.
               If not set no proxy will be used.
               NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.
+          insecure:
+            type: boolean
+            description: >
+              If you'd like to skip the SSL validation.
+              For example for self-signed certs.
+            default: false
         required:
         - target
     required:
@@ -571,6 +608,11 @@ definitions:
         properties:
           force:
             type: boolean
+          autoRestart:
+            type: boolean
+            description:
+              When set to true, the node will be restarted at the end of the scenario.
+            default: true
     required:
     - stop
 

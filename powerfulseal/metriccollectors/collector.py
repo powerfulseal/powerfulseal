@@ -58,3 +58,7 @@ class AbstractCollector(ABC):
     @abstractmethod
     def add_matched_to_empty_set_metric(self, source):
         pass  # pragma: nocover
+
+    @abstractmethod
+    def add_scenario_counter_metric(self, name, result):
+        pass  # pragma: nocover

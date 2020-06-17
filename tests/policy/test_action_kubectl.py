@@ -15,8 +15,11 @@
 
 
 import random
+import subprocess
+import os
+
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 
 
 # noinspection PyUnresolvedReferences
@@ -24,8 +27,16 @@ from tests.fixtures import action_kubectl
 
 
 def test_creates_cleanup_action(action_kubectl):
+    action_kubectl.schema["action"] = "apply"
     action_kubectl.schema["autoDelete"] = True
-    action_kubectl.execute()
+
+    process = MagicMock()
+    process.returncode = 0
+    mock_run = MagicMock(return_value=process)
+    with patch("subprocess.run", mock_run):
+        assert action_kubectl.execute()
+
+    assert mock_run.call_count == 1
     cleanup = action_kubectl.get_cleanup_actions()
     assert len(cleanup) == 1
     job = cleanup[0]
@@ -33,10 +44,56 @@ def test_creates_cleanup_action(action_kubectl):
     assert job.schema is not action_kubectl.schema
     assert job.schema["payload"] == action_kubectl.schema["payload"]
     assert job.schema["action"] == "delete"
-    assert job.schema["autoDelete"] == False
+
+def test_creates_cleanup_action_failure(action_kubectl):
+    action_kubectl.schema["action"] = "apply"
+    action_kubectl.schema["autoDelete"] = True
+
+    process = MagicMock()
+    process.returncode = 1
+    mock_run = MagicMock(return_value=process)
+    with patch("subprocess.run", mock_run):
+        assert not action_kubectl.execute()
+
+    assert mock_run.call_count == 1
+    cleanup = action_kubectl.get_cleanup_actions()
+    assert len(cleanup) == 1
+    job = cleanup[0]
+    assert job is not action_kubectl
+    assert job.schema is not action_kubectl.schema
+    assert job.schema["payload"] == action_kubectl.schema["payload"]
+    assert job.schema["action"] == "delete"
 
 
 def test_doesnt_create_cleanup_action(action_kubectl):
     action_kubectl.schema["autoDelete"] = False
     action_kubectl.execute()
     assert action_kubectl.get_cleanup_actions() == []
+
+
+def test_passes_http_proxy(action_kubectl):
+    proxy_value = "someproxy.com:8080"
+    action_kubectl.schema["proxy"] = proxy_value
+    action_kubectl.schema["action"] = "apply"
+    action_kubectl.schema["payload"] = "payload"
+    mock_run = MagicMock()
+
+    with patch("subprocess.run", mock_run):
+        action_kubectl.execute()
+
+    assert mock_run.call_count == 1
+    args = mock_run.call_args
+    env = os.environ.copy()
+    env["HTTP_PROXY"] = proxy_value
+    env["HTTPS_PROXY"] = proxy_value
+    env["http_proxy"] = proxy_value
+    env["https_proxy"] = proxy_value
+    assert args.args == ('kubectl apply -f -',)
+    assert args.kwargs == dict(
+        input="payload",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
+        text=True,
+        env=env
+    )

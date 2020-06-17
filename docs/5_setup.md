@@ -50,6 +50,32 @@ If you're running outside of your cluster, the setup will involve:
 It should look something like [this](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/setup.png).
 
 
+## Kubectl
+
+The `powerfulseal` image packages a `kubectl` binary to execute the `kubectl` actions with.
+When executing the commands, the `http{s}_proxy` variables are overwritten by the contents of the `proxy` parameter from inside of the scenario.
+
+If you exec into the pod, you can `kubectl` directly, using the same RBAC permissions.
+
+For example, in the [./kubernetes](https://github.com/bloomberg/powerfulseal/tree/master/kubernetes) contains RBAC which allows the seal to:
+
+- read from all namespaces
+- delete pods in all namespaces
+- do everything inside of the special `powerfulseal-sandbox` namespace
+  - all creation of new pods will need to happen inside of that namespace
+
+
+### `kubectl` action permissions
+
+Remember, that in order to be able to execute the `kubectl` action payloads, you're going to need to give you pod necessary permissions.
+
+
+
+## Exec-ing into a running pod
+
+If you have a running `powerfulseal` pod executing scenario, you can always `kubectl exec -ti ps-pod -- bash` and then run `powerfulseal interactive` from inside of it.
+
+
 ## Cloud drivers
 
 In order to interact with VMs, you're going to need to configure a cloud driver. [Learn more](./cloud-provider-requirements)

@@ -62,7 +62,7 @@ def no_filtered_items_scenario():
 
 # Pod ActionNodesPods Fixtures
 EXAMPLE_POD_SCHEMA = {
-    "match": [
+    "matches": [
         {
             "property": {
                 "name": "attr",
@@ -89,7 +89,7 @@ def pod_scenario():
 
 # Node ActionNodesPods Fixtures
 EXAMPLE_NODE_SCHEMA = {
-    "match": [
+    "matches": [
         {
             "property": {
                 "name": "attr",

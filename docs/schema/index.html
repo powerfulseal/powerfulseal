@@ -29,7 +29,48 @@
                 <span class="badge badge-dark value-type">Type: object</span><span class="description"><p>General configuration of this policy.</p>
 </span>
 
-            <div class="accordion" id="accordionconfig__runStrategy">
+            <div class="accordion" id="accordionconfig__exitStrategy">
+        <div class="card">
+            <div class="card-header" id="headingconfig__exitStrategy">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#config__exitStrategy"
+                            aria-expanded="False" aria-controls="config__exitStrategy" onclick="setAnchor('#config__exitStrategy')"><span class="property-name">exitStrategy</span></button>
+                </h2>
+            </div>
+
+            <div id="config__exitStrategy"
+                 class="collapse property-definition-div" aria-labelledby="headingconfig__exitStrategy"
+                 data-parent="#accordionconfig__exitStrategy">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: object</span><span class="description"><p>Configure how exit is configured</p>
+</span>
+
+            <div class="accordion" id="accordionconfig__exitStrategy__strategy">
+        <div class="card">
+            <div class="card-header" id="headingconfig__exitStrategy__strategy">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#config__exitStrategy__strategy"
+                            aria-expanded="False" aria-controls="config__exitStrategy__strategy" onclick="setAnchor('#config__exitStrategy__strategy')"><span class="property-name">strategy</span></button>
+                </h2>
+            </div>
+
+            <div id="config__exitStrategy__strategy"
+                 class="collapse property-definition-div" aria-labelledby="headingconfig__exitStrategy__strategy"
+                 data-parent="#accordionconfig__exitStrategy__strategy">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: enum (of string)</span> <span class="badge badge-success default-value">Default: "report"</span><span class="description"><p>Affects what PowerfulSeal does when errors occur. The default <code>report</code> logs an error message, updates metrics and carries on. <code>fail-fast</code> fails and exits immediately on first exit (useful when running as a job).</p>
+</span>
+
+            <div class="enum-value" id="config__exitStrategy__strategy_enum">
+                <h4>Must be one of:</h4>
+                <ul class="list-group"><li class="list-group-item">"report"</li><li class="list-group-item">"fail-fast"</li></ul>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionconfig__runStrategy">
         <div class="card">
             <div class="card-header" id="headingconfig__runStrategy">
                 <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#config__runStrategy"
@@ -408,6 +449,25 @@
               </div>
             </div>
         </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option1__probeHTTP__insecure">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option1__probeHTTP__insecure">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option1__probeHTTP__insecure"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option1__probeHTTP__insecure" onclick="setAnchor('#scenarios_array_items__steps_array_items__option1__probeHTTP__insecure')"><span class="property-name">insecure</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option1__probeHTTP__insecure"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option1__probeHTTP__insecure"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option1__probeHTTP__insecure">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: boolean</span> <span class="badge badge-success default-value">Default: false</span><span class="description"><p>If you'd like to skip the SSL validation. For example for self-signed certs.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
     </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option1__probeHTTP__method">
         <div class="card">
             <div class="card-header" id="headingscenarios_array_items__steps_array_items__option1__probeHTTP__method">
@@ -705,6 +765,25 @@
               </div>
             </div>
         </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary" onclick="setAnchor('#scenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary')"><span class="property-name">kubectlBinary</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option2__kubectl__kubectlBinary">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: string</span> <span class="badge badge-success default-value">Default: "kubectl"</span><span class="description"><p>The path to the binary of kubectl.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
     </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option2__kubectl__payload">
         <div class="card">
             <div class="card-header" id="headingscenarios_array_items__steps_array_items__option2__kubectl__payload">
@@ -718,6 +797,25 @@
                  data-parent="#accordionscenarios_array_items__steps_array_items__option2__kubectl__payload">
               <div class="card-body">
                 <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>Free-form, kubectl-compatible payload, which will be passed to kubectl as is.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option2__kubectl__proxy">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option2__kubectl__proxy">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option2__kubectl__proxy"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option2__kubectl__proxy" onclick="setAnchor('#scenarios_array_items__steps_array_items__option2__kubectl__proxy')"><span class="property-name">proxy</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option2__kubectl__proxy"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option2__kubectl__proxy"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option2__kubectl__proxy">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: string</span> <span class="badge badge-success default-value">Default: ""</span><span class="description"><p>Proxy to use with the kubectl command. If not set no proxy will be used. NOTE, that the probe ignores (and overrides) HTTP{S}_PROXY envvars.</p>
 </span>
 
             
@@ -1609,7 +1707,26 @@
               <div class="card-body">
                 <span class="badge badge-dark value-type">Type: object</span>
 
-            <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__force">
+            <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart" onclick="setAnchor('#scenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart')"><span class="property-name">autoRestart</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__autoRestart">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: boolean</span> <span class="badge badge-success default-value">Default: true</span><span class="description"><p>When set to true, the node will be restarted at the end of the scenario.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__force">
         <div class="card">
             <div class="card-header" id="headingscenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__force">
                 <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option4__nodeAction__actions_array_items__option2__stop__force"

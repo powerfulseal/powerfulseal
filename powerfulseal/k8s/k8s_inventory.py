@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from powerfulseal import makeLogger
 from datetime import datetime
 from .pod import Pod
+import re
 
 
 def get_status(status):
@@ -47,6 +47,17 @@ class K8sInventory():
             return False
         return True
 
+    def get_regex_namespaces(self, regex):
+        namespaces = []
+        for item in self.k8s_client.list_namespaces():
+            expr = re.compile(regex, re.IGNORECASE)
+            if expr:
+                regex_any_match = expr.search(str(item.metadata.name))
+                # Make sure search is not not and see if full match is equal to regex string
+                if regex_any_match:
+                    namespaces.append(item.metadata.name)
+        return namespaces
+
     def preprocess_namespace(self, namespace):
         # Check if namespace is None instead of using "or" as Kubernetes treats
         # an empty string as the */all wildcard
@@ -56,6 +67,8 @@ class K8sInventory():
             namespaces = ["default"]
         elif namespace == "*":
             namespaces = [""]
+        elif "*" in namespace:
+            namespaces = self.get_regex_namespaces(namespace)
         elif sep in namespace:
             namespaces = namespace.split(sep)
         else:
@@ -74,7 +87,7 @@ class K8sInventory():
         namespaces = []
         try:
             for item in self.k8s_client.list_namespaces():
-                namespaces.append(item.metadata.name )
+                namespaces.append(item.metadata.name)
         except Exception as e:
             self.logger.exception(e)
         self._cache_namespaces = namespaces
@@ -119,7 +132,7 @@ class K8sInventory():
                             for status in item.status.container_statuses:
                                 container_ids.append(status.container_id)
                                 restart_count.append(status.restart_count)
-                        
+
                         pod_objects.append(Pod(
                             num=i,
                             name=item.metadata.name,

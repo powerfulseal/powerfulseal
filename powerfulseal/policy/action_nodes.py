@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from powerfulseal.metriccollectors.collector import NODE_SOURCE
 from .action_nodes_pods import ActionNodesPods
 
@@ -34,10 +35,12 @@ class ActionNodes(ActionNodesPods):
             "wait": self.action_wait,
             "execute": self.action_execute,
         }
+        self.cleanup_actions = []
 
     def match(self):
         """ Makes a union of all the nodes matching any of the policy criteria.
         """
+        self.inventory.sync()
         selected_nodes = set()
         criteria = self.schema.get("matches", [])
         for node in self.inventory.find_nodes():
@@ -66,11 +69,32 @@ class ActionNodes(ActionNodesPods):
     def action_stop(self, items, params):
         """ Action to stop a node.
         """
+        auto_restart = params.get("autoRestart", True)
         success = True
         for item in items:
             self.logger.info("Action stop on %r", item)
             try:
                 self.driver.stop(item)
+                if auto_restart:
+                    schema = dict()
+                    schema["matches"] = self.schema.get("matches", {})
+                    schema["filters"] = [
+                        dict(property=dict(
+                            name="state",
+                            value="DOWN"
+                        ))
+                    ]
+                    schema["actions"] = [
+                        dict(start=dict())
+                    ]
+                    start = ActionNodes(
+                        name=self.name,
+                        schema=schema,
+                        inventory=self.inventory,
+                        driver=self.driver,
+                        executor=self.executor
+                    )
+                    self.cleanup_actions.append(start)
                 self.metric_collector.add_node_stopped_metric(item)
             except:
                 self.metric_collector.add_node_stop_failed_metric(item)
@@ -93,3 +117,6 @@ class ActionNodes(ActionNodesPods):
                     self.metric_collector.add_execute_failed_metric(item)
                     success = False
         return success
+
+    def get_cleanup_actions(self):
+        return self.cleanup_actions

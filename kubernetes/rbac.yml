@@ -1,10 +1,26 @@
 ---
+# this is the namespace where the powerfulseal will live
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: powerfulseal
+---
+# this is the namespace where powerfulseal will create things
+# it will have full power over this namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: powerfulseal-sandbox
+
+# the service account to read from all namespaces
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  labels:
-    app: powerfulseal
   name: powerfulseal
+  namespace: powerfulseal
+
+# cluster role to read things and delete pods in all namespaces
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -31,19 +47,57 @@ rules:
   resources:
   - namespaces
   - deployments
+  - services
   verbs:
   - get
   - list
+- apiGroups:
+  - "apps"
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+# bind the cluster role to the service account
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: powerfulseal
+subjects:
+  - kind: ServiceAccount
+    name: powerfulseal
+    namespace: powerfulseal
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: powerfulseal
+
+# role to do all and anything in powerfulseal-sandbox
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: powerfulseal-sandbox
+  namespace: powerfulseal-sandbox
+rules:
+  - apiGroups:
+    - '*'
+    resources:
+    - '*'
+    verbs:
+    - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: powerfulseal-sandbox
+  namespace: powerfulseal-sandbox
 subjects:
-- kind: ServiceAccount
-  name: powerfulseal
-  namespace: default
+  - kind: ServiceAccount
+    name: powerfulseal
+    namespace: powerfulseal
+roleRef:
+  kind: Role
+  name: powerfulseal-sandbox
+  apiGroup: rbac.authorization.k8s.io

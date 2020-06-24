@@ -73,10 +73,10 @@ class ActionProbeHTTP(ActionAbstract):
             headers[header["name"]] = header["value"]
         return headers
 
-    def make_call(self, url, method, body, headers, timeout, code, proxy):
+    def make_call(self, url, method, body, headers, timeout, code, proxy, verify):
         self.logger.info(
-            "Making a call: %s, %s, %r, %d, %d, %s",
-            url, method, headers, timeout, code, body
+            "Making a call: %s, %s, %r, %d, %d, %s, %s, %s",
+            url, method, headers, timeout, code, body, proxy, verify
         )
         try:
             resp = requests.request(
@@ -89,6 +89,7 @@ class ActionProbeHTTP(ActionAbstract):
                     http=proxy or "",
                     https=proxy or "",
                 ),
+                verify=verify,
             )
             resp.raise_for_status()
             self.logger.info("Response: %s", resp.text)
@@ -109,6 +110,7 @@ class ActionProbeHTTP(ActionAbstract):
         timeout = self.schema.get("timeout", 1000)
         code = self.schema.get("code", 200)
         proxy = self.schema.get("proxy", "")
+        insecure = self.schema.get("insecure", False)
 
         for _ in range(count):
             for retry in range(retries):
@@ -120,6 +122,7 @@ class ActionProbeHTTP(ActionAbstract):
                     timeout=timeout,
                     code=code,
                     proxy=proxy,
+                    verify=not insecure
                 )
                 if not success:
                     # if we've reached the limit, the answer is no

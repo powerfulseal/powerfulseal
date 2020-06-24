@@ -49,6 +49,12 @@ def test_node_repr(node):
         assert key in rep
         assert str(val) in rep
 
+def test_node_state(node):
+    node.state = NodeState.UP
+    assert str(node.state) == "UP"
+    node.state = NodeState.DOWN
+    assert str(node.state) == "DOWN"
+
 @pytest.mark.parametrize("state", [
     "UP",
     "up",

@@ -10,6 +10,8 @@ NODE_STOPS_METRIC_NAME = 'powerfulseal.nodes_stopped_total'
 NODE_STOPS = ['status:', 'id:', 'name:']
 EXECUTE_FAILED_METRIC_NAME = 'powerfulseal.execute_failed_total'
 EXECUTE_FAILURES = ['id:', 'name:']
+SCENARIO_RUNS_METRIC_NAME = 'powerfulseal.scenario_runs_total'
+SCENARIO_RUNS = ['name:', 'result:']
 FILTERED_TO_EMPTY_SET_METRIC_NAME = 'powerfulseal.empty_filter_total'
 PROBABILITY_FILTER_NOT_PASSED_METRIC_NAME = 'powerfulseal.probability_filter_not_passed_total'
 MATCHED_TO_EMPTY_SET_METRIC_NAME = 'powerfulseal.empty_match_total'
@@ -54,3 +56,8 @@ class DatadogCollector(AbstractCollector):
     def add_matched_to_empty_set_metric(self, source):
         statsd.increment(MATCHED_TO_EMPTY_SET_METRIC_NAME,
                          tags=name_tags(MATCHED_TO_EMPTY_SET, [source]))
+
+    def add_scenario_counter_metric(self, name, result):
+        res = "success" if result else "fail"
+        statsd.increment(SCENARIO_RUNS_METRIC_NAME, tags=name_tags(
+            SCENARIO_RUNS, [name, res]))

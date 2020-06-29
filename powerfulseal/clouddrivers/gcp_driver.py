@@ -17,7 +17,7 @@ def create_connection_from_config():
     """
     credentials = ServiceAccountCredentials.get_application_default()
     return googleapiclient.discovery.build(
-        'compute', 'v1', credentials=credentials)
+        'compute', 'v1', credentials=credentials,cache_discovery=False)
 
 
 def get_all_ips(instance):

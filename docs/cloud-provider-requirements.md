@@ -51,7 +51,7 @@ For being able to run node related commands, credentials have to be specified in
 2. User account: Not recommended as you can reach easily reach a "quota exceeded" or "API not enabled" error. ```PowerfulSeal``` uses auto-discovery and to get it working just follow [this](https://cloud.google.com/docs/authentication/end-user).
 
 Having configuration ready and ssh connection to the node instances working, you can start playing with ```PowerfulSeal``` with this example:
-```powerfulseal interactive --kubeconfig ~/.kube/config --gcp --inventory-kubernetes --ssh-allow-missing-host-keys --ssh-path-to-private-key ~/.ssh/google_compute_engine --remote-user myuser```
+```powerfulseal interactive --gcp  --ssh-allow-missing-host-keys --ssh-path-to-private-key ~/.ssh/google_compute_engine --remote-user myuser```
 
 > Note: In case of running inside Pyenv and getting ```python2 command not found``` error when running gcloud (and you want to run ```PowerfulSeal``` with Python 3+), [this](https://github.com/pyenv/pyenv/issues/1159#issuecomment-453906182) might be useful, as gcloud requires Python2.
 

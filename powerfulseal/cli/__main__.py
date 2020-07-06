@@ -210,7 +210,7 @@ def add_policy_options(parser):
     args.add_argument('--policy-file',
         default=os.environ.get("POLICY_FILE"),
         help='the policy file to run',
-        required=True
+        required=False
     )
 
 def add_run_options(parser):
@@ -285,6 +285,22 @@ def check_valid_port(value):
         raise argparse.ArgumentTypeError("%s is an invalid port number" % value)
     return parsed
 
+
+def load_policy_fn(policy_file, k8s_client, logger):
+    def load_policy():
+        if policy_file is None:
+            policy = {"scenarios": []}
+        else:
+            policy = PolicyRunner.load_file(policy_file)
+
+        # Load scenarios from K8S crd extending file scenarios
+        scenarios = k8s_client.get_scenarios()
+        policy['scenarios'].extend(scenarios)
+        if not PolicyRunner.is_policy_valid(policy):
+            logger.error("Policy not valid. See log output above.")
+            return sys.exit(1)
+        return policy
+    return load_policy
 
 def parse_args(args):
     parser = ArgumentParser(
@@ -605,11 +621,7 @@ def main(argv):
     ##########################################################################
     if args.mode == 'autonomous':
 
-        # read and validate the policy
-        policy = PolicyRunner.load_file(args.policy_file)
-        if not PolicyRunner.is_policy_valid(policy):
-            logger.error("Policy not valid. See log output above.")
-            return sys.exit(1)
+        policy_loader = load_policy_fn(args.policy_file, k8s_client, logger)
 
         # run the metrics server if requested
         if not args.headless:
@@ -618,7 +630,7 @@ def main(argv):
             start_server(
                 host=args.host,
                 port=args.port,
-                policy=policy,
+                policy_loader_fn=policy_loader,
                 accept_proxy_headers=args.accept_proxy_headers,
                 logger=server_log_handler,
             )
@@ -627,7 +639,7 @@ def main(argv):
 
         logger.info("STARTING AUTONOMOUS MODE")
         success = PolicyRunner.run(
-            policy,
+            policy_loader,
             inventory,
             k8s_inventory,
             driver,

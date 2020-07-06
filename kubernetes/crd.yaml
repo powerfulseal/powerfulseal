@@ -1,0 +1,748 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: scenarios.powerfulseal.io
+spec:
+  group: powerfulseal.io
+  version: v1
+  scope: Namespaced
+  names:
+    plural: scenarios
+    singular: scenario
+    kind: Scenario
+    shortNames:
+      - scenario
+  versions:
+    - name: v1
+      served: true
+      storage: true
+  validation:
+    openAPIV3Schema:
+      type: object
+      required:
+        - spec
+      properties:
+        spec:
+          type: object
+          description: >
+            A scenario contains all the steps necessary to prepare, implement
+            and validate a chaos engineering experiment.
+          properties:
+            name:
+              type: string
+              description: >
+                A brief, descriptive name of the scenario. Will be used to
+                identify the scenario in logs.
+              minLength: 3
+              maxLength: 80
+            description:
+              type: string
+              description: >
+                A longer description, helping to understand what the scenario is
+                doing when reading the yaml file. Optional.
+            steps:
+              type: array
+              description: >
+                The sequence of events to prepare, validate, execute and analyse
+                the chaos engineering experiment.
+              items:
+                oneOf:
+                  - description: |
+                      Issue an HTTP request and validate the response.
+                    type: object
+                    properties:
+                      probeHTTP:
+                        type: object
+                        properties:
+                          target:
+                            type: object
+                            oneOf:
+                              - type: object
+                                description: |
+                                  A target of a static URL.
+                                properties:
+                                  url:
+                                    type: string
+                                    description: >
+                                      The fully qualified url to issue the
+                                      request to. For example:
+                                      `http://example.com`.
+                                required:
+                                  - url
+                              - type: object
+                                description: >
+                                  Target the given `Kubernetes` service in a
+                                  given namespace. It will use directly the IP
+                                  of the given service, so make sure it
+                                  resolves.
+                                properties:
+                                  service:
+                                    type: object
+                                    properties:
+                                      name:
+                                        type: string
+                                        description: |
+                                          Name of the kubernetes service.
+                                      namespace:
+                                        type: string
+                                        description: |
+                                          Namespace of the kubernetes service.
+                                      port:
+                                        type: number
+                                        minimum: 1
+                                        maximum: 65535
+                                        description: >
+                                          Port number to hit. Independent of what
+                                          the service defines.
+                                      protocol:
+                                        type: string
+                                        enum:
+                                          - http
+                                          - https
+                                        description: |
+                                          Protocol to use for the probe.
+                                    required:
+                                      - name
+                                      - namespace
+                                required:
+                                  - service
+                          retries:
+                            type: number
+                            description: >
+                              Number of retries before failing the probe.
+                              Ignored, if there are no errors on the probe.
+                            minimum: 1
+                          delay:
+                            type: number
+                            description: |
+                              Delay in ms between retries.
+                            minimum: 1
+                          timeout:
+                            type: number
+                            description: |
+                              Request timeout in ms.
+                            minimum: 1
+                          code:
+                            type: number
+                            description: |
+                              Expected status code.
+                            minimum: 1
+                            maximum: 599
+                          count:
+                            type: number
+                            description: |
+                              Number of requests to make.
+                            minimum: 1
+                          endpoint:
+                            type: string
+                            description: >
+                              Endpoint to add to the url. For example
+                              `/healthz`. Works for both url and service.
+                          method:
+                            type: string
+                            description: |
+                              HTTP method to use.
+                            enum:
+                              - get
+                              - post
+                              - patch
+                              - head
+                              - delete
+                          body:
+                            type: string
+                            description: |
+                              Body of the HTTP request.
+                          headers:
+                            description: |
+                              Give any additional headers to the request.
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                value:
+                                  type: string
+                          proxy:
+                            type: string
+                            description: >
+                              Proxy to use with the requests. If not set no
+                              proxy will be used. NOTE, that the probe ignores
+                              (and overrides) HTTP{S}_PROXY envvars.
+                          insecure:
+                            type: boolean
+                            description: >
+                              If you'd like to skip the SSL validation. For
+                              example for self-signed certs.
+                        required:
+                          - target
+                    required:
+                      - probeHTTP
+                  - description: >
+                      Allows to execute a `kubectl apply` or `kubectl delete`
+                      command as part of the scenario.
+                    type: object
+                    properties:
+                      kubectl:
+                        type: object
+                        properties:
+                          action:
+                            type: string
+                            enum:
+                              - apply
+                              - delete
+                          payload:
+                            type: string
+                            description: >
+                              Free-form, kubectl-compatible payload, which will
+                              be passed to kubectl as is.
+                          autoDelete:
+                            type: boolean
+                            description: >-
+                              When set to true, all the `kubectl apply` commands
+                              will be `kubectl delete`ed at the end of the
+                              scenario.
+                          proxy:
+                            type: string
+                            description: >
+                              Proxy to use with the kubectl command. If not set
+                              no proxy will be used. NOTE, that the probe
+                              ignores (and overrides) HTTP{S}_PROXY envvars.
+                          kubectlBinary:
+                            type: string
+                            description: |
+                              The path to the binary of kubectl.
+                        required:
+                          - action
+                          - payload
+                    required:
+                      - kubectl
+                  - description: >
+                      Match, filter and action on pods in your kubernetes
+                      cluster. Matchers create the initial set. That set is
+                      de-duplicated and passed on to the filters. Filters can
+                      exclude items. Whatever is passed through the filters will
+                      then be actioned with every action in the action array.
+                      See below for the details of the configuration available.
+                    type: object
+                    properties:
+                      podAction:
+                        type: object
+                        properties:
+                          matches:
+                            type: array
+                            description: >
+                              An array of match criteria to select a set of
+                              pods. Will be deduplicated.
+                            items:
+                              oneOf:
+                                - type: object
+                                  description: >
+                                    Pick all pods for a deployment in a
+                                    namespace.
+                                  properties:
+                                    namespace:
+                                      type: string
+                                  required:
+                                    - namespace
+                                - type: object
+                                  description: >
+                                    Pick all pods for a deployment in a
+                                    namespace.
+                                  properties:
+                                    deployment:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                        namespace:
+                                          type: string
+                                      required:
+                                        - name
+                                        - namespace
+                                  required:
+                                    - deployment
+                                - type: object
+                                  description: >
+                                    Pick all pods matching the particular set of
+                                    labels in a namespace.
+                                  properties:
+                                    labels:
+                                      type: object
+                                      properties:
+                                        selector:
+                                          type: string
+                                        namespace:
+                                          type: string
+                                      required:
+                                        - selector
+                                        - namespace
+                                  required:
+                                    - labels
+                          filters:
+                            type: array
+                            description: >
+                              An array of filters to only select certain pods
+                              from the initial set.
+                            items:
+                              type: object
+                              oneOf:
+                                - type: object
+                                  description: |
+                                    Select pods by property values.
+                                  properties:
+                                    property:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                          enum:
+                                            - name
+                                            - state
+                                        value:
+                                          type: string
+                                        negative:
+                                          type: boolean
+                                          description: >-
+                                            Set to true to negate the match (logical
+                                            NOT)
+                                      required:
+                                        - name
+                                        - value
+                                  required:
+                                    - property
+                                - type: object
+                                  description: >
+                                    Only pass the filter during specific time of
+                                    the day and week.
+                                  properties:
+                                    dayTime:
+                                      type: object
+                                      properties:
+                                        onlyDays:
+                                          type: array
+                                          items:
+                                            type: string
+                                            enum:
+                                              - monday
+                                              - tuesday
+                                              - wednesday
+                                              - thursday
+                                              - friday
+                                              - saturday
+                                              - sunday
+                                        startTime:
+                                          type: object
+                                          description: >
+                                            Describes a time of the day, in the
+                                            local timezone.
+                                          properties:
+                                            hour:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 23
+                                            minute:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                            second:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                          required:
+                                            - hour
+                                            - minute
+                                            - second
+                                        endTime:
+                                          type: object
+                                          description: >
+                                            Describes a time of the day, in the
+                                            local timezone.
+                                          properties:
+                                            hour:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 23
+                                            minute:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                            second:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                          required:
+                                            - hour
+                                            - minute
+                                            - second
+                                      required:
+                                        - onlyDays
+                                        - startTime
+                                        - endTime
+                                  required:
+                                    - dayTime
+                                - type: object
+                                  description: >
+                                    Take a random sample. Either a specific size
+                                    (up to N), or a ratio (0.5 == 50%) of the
+                                    initial size.
+                                  properties:
+                                    randomSample:
+                                      type: object
+                                      properties:
+                                        size:
+                                          type: number
+                                          minimum: 1
+                                        ratio:
+                                          type: number
+                                          minimum: 0
+                                          maximum: 1
+                                  required:
+                                    - randomSample
+                                - type: object
+                                  description: >
+                                    Only pass the filter with a desired
+                                    probability.
+                                  properties:
+                                    probability:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 1
+                                  required:
+                                    - probability
+                          actions:
+                            type: array
+                            description: >
+                              An array of actions to be applied to each pod from
+                              the set.
+                            items:
+                              type: object
+                              oneOf:
+                                - type: object
+                                  description: |
+                                    Kill a pod.
+                                  properties:
+                                    kill:
+                                      type: object
+                                      properties:
+                                        probability:
+                                          type: number
+                                          minimum: 0
+                                          maximum: 1
+                                        force:
+                                          type: boolean
+                                  required:
+                                    - kill
+                                - type: object
+                                  description: |
+                                    Wait some seconds.
+                                  properties:
+                                    wait:
+                                      type: object
+                                      properties:
+                                        seconds:
+                                          type: number
+                                          minimum: 0
+                                      required:
+                                        - seconds
+                                  required:
+                                    - wait
+                                - type: object
+                                  description: >
+                                    Check that all pods are in the desired
+                                    state, fail otherwise.
+                                  properties:
+                                    checkPodState:
+                                      type: object
+                                      properties:
+                                        state:
+                                          description: >
+                                            Status, as returned by kubernetes
+                                            (`Running`, `Terminating`, etc).
+                                          type: string
+                                      required:
+                                        - state
+                                  required:
+                                    - checkPodState
+                                - type: object
+                                  description: >
+                                    Count the pods and fail if they don't match
+                                    the desired number.
+                                  properties:
+                                    checkPodCount:
+                                      type: object
+                                      properties:
+                                        count:
+                                          type: number
+                                      required:
+                                        - count
+                                  required:
+                                    - checkPodCount
+                        required:
+                          - matches
+                          - actions
+                    required:
+                      - podAction
+                  - description: >
+                      Match, filter and action on nodes in your kubernetes
+                      cluster. It can integrate with your cloud provider and
+                      take nodes up and down to simulate VMs going down. If
+                      you're running in SSH mode, it can also execute various
+                      commands on hosts. And much more! See below for mode
+                      details.
+                    type: object
+                    properties:
+                      nodeAction:
+                        type: object
+                        properties:
+                          matches:
+                            type: array
+                            description: >
+                              An array of match criteria to select a set of
+                              nodes. Will be deduplicated.
+                            items:
+                              oneOf:
+                                - type: object
+                                  description: |
+                                    Select nodes by property values.
+                                  properties:
+                                    property:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                          enum:
+                                            - name
+                                            - ip
+                                            - group
+                                            - az
+                                            - state
+                                        value:
+                                          type: string
+                                        negative:
+                                          type: boolean
+                                          description: >-
+                                            Set to true to negate the match (logical
+                                            NOT)
+                                      required:
+                                        - name
+                                        - value
+                                  required:
+                                    - property
+                          filters:
+                            type: array
+                            description: >
+                              An array of filters, which will be applied in the
+                              defined order.
+                            items:
+                              type: object
+                              oneOf:
+                                - type: object
+                                  description: |
+                                    Select nodes by property values.
+                                  properties:
+                                    property:
+                                      type: object
+                                      properties:
+                                        name:
+                                          type: string
+                                          enum:
+                                            - name
+                                            - ip
+                                            - group
+                                            - az
+                                            - state
+                                        value:
+                                          type: string
+                                        negative:
+                                          type: boolean
+                                          description: >-
+                                            Set to true to negate the match (logical
+                                            NOT)
+                                      required:
+                                        - name
+                                        - value
+                                  required:
+                                    - property
+                                - type: object
+                                  description: >
+                                    Only pass the filter during specific time of
+                                    the day and week.
+                                  properties:
+                                    dayTime:
+                                      type: object
+                                      properties:
+                                        onlyDays:
+                                          type: array
+                                          items:
+                                            type: string
+                                            enum:
+                                              - monday
+                                              - tuesday
+                                              - wednesday
+                                              - thursday
+                                              - friday
+                                              - saturday
+                                              - sunday
+                                        startTime:
+                                          type: object
+                                          description: >
+                                            Describes a time of the day, in the
+                                            local timezone.
+                                          properties:
+                                            hour:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 23
+                                            minute:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                            second:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                          required:
+                                            - hour
+                                            - minute
+                                            - second
+                                        endTime:
+                                          type: object
+                                          description: >
+                                            Describes a time of the day, in the
+                                            local timezone.
+                                          properties:
+                                            hour:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 23
+                                            minute:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                            second:
+                                              type: number
+                                              minimum: 0
+                                              maximum: 59
+                                          required:
+                                            - hour
+                                            - minute
+                                            - second
+                                      required:
+                                        - onlyDays
+                                        - startTime
+                                        - endTime
+                                  required:
+                                    - dayTime
+                                - type: object
+                                  description: >
+                                    Take a random sample. Either a specific size
+                                    (up to N), or a ratio (0.5 == 50%) of the
+                                    initial size.
+                                  properties:
+                                    randomSample:
+                                      type: object
+                                      properties:
+                                        size:
+                                          type: number
+                                          minimum: 1
+                                        ratio:
+                                          type: number
+                                          minimum: 0
+                                          maximum: 1
+                                  required:
+                                    - randomSample
+                                - type: object
+                                  description: >
+                                    Only pass the filter with a desired
+                                    probability.
+                                  properties:
+                                    probability:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 1
+                                  required:
+                                    - probability
+                          actions:
+                            type: array
+                            description: >
+                              An array of actions, which will be executed on
+                              each node.
+                            items:
+                              type: object
+                              oneOf:
+                                - type: object
+                                  description: |
+                                    Start a node.
+                                  properties:
+                                    start:
+                                      type: object
+                                      nullable: true
+                                  required:
+                                    - start
+                                - type: object
+                                  description: |
+                                    Stop a node.
+                                  properties:
+                                    stop:
+                                      type: object
+                                      properties:
+                                        force:
+                                          type: boolean
+                                        autoRestart:
+                                          type: boolean
+                                          description: >-
+                                            When set to true, the node will be
+                                            restarted at the end of the scenario.
+                                  required:
+                                    - stop
+                                - type: object
+                                  description: >
+                                    Executes arbitrary command on a particular
+                                    node. Use with caution.
+                                  properties:
+                                    execute:
+                                      type: object
+                                      properties:
+                                        cmd:
+                                          type: string
+                                      required:
+                                        - cmd
+                                  required:
+                                    - execute
+                                - type: object
+                                  description: |
+                                    Wait some seconds.
+                                  properties:
+                                    wait:
+                                      type: object
+                                      properties:
+                                        seconds:
+                                          type: number
+                                          minimum: 0
+                                      required:
+                                        - seconds
+                                  required:
+                                    - wait
+                        required:
+                          - matches
+                          - actions
+                    required:
+                      - nodeAction
+                  - description: |
+                      Allows to wait a number of seconds.
+                    type: object
+                    properties:
+                      wait:
+                        type: object
+                        properties:
+                          seconds:
+                            type: number
+                            minimum: 0
+                        required:
+                          - seconds
+                    required:
+                      - wait
+          required:
+            - name
+            - steps

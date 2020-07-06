@@ -27,20 +27,18 @@ Powerfulseal adds all CRD-defined scenarios to the ones defined in the policy co
 
 - Apply the rbac.yml (choose the appropriate namespace) to setup a service account with sufficient privileges
 
-  `kubectl apply -f kubernetes/bac.yml`
+  `kubectl apply -f kubernetes/rbac.yml`
 
-- Apply Powerseal deployment
+- Deploy powerful seal
   `kubectl apply -f kubernetes/powerfulseal.yml`
-
-- Deploy base powerseal configuration
-  `kubectl apply -f kubernetes/policy.yml`
 
 ## CRD Installation
 
 - Create the Custom Resource Definition
-    `kubectl apply -f kubernetes/rbac.yml`
+    `kubectl apply -f kubernetes/crd.yml`
 
-## Create a Scenario
+## Deploy Example
 
-An example scenario is provided
-    `kubectl apply -f kubernetes/scenario_example.yml`
+An example scenario is provided. This creates a sandbox namespace with 2 nginx replicas and ensures their resilience
+    `kubectl apply -f kubernetes/sandbox.yml`
+    `kubectl apply -f kubernetes/sandbox_scenario.yml`

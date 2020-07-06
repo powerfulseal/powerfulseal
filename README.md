@@ -61,9 +61,8 @@ powerfulseal autonomous --policy-file ./policy.yaml
 
 ## Installing
 
-
-- [docker hub](https://hub.docker.com/r/bloomberg/powerfulseal/tags): `pip install powerfulseal`
-- [pip](https://pypi.org/project/powerfulseal/): `docker pull bloomberg/powerfulseal:3.0.0rc9`
+- [docker hub](https://hub.docker.com/r/bloomberg/powerfulseal/tags): `docker pull bloomberg/powerfulseal:3.0.0rc9`
+- [pip](https://pypi.org/project/powerfulseal/): `pip install powerfulseal`
 
 
 ## Read about the PowerfulSeal

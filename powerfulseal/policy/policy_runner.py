@@ -50,6 +50,7 @@ class PolicyRunner():
         try:
             jsonschema.validate(policy, schema)
         except jsonschema.ValidationError as error:
+            logger.error(policy)
             logger.error(error)
             return False
         return True

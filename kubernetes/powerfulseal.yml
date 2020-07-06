@@ -6,20 +6,25 @@ metadata:
   namespace: powerfulseal
 data:
   policy.yml: |-
+    config:
+      runStrategy:
+        minSecondsBetweenRuns: 10
+        maxSecondsBetweenRuns: 10
     scenarios:
     - name: "delete a random pod in default namespace"
       steps:
-      - matches:
-        - labels:
-            namespace: "default"
-            selector: "app=hello"
-        filters:
-        - randomSample:
-            size: 1
-        actions:
-        - kill:
-            probability: 0.77
-            force: true
+      - podAction:
+          matches:
+          - labels:
+              namespace: "default"
+              selector: "app=hello"
+          filters:
+          - randomSample:
+              size: 1
+          actions:
+          - kill:
+              probability: 0.77
+              force: true
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,7 +47,8 @@ spec:
       serviceAccountName: powerfulseal
       containers:
         - name: powerfulseal
-          image: store/bloomberg/powerfulseal:3.0.0rc8
+          imagePullPolicy: Always
+          image: 445200264539.dkr.ecr.ap-southeast-2.amazonaws.com/pccs/powerfulseal:3.0.0-crd
           args:
           - autonomous
           - --policy-file=/policy.yml

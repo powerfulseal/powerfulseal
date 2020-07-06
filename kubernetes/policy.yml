@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sealpolicy
+  namespace: powerfulseal
+data:
+  policy.yml: |
+    config:
+      runStrategy:
+        minSecondsBetweenRuns: 300
+        maxSecondsBetweenRuns: 600
+    scenarios: []

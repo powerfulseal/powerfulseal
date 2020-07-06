@@ -10,7 +10,7 @@ spec:
         matches:
         - labels:
             namespace: batata
-            selector: app=batata
+            selector: app=my-app
         filters:
           - randomSample:
               size: 1
@@ -21,7 +21,7 @@ spec:
     - probeHTTP:
         target:
           service:
-            name: batata-main
+            name: my-service
             namespace: batata
             port: 9093
         endpoint: /

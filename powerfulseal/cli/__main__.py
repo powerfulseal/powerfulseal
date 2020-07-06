@@ -286,22 +286,6 @@ def check_valid_port(value):
     return parsed
 
 
-def load_policy_fn(policy_file, k8s_client, logger):
-    def load_policy():
-        if policy_file is None:
-            policy = {"scenarios": []}
-        else:
-            policy = PolicyRunner.load_file(policy_file)
-
-        # Load scenarios from K8S crd extending file scenarios
-        scenarios = k8s_client.get_scenarios()
-        policy['scenarios'].extend(scenarios)
-        if not PolicyRunner.is_policy_valid(policy):
-            logger.error("Policy not valid. See log output above.")
-            return sys.exit(1)
-        return policy
-    return load_policy
-
 def parse_args(args):
     parser = ArgumentParser(
         config_file_parser_class=YAMLConfigFileParser,
@@ -621,7 +605,7 @@ def main(argv):
     ##########################################################################
     if args.mode == 'autonomous':
 
-        policy_loader = load_policy_fn(args.policy_file, k8s_client, logger)
+        runner = PolicyRunner(args.policy_file, k8s_client, logger)
 
         # run the metrics server if requested
         if not args.headless:
@@ -630,7 +614,7 @@ def main(argv):
             start_server(
                 host=args.host,
                 port=args.port,
-                policy_loader_fn=policy_loader,
+                read_policy_fn=runner.read_policy,
                 accept_proxy_headers=args.accept_proxy_headers,
                 logger=server_log_handler,
             )
@@ -638,8 +622,7 @@ def main(argv):
             logger.info("NOT starting the UI server")
 
         logger.info("STARTING AUTONOMOUS MODE")
-        success = PolicyRunner.run(
-            policy_loader,
+        success = runner.run(
             inventory,
             k8s_inventory,
             driver,

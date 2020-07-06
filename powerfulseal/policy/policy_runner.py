@@ -15,6 +15,8 @@
 
 import random
 import time
+import sys
+import copy
 
 import jsonschema
 import yaml
@@ -31,6 +33,28 @@ class PolicyRunner():
     DEFAULT_POLICY = {
         "scenarios": []
     }
+
+    def __init__(self, config_file, k8s_client, logger=None):
+        self.config_file = config_file
+        self.k8s_client = k8s_client
+        self.logger = logger or makeLogger(__name__)
+
+    def read_policy(self):
+        """
+            Read configuration
+        """
+        if self.config_file is None:
+            policy = copy.deepcopy(PolicyRunner.DEFAULT_POLICY)
+        else:
+            policy = PolicyRunner.load_file(self.config_file)
+
+        # Load scenarios from K8S crd extending file scenarios
+        scenarios = self.k8s_client.get_scenarios()
+        policy['scenarios'].extend(scenarios)
+        if not PolicyRunner.is_policy_valid(policy):
+            self.logger.error("Policy not valid. See log output above.")
+            return sys.exit(1)
+        return policy
 
     @classmethod
     def get_schema(cls):
@@ -55,15 +79,14 @@ class PolicyRunner():
             return False
         return True
 
-    @classmethod
-    def run(cls, policy_loader, inventory, k8s_inventory, driver, executor,
+    def run(self, inventory, k8s_inventory, driver, executor,
             metric_collector=None):
         """ Runs a policy forever
         """
-        policy = policy_loader()
+        policy = self.read_policy()
         loops = policy.get("config", {}).get("runStrategy", {}).get("runs", None)
         while loops is None or loops > 0:
-            policy = policy_loader()
+            policy = self.read_policy()
             config = policy.get("config", {}).get("runStrategy", {})
             should_randomize = config.get("strategy") == "random"
             wait_min = config.get("minSecondsBetweenRuns", 0)

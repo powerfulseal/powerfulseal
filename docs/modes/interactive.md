@@ -18,5 +18,5 @@ Make sure you hit __tab__ for autocompletion - that's what really makes the seal
 
 Here's a sneak peek of what you can do in the interactive mode:
 
-[![demo nodes](./media/video-nodes.gif)](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/video-nodes.gif)
-[![demo pods](./media/video-pods.gif)](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/video-pods.gif)
+[![asciicast](https://asciinema.org/a/343525.svg)](https://asciinema.org/a/343525)
+[![asciicast](https://asciinema.org/a/337767.svg)](https://asciinema.org/a/337767)

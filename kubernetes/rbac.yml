@@ -58,6 +58,13 @@ rules:
   verbs:
   - get
   - list
+- apiGroups:
+  - "powerfulseal.io"
+  resources:
+  - scenarios
+  verbs:
+  - get
+  - list
 # bind the cluster role to the service account
 ---
 apiVersion: rbac.authorization.k8s.io/v1

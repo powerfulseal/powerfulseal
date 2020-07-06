@@ -33,6 +33,7 @@ DEFAULT_COLOR_KEYWORDS = {
     "DOWN": "red",
     "node": "blue",
     "pod": "blue",
+    "host_ip": "yellow",
     "ip": "yellow",
     "extIp": "yellow",
     "Running": "green",
@@ -53,7 +54,8 @@ def colour_output(output, extras=None):
     else:
         pattern = DEFAULT_COLOR_KEYWORDS
     for word, colour in pattern.items():
-        output = output.replace(word, colored(word, colour))
+        output = output.replace(
+            word+'=', colored(word, colour)+'=').replace('='+word, '='+colored(word, colour))
     return output
 
 def filter_text_insensitive(collection, item=None):

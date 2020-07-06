@@ -4,14 +4,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: powerfulseal
----
-# this is the namespace where powerfulseal will create things
-# it will have full power over this namespace
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: powerfulseal-sandbox
-
 # the service account to read from all namespaces
 ---
 apiVersion: v1
@@ -86,32 +78,3 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: powerfulseal
-
-# role to do all and anything in powerfulseal-sandbox
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: powerfulseal-sandbox
-  namespace: powerfulseal-sandbox
-rules:
-  - apiGroups:
-    - '*'
-    resources:
-    - '*'
-    verbs:
-    - '*'
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: powerfulseal-sandbox
-  namespace: powerfulseal-sandbox
-subjects:
-  - kind: ServiceAccount
-    name: powerfulseal
-    namespace: powerfulseal
-roleRef:
-  kind: Role
-  name: powerfulseal-sandbox
-  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: powerfulseal-sandbox
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: powerfulseal-sandbox
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: "powerfulseal.io/v1"
+kind: Scenario
+metadata:
+  name: api
+  namespace: powerfulseal-sandbox
+spec:
+    name: Kill one nginx pod in powerfulseal-sandbox, make sure the service responds
+    steps:
+    # kill a pod from `powerfulseal-sandbox` namespace
+    - podAction:
+        matches:
+        - labels:
+            namespace: powerfulseal-sandbox
+            selector: app=nginx
+        filters:
+          - randomSample:
+              size: 1
+        actions:
+          - kill:
+              probability: 1
+    # check my service continues working
+    - probeHTTP:
+        target:
+          service:
+            name: my-service
+            namespace: powerfulseal-sandbox
+            port: 80
+        endpoint: /

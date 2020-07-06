@@ -213,7 +213,6 @@ class K8sClient():
                 K8S_CRD_PLURAL)
             out = []
             for scenario in scenarios['items']:
-                self.logger.info(scenario)
                 out.append(scenario['spec'])
             return out
         except ApiException as e:

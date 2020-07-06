@@ -19,6 +19,9 @@ import kubernetes.client
 import kubernetes.config
 from kubernetes.client.rest import ApiException
 
+K8S_CRD_GROUP = "powerfulseal.io"
+K8S_CRD_VERSION = "v1"
+K8S_CRD_PLURAL = "scenarios"
 
 class K8sClient():
     """ Higher level Kubernetes client.
@@ -32,6 +35,8 @@ class K8sClient():
         self.kube_config = kube_config
         self.client_corev1api = kubernetes.client.CoreV1Api()
         self.client_appsv1api = kubernetes.client.AppsV1Api()
+        self.client_extensionsApi = kubernetes.client.ApiextensionsV1beta1Api()
+        self.client_customObjectsApi = kubernetes.client.CustomObjectsApi()
 
         self.logger = logger or makeLogger(__name__)
         self.logger.info("Initializing with config: %s", kube_config)
@@ -182,6 +187,35 @@ class K8sClient():
                 namespace=namespace,
                 name=name,
             )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def get_scenarios(self, namespaces="", labels=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            ExtensionsV1beta1Api.md#list_namespaced_deployment
+        """
+        try:
+            crds = self.client_extensionsApi.list_custom_resource_definition().to_dict()['items']
+            crd = None
+            for x in crds:
+                if x['spec']['names']['plural'].lower() == K8S_CRD_PLURAL and \
+                        x['spec']['group'].lower() == K8S_CRD_GROUP:
+                    crd = x
+            if crd == None:
+                return []
+
+            scenarios = self.client_customObjectsApi.list_namespaced_custom_object(
+                K8S_CRD_GROUP,
+                K8S_CRD_VERSION,
+                namespaces,
+                K8S_CRD_PLURAL)
+            out = []
+            for scenario in scenarios['items']:
+                self.logger.info(scenario)
+                out.append(scenario['spec'])
+            return out
         except ApiException as e:
             self.logger.exception(e)
             raise

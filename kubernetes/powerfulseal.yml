@@ -34,7 +34,7 @@ spec:
       containers:
         - name: powerfulseal
           imagePullPolicy: Always
-          image: store/bloomberg/powerfulseal:3.1.0rc01
+          image: bloomberg/powerfulseal:3.0.0rc9
           args:
           - autonomous
           - --policy-file=/policy.yml

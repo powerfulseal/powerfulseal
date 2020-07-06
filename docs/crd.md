@@ -20,6 +20,8 @@ parent: Setup
 
 `Powerfulseal` can be deployed on Kubernetes cluster to perform random chaos the application services.
 It also allows teams to define scenarios in their own namespace using [Kubernetes Custom Resources (CRD)](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/).
+Powerfulseal adds all CRD-defined scenarios to the ones defined in the policy configuration file (optional).
+*Scenarios are reloaded after the execution of the current run.*
 
 ## Kubernetes Installation
 

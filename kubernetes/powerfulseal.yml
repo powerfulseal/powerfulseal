@@ -27,6 +27,9 @@ metadata:
   name: powerfulseal
   namespace: powerfulseal
 spec:
+  selector:
+    matchLabels:
+      name: powerfulseal
   replicas: 1
   template:
     metadata:

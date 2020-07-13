@@ -29,7 +29,7 @@ Powerfulseal adds all CRD-defined scenarios to the ones defined in the policy co
 
   `kubectl apply -f kubernetes/rbac.yml`
 
-- Deploy powerful seal
+- Deploy powerfulseal
   `kubectl apply -f kubernetes/powerfulseal.yml`
 
 ## CRD Installation

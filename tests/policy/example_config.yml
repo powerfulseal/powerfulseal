@@ -235,6 +235,10 @@ scenarios:
             probability: 1
             force: true
 
+        # stops the hosts the pods are running on
+        - stopHost:
+            autoRestart: true
+
 
   # check that there are two pods, and both running in luckywinner namespace
   - podAction:

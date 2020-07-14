@@ -74,7 +74,7 @@ class Scenario():
             return
         self.logger.info("Cleanup started (%d items)", len(self.cleanup_list))
         for action in self.cleanup_list:
-            self.execute_action(action)
+            action.execute()
         self.cleanup_list = []
         self.logger.info("Cleanup done")
 

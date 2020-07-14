@@ -402,8 +402,6 @@ definitions:
         type: object
         additionalProperties: false
         properties:
-          force:
-            type: boolean
           autoRestart:
             type: boolean
             description:

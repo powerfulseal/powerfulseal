@@ -176,6 +176,7 @@ class ActionPods(ActionNodesPods):
     def action_stop_host(self, pods, params):
         """ Action to stop a node.
         """
+        self.inventory.sync()
         host_ips = list(set([p.host_ip for p in pods]))
         for host_ip in host_ips:
             host = self.inventory.get_node_by_ip(host_ip)

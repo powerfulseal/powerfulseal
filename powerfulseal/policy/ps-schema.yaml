@@ -129,7 +129,6 @@ definitions:
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
           - "$ref": "#/definitions/waitAction"
-          - "$ref": "#/definitions/stopPodsHostAction"
     required:
     - name
     - steps
@@ -228,6 +227,7 @@ definitions:
               - "$ref": "#/definitions/actionWait"
               - "$ref": "#/definitions/checkPodState"
               - "$ref": "#/definitions/checkPodCount"
+              - "$ref": "#/definitions/stopPodsHostAction"
         required:
         - matches
         - actions

@@ -38,6 +38,7 @@ class ActionNodesPods(ActionAbstract):
         self.logger = logger or makeLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.action_mapping = dict()
+        self.cleanup_actions = []
 
     def execute(self):
         """ Main entry point to starting a scenario.
@@ -229,4 +230,6 @@ class ActionNodesPods(ActionAbstract):
                         success = False
         return success
 
+    def get_cleanup_actions(self):
+        return self.cleanup_actions
 

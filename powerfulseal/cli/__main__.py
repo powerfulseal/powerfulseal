@@ -210,7 +210,7 @@ def add_policy_options(parser):
     args.add_argument('--policy-file',
         default=os.environ.get("POLICY_FILE"),
         help='the policy file to run',
-        required=True
+        required=False
     )
 
 def add_run_options(parser):
@@ -605,11 +605,7 @@ def main(argv):
     ##########################################################################
     if args.mode == 'autonomous':
 
-        # read and validate the policy
-        policy = PolicyRunner.load_file(args.policy_file)
-        if not PolicyRunner.is_policy_valid(policy):
-            logger.error("Policy not valid. See log output above.")
-            return sys.exit(1)
+        runner = PolicyRunner(args.policy_file, k8s_client, logger)
 
         # run the metrics server if requested
         if not args.headless:
@@ -618,7 +614,7 @@ def main(argv):
             start_server(
                 host=args.host,
                 port=args.port,
-                policy=policy,
+                read_policy_fn=runner.read_policy,
                 accept_proxy_headers=args.accept_proxy_headers,
                 logger=server_log_handler,
             )
@@ -626,8 +622,7 @@ def main(argv):
             logger.info("NOT starting the UI server")
 
         logger.info("STARTING AUTONOMOUS MODE")
-        success = PolicyRunner.run(
-            policy,
+        success = runner.run(
             inventory,
             k8s_inventory,
             driver,

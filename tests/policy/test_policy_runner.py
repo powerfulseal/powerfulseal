@@ -17,6 +17,7 @@
 import pytest
 import pkg_resources
 from mock import MagicMock
+import mock
 
 from powerfulseal.policy import PolicyRunner
 
@@ -30,19 +31,36 @@ def test_example_config_validates():
     policy = PolicyRunner.load_file(filename)
     assert PolicyRunner.is_policy_valid(policy)
 
+crd_scenario_name = "test"
+
+def get_scenarios_mock():
+    return [{
+        "name": crd_scenario_name,
+        "steps": [
+            {"podAction": {
+                "matches": [{"labels": {"namespace": "powerfulseal-sandbox", "selector": "app=nginx"}}],
+                "actions": [{"kill": {"probability": 1}}]
+            }}
+        ]
+    }]
 
 def test_parses_config_correctly(monkeypatch):
-    sleep_mock = MagicMock()
-    monkeypatch.setattr("time.sleep", sleep_mock)
-    filename = pkg_resources.resource_filename("tests.policy", "example_config2.yml")
-    policy = PolicyRunner.load_file(filename)
-    inventory = MagicMock()
-    k8s_inventory = MagicMock()
-    driver = MagicMock()
-    executor = MagicMock()
-    LOOPS = policy.get("config").get("runStrategy").get("runs")
-    PolicyRunner.run(policy, inventory, k8s_inventory, driver, executor)
-    assert sleep_mock.call_count == LOOPS
-    for call in sleep_mock.call_args_list:
-        args, _ = call
-        assert 77 <= args[0] <= 78
+    with mock.patch('powerfulseal.k8s.k8s_client') as k8s_client:
+        k8s_client.get_scenarios = get_scenarios_mock
+        sleep_mock = MagicMock()
+        monkeypatch.setattr("time.sleep", sleep_mock)
+        filename = pkg_resources.resource_filename(
+            "tests.policy", "example_config2.yml")
+        runner = PolicyRunner(filename, k8s_client)
+        policy = runner.read_policy()
+        inventory = MagicMock()
+        k8s_inventory = MagicMock()
+        driver = MagicMock()
+        executor = MagicMock()
+        LOOPS = policy.get("config").get("runStrategy").get("runs") + 1
+        assert policy.get("scenarios")[1].get("name") == crd_scenario_name
+        runner.run(inventory, k8s_inventory, driver, executor)
+        assert sleep_mock.call_count == LOOPS
+        for call in sleep_mock.call_args_list:
+            args, _ = call
+            assert 77 <= args[0] <= 78

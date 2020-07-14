@@ -15,6 +15,8 @@
 
 import random
 import time
+import sys
+import copy
 
 import jsonschema
 import yaml
@@ -31,6 +33,28 @@ class PolicyRunner():
     DEFAULT_POLICY = {
         "scenarios": []
     }
+
+    def __init__(self, config_file, k8s_client, logger=None):
+        self.config_file = config_file
+        self.k8s_client = k8s_client
+        self.logger = logger or makeLogger(__name__)
+
+    def read_policy(self):
+        """
+            Read configuration
+        """
+        if self.config_file is None:
+            policy = copy.deepcopy(PolicyRunner.DEFAULT_POLICY)
+        else:
+            policy = PolicyRunner.load_file(self.config_file)
+
+        # Load scenarios from K8S crd extending file scenarios
+        scenarios = self.k8s_client.get_scenarios()
+        policy['scenarios'].extend(scenarios)
+        if not PolicyRunner.is_policy_valid(policy):
+            self.logger.error("Policy not valid. See log output above.")
+            return sys.exit(1)
+        return policy
 
     @classmethod
     def get_schema(cls):
@@ -50,37 +74,38 @@ class PolicyRunner():
         try:
             jsonschema.validate(policy, schema)
         except jsonschema.ValidationError as error:
+            logger.error(policy)
             logger.error(error)
             return False
         return True
 
-    @classmethod
-    def run(cls, policy, inventory, k8s_inventory, driver, executor,
+    def run(self, inventory, k8s_inventory, driver, executor,
             metric_collector=None):
         """ Runs a policy forever
         """
-        config = policy.get("config", {}).get("runStrategy", {})
-        should_randomize = config.get("strategy") == "random"
-        wait_min = config.get("minSecondsBetweenRuns", 0)
-        wait_max = config.get("maxSecondsBetweenRuns", 300)
-        loops = config.get("runs", None)
-        exitConfig = policy.get("config", {}).get("exitStrategy", {})
-        exitStrategy = exitConfig.get("strategy", "report")
-        scenarios = [
-            Scenario(
-                name=item.get("name"),
-                schema=item,
-                inventory=inventory,
-                k8s_inventory=k8s_inventory,
-                driver=driver,
-                executor=executor,
-                metric_collector=metric_collector
-            )
-            for item in policy.get("scenarios", [])
-        ]
+        policy = self.read_policy()
+        loops = policy.get("config", {}).get("runStrategy", {}).get("runs", None)
         while loops is None or loops > 0:
-            if not scenarios:
-                return True
+            policy = self.read_policy()
+            config = policy.get("config", {}).get("runStrategy", {})
+            should_randomize = config.get("strategy") == "random"
+            wait_min = config.get("minSecondsBetweenRuns", 0)
+            wait_max = config.get("maxSecondsBetweenRuns", 300)
+            exitConfig = policy.get("config", {}).get("exitStrategy", {})
+            exitStrategy = exitConfig.get("strategy", "report")
+            scenarios = [
+                Scenario(
+                    name=item.get("name"),
+                    schema=item,
+                    inventory=inventory,
+                    k8s_inventory=k8s_inventory,
+                    driver=driver,
+                    executor=executor,
+                    metric_collector=metric_collector
+                )
+                for item in policy.get("scenarios", [])
+            ]
+
             if should_randomize:
                 random.shuffle(scenarios)
             for scenario in scenarios:

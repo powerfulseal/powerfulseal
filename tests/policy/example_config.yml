@@ -66,7 +66,7 @@ scenarios:
               serviceAccountName: powerfulseal
               containers:
                 - name: powerfulseal
-                  image: bloomberg/powerfulseal:3.0.0rc9
+                  image: bloomberg/powerfulseal:3.0.0rc10
                   args:
                   - autonomous
                   - --policy-file=/policy.yml

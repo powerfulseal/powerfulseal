@@ -6,20 +6,11 @@ metadata:
   namespace: powerfulseal
 data:
   policy.yml: |-
-    scenarios:
-    - name: "delete a random pod in default namespace"
-      steps:
-      - matches:
-        - labels:
-            namespace: "default"
-            selector: "app=hello"
-        filters:
-        - randomSample:
-            size: 1
-        actions:
-        - kill:
-            probability: 0.77
-            force: true
+    config:
+      runStrategy:
+        minSecondsBetweenRuns: 30
+        maxSecondsBetweenRuns: 300
+    scenarios: []
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -27,6 +18,9 @@ metadata:
   name: powerfulseal
   namespace: powerfulseal
 spec:
+  selector:
+    matchLabels:
+      name: powerfulseal
   replicas: 1
   template:
     metadata:
@@ -39,7 +33,8 @@ spec:
       serviceAccountName: powerfulseal
       containers:
         - name: powerfulseal
-          image: bloomberg/powerfulseal:3.0.0rc9
+          imagePullPolicy: Always
+          image: bloomberg/powerfulseal:3.0.0rc10
           args:
           - autonomous
           - --policy-file=/policy.yml

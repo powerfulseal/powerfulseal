@@ -129,6 +129,7 @@ definitions:
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
           - "$ref": "#/definitions/waitAction"
+          - "$ref": "#/definitions/stopPodsHostAction"
     required:
     - name
     - steps
@@ -389,6 +390,27 @@ definitions:
         - seconds
     required:
     - wait
+
+
+  stopPodsHostAction:
+    description: >
+      Stops the host on which the pods are running.
+    type: object
+    additionalProperties: false
+    properties:
+      stopHost:
+        type: object
+        additionalProperties: false
+        properties:
+          force:
+            type: boolean
+          autoRestart:
+            type: boolean
+            description:
+              When set to true, the node will be restarted at the end of the scenario.
+            default: true
+    required:
+    - stopHost
 
 
 ###################################################################################################

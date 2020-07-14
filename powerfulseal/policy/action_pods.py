@@ -16,18 +16,23 @@
 import random
 import re
 
+from powerfulseal import makeLogger
 from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .action_nodes_pods import ActionNodesPods
 
 class StartHostAction():
     """ A little helper class to start hosts in cleanup """
-    def __init__(self, driver, host):
+    def __init__(self, driver, host, logger=None):
         self.driver = driver
         self.host = host
+        self.logger = logger
+
     def execute(self):
         try:
             self.driver.start(self.host)
+            self.logger.info("Restarted node %s", self.host)
         except:
+            self.logger.exception("Exception restarting node %s", self.host)
             return False
         return True
 
@@ -177,12 +182,12 @@ class ActionPods(ActionNodesPods):
             if host is None:
                 self.logger.warning("Couldn't find host with IP %r", host_ip)
                 return False
-            self.logger.info("Action stop on %r", host)
+            self.logger.info("Action stop on host %r (pods %s)", host, pods)
             try:
                 self.inventory.driver.stop(host)
                 if params.get("autoRestart", True):
                     self.cleanup_actions.append(
-                        StartHostAction(driver=self.inventory.driver, host=host)
+                        StartHostAction(driver=self.inventory.driver, host=host, logger=self.logger)
                     )
                 self.metric_collector.add_node_stopped_metric(host)
             except:

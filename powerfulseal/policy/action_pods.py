@@ -19,6 +19,18 @@ import re
 from powerfulseal.metriccollectors.collector import POD_SOURCE
 from .action_nodes_pods import ActionNodesPods
 
+class StartHostAction():
+    """ A little helper class to start hosts in cleanup """
+    def __init__(self, driver, host):
+        self.driver = driver
+        self.host = host
+    def execute(self):
+        try:
+            self.driver.start(self.host)
+        except:
+            return False
+        return True
+
 
 class ActionPods(ActionNodesPods):
     """ Pod scenario handler.
@@ -37,6 +49,7 @@ class ActionPods(ActionNodesPods):
             "kill": self.action_kill,
             "checkPodCount": self.action_check_pod_count,
             "checkPodState": self.action_check_pod_state,
+            "stopHost": self.action_stop_host,
         }
 
     def match(self):
@@ -154,3 +167,26 @@ class ActionPods(ActionNodesPods):
                 self.logger.error("Expected pod in state '%s', got '%s' (%r)", state, pod.state, pod)
                 success = False
         return success
+
+    def action_stop_host(self, pods, params):
+        """ Action to stop a node.
+        """
+        host_ips = list(set([p.host_ip for p in pods]))
+        for host_ip in host_ips:
+            host = self.inventory.get_node_by_ip(host_ip)
+            if host is None:
+                self.logger.warning("Couldn't find host with IP %r", host_ip)
+                return False
+            self.logger.info("Action stop on %r", host)
+            try:
+                self.inventory.driver.stop(host)
+                if params.get("autoRestart", True):
+                    self.cleanup_actions.append(
+                        StartHostAction(driver=self.inventory.driver, host=host)
+                    )
+                self.metric_collector.add_node_stopped_metric(host)
+            except:
+                self.metric_collector.add_node_stop_failed_metric(host)
+                self.logger.exception("Error stopping the machine")
+                return False
+        return True

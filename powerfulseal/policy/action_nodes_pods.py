@@ -209,6 +209,7 @@ class ActionNodesPods(ActionAbstract):
         sleep_time = params.get("seconds", 0)
         self.logger.info("Action sleep for %s seconds", sleep_time)
         time.sleep(sleep_time)
+        return True
 
     def act(self, items):
         """ Execute policy's actions on the items

@@ -227,6 +227,7 @@ definitions:
               - "$ref": "#/definitions/actionWait"
               - "$ref": "#/definitions/checkPodState"
               - "$ref": "#/definitions/checkPodCount"
+              - "$ref": "#/definitions/stopPodsHostAction"
         required:
         - matches
         - actions
@@ -389,6 +390,25 @@ definitions:
         - seconds
     required:
     - wait
+
+
+  stopPodsHostAction:
+    description: >
+      Stops the host on which the pods are running.
+    type: object
+    additionalProperties: false
+    properties:
+      stopHost:
+        type: object
+        additionalProperties: false
+        properties:
+          autoRestart:
+            type: boolean
+            description:
+              When set to true, the node will be restarted at the end of the scenario.
+            default: true
+    required:
+    - stopHost
 
 
 ###################################################################################################

@@ -35,7 +35,6 @@ class ActionNodes(ActionNodesPods):
             "wait": self.action_wait,
             "execute": self.action_execute,
         }
-        self.cleanup_actions = []
 
     def match(self):
         """ Makes a union of all the nodes matching any of the policy criteria.
@@ -117,6 +116,3 @@ class ActionNodes(ActionNodesPods):
                     self.metric_collector.add_execute_failed_metric(item)
                     success = False
         return success
-
-    def get_cleanup_actions(self):
-        return self.cleanup_actions

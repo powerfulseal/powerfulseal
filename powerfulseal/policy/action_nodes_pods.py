@@ -38,6 +38,7 @@ class ActionNodesPods(ActionAbstract):
         self.logger = logger or makeLogger(__name__, name)
         self.metric_collector = metric_collector or StdoutCollector()
         self.action_mapping = dict()
+        self.cleanup_actions = []
 
     def execute(self):
         """ Main entry point to starting a scenario.
@@ -208,6 +209,7 @@ class ActionNodesPods(ActionAbstract):
         sleep_time = params.get("seconds", 0)
         self.logger.info("Action sleep for %s seconds", sleep_time)
         time.sleep(sleep_time)
+        return True
 
     def act(self, items):
         """ Execute policy's actions on the items
@@ -229,4 +231,6 @@ class ActionNodesPods(ActionAbstract):
                         success = False
         return success
 
+    def get_cleanup_actions(self):
+        return self.cleanup_actions
 

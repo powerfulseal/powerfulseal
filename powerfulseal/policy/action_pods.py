@@ -25,7 +25,7 @@ class StartHostAction():
     def __init__(self, driver, host, logger=None):
         self.driver = driver
         self.host = host
-        self.logger = logger
+        self.logger = logger or makeLogger(__name__)
 
     def execute(self):
         try:

@@ -116,10 +116,10 @@ class PolicyRunner():
                         return False
                     else:
                         logger.error("Scenario failed, reporting and carrying on")
-                sleep_time = int(random.uniform(wait_min, wait_max))
-                logger.info("Sleeping for %s seconds", sleep_time)
-                time.sleep(sleep_time)
-                if loops is not None:
-                    loops -= 1
+            sleep_time = int(random.uniform(wait_min, wait_max))
+            logger.info("Sleeping for %s seconds", sleep_time)
+            time.sleep(sleep_time)
+            if loops is not None:
+                loops -= 1
         logger.info("All done here!")
         return True

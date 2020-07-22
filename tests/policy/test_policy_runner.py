@@ -57,7 +57,7 @@ def test_parses_config_correctly(monkeypatch):
         k8s_inventory = MagicMock()
         driver = MagicMock()
         executor = MagicMock()
-        LOOPS = policy.get("config").get("runStrategy").get("runs") + 1
+        LOOPS = policy.get("config").get("runStrategy").get("runs")
         assert policy.get("scenarios")[1].get("name") == crd_scenario_name
         runner.run(inventory, k8s_inventory, driver, executor)
         assert sleep_mock.call_count == LOOPS

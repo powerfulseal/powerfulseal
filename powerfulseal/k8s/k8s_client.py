@@ -214,7 +214,7 @@ class K8sClient():
             out = []
             for scenario in scenarios['items']:
                 out.append(scenario['spec'])
-            self.logger.info("Read %d scenarios from CRDS", len(out))
+            self.logger.debug("Read %d scenarios from CRDS", len(out))
             return out
         except ApiException as e:
             if e.status == 403:

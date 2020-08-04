@@ -39,6 +39,20 @@ spec:
           - autonomous
           - --policy-file=/policy.yml
           - --prometheus-collector
+          env:
+          # in order to allow PowerfulSeal to not accidentally self-destruct
+          # give it the pod name
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          # and the host ip
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
           volumeMounts:
             - name: policyfile
               mountPath: /policy.yml

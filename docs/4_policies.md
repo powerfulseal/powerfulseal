@@ -104,3 +104,31 @@ scenarios: []
 ## Examples
 
 To see examples of policies, use the menu on the left.
+
+
+## Note on self-destruction
+
+With great power comes great responsibility, and sometimes it's easy to take down the wrong pod or node and kill it by accident.
+
+That's not idea, because it might result in nodes staying down, or incomplete experiments.
+
+To avoid that, PowerfulSeal honors two variables, that it will filter out from killing:
+
+```yaml
+          env:
+          # in order to allow PowerfulSeal to not accidentally self-destruct
+          # give it the pod name
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          # and the host ip
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
+```
+
+Any pods with this name, and any hosts with that IP will be spared.

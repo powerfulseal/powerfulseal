@@ -182,15 +182,6 @@ def test_doesnt_kill_when_cant_find_node(pod_scenario):
 
 @patch.dict(os.environ, {"POD_NAME": "powerfulseal-asyxoy2-sdaf"})
 def test_doesnt_kill_itself(pod_scenario):
-    pod_scenario.schema = {
-        "actions": [
-            {
-                "kill": {
-                    "force": True
-                }
-            },
-        ]
-    }
     mock_item = MagicMock()
     mock_item.name = "powerfulseal-asyxoy2-sdaf"
     mock_item2 = MagicMock()

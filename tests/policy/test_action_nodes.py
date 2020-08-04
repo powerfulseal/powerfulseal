@@ -187,13 +187,6 @@ def test_action_stop_doesnt_create_cleanup_action(node_scenario):
 
 @patch.dict(os.environ, {"HOST_IP": "1.2.3.4"})
 def test_doesnt_stop_itself(node_scenario):
-    node_scenario.schema["actions"] = [
-        dict(
-            stop=dict(
-                autoRestart=False
-            )
-        )
-    ]
     mock_item = MagicMock()
     mock_item.ip = "1.2.3.4"
     mock_item2 = MagicMock()

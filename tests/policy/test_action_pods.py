@@ -15,8 +15,9 @@
 
 
 import random
+import os
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 
 
 # noinspection PyUnresolvedReferences
@@ -177,3 +178,28 @@ def test_doesnt_kill_when_cant_find_node(pod_scenario):
     pod_scenario.act(items)
     assert mock.call_count == 0
     assert pod_scenario.executor.logger.info.call_args[0] == ("Node not found for pod: %s", items[1])
+
+
+@patch.dict(os.environ, {"POD_NAME": "powerfulseal-asyxoy2-sdaf"})
+def test_doesnt_kill_itself(pod_scenario):
+    pod_scenario.schema = {
+        "actions": [
+            {
+                "kill": {
+                    "force": True
+                }
+            },
+        ]
+    }
+    mock_item = MagicMock()
+    mock_item.name = "powerfulseal-asyxoy2-sdaf"
+    mock_item2 = MagicMock()
+    mock_item2.name = "powerfulseal-not-that-one"
+    pod_scenario.match = MagicMock(return_value=[mock_item, mock_item2])
+    pod_scenario.act = MagicMock()
+    pod_scenario.execute()
+    assert pod_scenario.act.call_count == 1
+    for _, call in enumerate(pod_scenario.act.call_args_list):
+        args, kwargs = call
+        assert args == ([mock_item2],)
+        assert kwargs == {}

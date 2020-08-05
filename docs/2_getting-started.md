@@ -85,7 +85,7 @@ For help, just type `help`. For more information about the modes, see our [docs 
 For each [release](https://github.com/bloomberg/powerfulseal/releases) a `docker` image is built and published to the [docker hub](https://hub.docker.com/r/bloomberg/powerfulseal/tags).
 
 ```sh
-docker pull bloomberg/powerfulseal:3.0.0rc13
+docker pull bloomberg/powerfulseal:3.0.0
 ```
 
 ### Run docker image
@@ -97,7 +97,7 @@ Below is an example of using the `-v` flag to inject your local `kubeconfig` to 
 ```sh
 docker run -it \
     -v ~/.kube:/root/.kube \
-    bloomberg/powerfulseal:3.0.0rc13 \
+    bloomberg/powerfulseal:3.0.0 \
     interactive
 ```
 

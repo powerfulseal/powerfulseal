@@ -108,9 +108,9 @@ To see examples of policies, use the menu on the left.
 
 ## Note on self-destruction
 
-With great power comes great responsibility, and sometimes it's easy to take down the wrong pod or node and kill it by accident.
+With great power comes great responsibility, and sometimes it's easy to take down the wrong pod or node and kill the Seal by accident.
 
-That's not idea, because it might result in nodes staying down, or incomplete experiments.
+That's not ideal, because it might result in nodes staying down, or incomplete experiments.
 
 To avoid that, PowerfulSeal honors two variables, that it will filter out from killing:
 

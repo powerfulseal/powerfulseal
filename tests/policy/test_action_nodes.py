@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import os
 import pytest
-from mock import MagicMock
+from mock import MagicMock, patch
 
 # noinspection PyUnresolvedReferences
 from tests.fixtures import node_scenario
@@ -183,3 +183,24 @@ def test_action_stop_doesnt_create_cleanup_action(node_scenario):
     mock_item = MagicMock()
     node_scenario.act([mock_item])
     assert node_scenario.get_cleanup_actions() == []
+
+
+@patch.dict(os.environ, {"HOST_IP": "1.2.3.4"})
+def test_doesnt_stop_itself(node_scenario):
+    mock_item = MagicMock()
+    mock_item.ip = "1.2.3.4"
+    mock_item2 = MagicMock()
+    mock_item2.extIp = "1.2.3.5"
+    mock_item3 = MagicMock()
+    mock_item3.ip = "1.2.3.5"
+    mock_item4 = MagicMock()
+    mock_item4.extIp = "1.2.3.4"
+    node_scenario.match = MagicMock(return_value=[mock_item, mock_item2, mock_item3, mock_item4])
+    node_scenario.act = MagicMock()
+    node_scenario.execute()
+    print(node_scenario.act.call_args_list)
+    assert node_scenario.act.call_count == 1
+    for _, call in enumerate(node_scenario.act.call_args_list):
+        args, kwargs = call
+        assert args == ([mock_item2, mock_item3],)
+        assert kwargs == {}

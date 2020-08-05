@@ -15,6 +15,7 @@
 
 
 import time
+import os
 import re
 from datetime import datetime
 import calendar
@@ -94,6 +95,26 @@ class ActionNodesPods(ActionAbstract):
             for v in value
         ])
 
+    def dont_self_destruct(self, items):
+        """ Don't kill its own pod or node """
+        HOST_IP = os.environ.get("HOST_IP")
+        POD_NAME = os.environ.get("POD_NAME", os.environ.get("HOSTNAME"))
+        attrs = dict(
+            ip=HOST_IP,
+            extIp=HOST_IP,
+            name=POD_NAME,
+        )
+        matches = set()
+        for item in items:
+            for attr, val in attrs.items():
+                if val and getattr(item, attr, None) == val:
+                    matches.add(item)
+        return [
+            item
+            for item in items
+            if item not in matches
+        ]
+
     def filter(self, items):
         """ Applies various filters based on the given policy.
         """
@@ -104,6 +125,7 @@ class ActionNodesPods(ActionAbstract):
             "randomSample": self.filter_random_sample,
             "probability": self.filter_probability,
         }
+        items = self.dont_self_destruct(items)
         return self.filter_mapping(items, filters, mapping)
 
     def filter_property(self, candidates, criterion):

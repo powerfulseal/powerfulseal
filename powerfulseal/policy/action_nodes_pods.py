@@ -109,6 +109,8 @@ class ActionNodesPods(ActionAbstract):
             for attr, val in attrs.items():
                 if val and getattr(item, attr, None) == val:
                     matches.add(item)
+        if len(matches) > 0:
+            self.logger.warning("Self-destruction prevention. Filtering out: %r", matches)
         return [
             item
             for item in items

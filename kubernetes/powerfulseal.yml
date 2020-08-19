@@ -34,11 +34,25 @@ spec:
       containers:
         - name: powerfulseal
           imagePullPolicy: Always
-          image: bloomberg/powerfulseal:3.0.0rc12
+          image: bloomberg/powerfulseal:3.0.1
           args:
           - autonomous
           - --policy-file=/policy.yml
           - --prometheus-collector
+          env:
+          # in order to allow PowerfulSeal to not accidentally self-destruct
+          # give it the pod name
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          # and the host ip
+          - name: HOST_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
           volumeMounts:
             - name: policyfile
               mountPath: /policy.yml

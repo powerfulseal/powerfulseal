@@ -3,6 +3,10 @@ python:
   - "3.7"
   - "3.8"
 
+arch:
+  - amd64
+  - arm64
+
 # enable docker in Travis
 services:
   - docker
@@ -42,3 +46,4 @@ deploy:
       tags: true
       python: "3.7"
       condition: -n "$TWINE_PASSWORD"
+      arch: amd64

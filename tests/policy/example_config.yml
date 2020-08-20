@@ -156,7 +156,10 @@ scenarios:
         # this will pass all the nodes with the given probability,
         # or none otherwise
         - probability: 0.5
-
+      retries:
+        retriesCount:
+          count: 50
+          sleep: 35
       # The actions will be executed in the order specified
       actions:
         - stop:
@@ -244,6 +247,8 @@ scenarios:
   - podAction:
       matches:
         - namespace: "luckywinner"
+      retriesTimeout:
+        timeout: 180
       actions:
         - checkPodCount:
             count: 2

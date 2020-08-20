@@ -57,7 +57,8 @@ class Scenario():
         for step in steps:
             for action_name, action_method in self.action_mapping.items():
                 if action_name in step:
-                    ret = action_method(schema=step.get(action_name))
+                    step_action = step.get(action_name)
+                    ret = self.retry(step_action, action_method)
                     if not ret:
                         self.logger.warning("Step returned failure %s. Finishing scenario early", step)
                         self.metric_collector.add_scenario_counter_metric(self.name, False)
@@ -67,6 +68,46 @@ class Scenario():
         self.metric_collector.add_scenario_counter_metric(self.name, True)
         self.cleanup()
         return True
+
+    def retry(self, step_action, action_method):
+        ret = False
+        if "retries" in step_action.keys():
+            step_retry = step_action['retries']
+            if "retriesTimeout" in step_retry.keys():
+                final_timeout = step_retry.get('retriesTimeout', {}).get('timeout', 60)
+                retry_sleep = step_retry.get('retriesTimeout', {}).get('sleep', 30)
+                timer = 0
+                while timer < final_timeout:
+                    ret = action_method(schema=step_action)
+                    if ret:
+                        return ret
+                    else:
+                        self.logger.warning("Failure in action. Sleeping %s and retrying", retry_sleep)
+                        #  wait a little
+                        time.sleep(retry_sleep)
+                        timer += retry_sleep
+                self.logger.error("No more retries allowed. Failing step")
+                return False
+
+            elif 'retriesCount' in step_retry.keys():
+                final_count = step_retry.get('retriesCount', {}).get('count', 1)
+                retry_sleep = step_retry.get('retriesCount', {}).get('sleep', 30)
+                counter = 0
+                while counter < final_count:
+                    ret = action_method(schema=step_action)
+                    if ret:
+                        return ret
+                    else:
+                        self.logger.warning("Failure in action. Sleeping %s and retrying", retry_sleep)
+                        #  wait a little
+                        time.sleep(retry_sleep)
+                        counter += 1
+                self.logger.error("No more retries allowed. Failing step")
+                return False
+
+        else:
+            ret = action_method(schema=step_action)
+        return ret
 
     def cleanup(self):
         if not self.cleanup_list:

@@ -6,13 +6,12 @@ local_no_proxy ?= ""
 
 name ?= powerfulseal
 version ?= `python setup.py --version`
-arch1=$(shell uname -m)
-ifeq ($(arch1),x86_64)
-  arch2=amd64
-else ifeq ($(arch1),aarch64)
-  arch2=arm64
+arch=$(shell uname -m)
+ifeq ($(arch),x86_64)
+  tag = $(name):$(version)
+else ifeq ($(arch),aarch64)
+  tag = $(name):$(version)-arm64
 endif
-tag = $(name):$(version)-$(arch2)
 namespace ?= "bloomberg/"
 
 test:

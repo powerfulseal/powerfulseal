@@ -14,7 +14,7 @@ permalink: /
 **PowerfulSeal** injects failure into your Kubernetes clusters, so that you can detect problems as early as possible. It allows for writing scenarios describing complete [chaos experiments](https://principlesofchaos.org).
 {: .fs-6 .fw-300 }
 
-[Get started now](./getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/bloomberg/powerfulseal){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get started now](./getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/powerfulseal/powerfulseal){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -61,5 +61,5 @@ scenarios:
 
 ### License
 
-Powerfulseal is distributed by an [Apache-2.0](https://github.com/bloomberg/powerfulseal/blob/master/LICENSE).
+Powerfulseal is distributed by an [Apache-2.0](https://github.com/powerfulseal/powerfulseal/blob/master/LICENSE).
 

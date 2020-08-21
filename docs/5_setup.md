@@ -29,9 +29,9 @@ has_children: true
 
 Running on `Kubernetes` is easy. You can do that by:
 
-- creating [RBAC rules](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/rbac.yml) to allow the seal to list, get and delete pods and nodes,
+- creating [RBAC rules](https://github.com/powerfulseal/powerfulseal/blob/master/kubernetes/rbac.yml) to allow the seal to list, get and delete pods and nodes,
   - you might need to adjust it depending on what you are planning to do with the Seal
-- creating a [configmap and deployment](https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/powerfulseal.yml)
+- creating a [configmap and deployment](https://github.com/powerfulseal/powerfulseal/blob/master/kubernetes/powerfulseal.yml)
   - your scenarios will live in the configmap
   - if you'd like to use the UI, you'll probably also need a service and ingress
 
@@ -47,7 +47,7 @@ If you're running outside of your cluster, the setup will involve:
 - making sure the Seal can `SSH` into the nodes in order to execute `docker kill` command
 - writing a set of policies
 
-It should look something like [this](https://github.com/bloomberg/powerfulseal/blob/master/docs/media/setup.png).
+It should look something like [this](https://github.com/powerfulseal/powerfulseal/blob/master/docs/media/setup.png).
 
 
 ## Kubectl
@@ -57,7 +57,7 @@ When executing the commands, the `http{s}_proxy` variables are overwritten by th
 
 If you exec into the pod, you can `kubectl` directly, using the same RBAC permissions.
 
-For example, in the [./kubernetes](https://github.com/bloomberg/powerfulseal/tree/master/kubernetes) contains RBAC which allows the seal to:
+For example, in the [./kubernetes](https://github.com/powerfulseal/powerfulseal/tree/master/kubernetes) contains RBAC which allows the seal to:
 
 - read from all namespaces
 - delete pods in all namespaces

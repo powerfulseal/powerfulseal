@@ -2,5 +2,5 @@ title: 'Powerfulseal'
 remote_theme: pmarsceill/just-the-docs
 aux_links:
   "Powerfulseal on GitHub":
-    - "//github.com/bloomberg/powerfulseal"
+    - "//github.com/powerfulseal/powerfulseal"
 footer_content: "© 2020 Bloomberg Finance L.P."

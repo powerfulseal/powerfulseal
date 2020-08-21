@@ -23,7 +23,7 @@ PowerfulSeal uses [tox](https://github.com/tox-dev/tox) to test multiple Python 
 
 ### Installation
 
-In order to use `tox`, `tox` must be installed and Python binaries for the versions listed in [tox.ini](https://github.com/bloomberg/powerfulseal/blob/master/tox.ini) must be visible in your PATH.
+In order to use `tox`, `tox` must be installed and Python binaries for the versions listed in [tox.ini](https://github.com/powerfulseal/powerfulseal/blob/master/tox.ini) must be visible in your PATH.
 
 Due to the difficulty in maintaining the required libraries for so many Python versions, it is recommended to use [pyenv](https://github.com/pyenv/pyenv) to install and manage multiple versions of Python.
 

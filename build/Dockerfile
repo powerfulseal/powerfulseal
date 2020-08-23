@@ -3,7 +3,7 @@ FROM python:3.7-slim-buster as builder
 
 # install all the build dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential curl && \
+    apt-get install -y build-essential curl libffi-dev libssl-dev && \
     apt-get clean && \
     apt-get autoclean && \
     apt-get autoremove
@@ -13,7 +13,8 @@ ARG https_proxy
 ARG no_proxy
 
 # download kubectl
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl \
+RUN if [ `uname -m` = "aarch64" ] ; then KUBECTL_ARCH="arm64"; else KUBECTL_ARCH="amd64"; fi \
+    && curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/${KUBECTL_ARCH}/kubectl \
     && chmod +x ./kubectl \
     && mv ./kubectl /usr/local/bin/kubectl \
     && kubectl version --client

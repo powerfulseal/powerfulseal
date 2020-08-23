@@ -45,5 +45,4 @@ deploy:
     on:
       tags: true
       python: "3.7"
-      condition: -n "$TWINE_PASSWORD"
-      arch: amd64
+      condition: -n "$TWINE_PASSWORD" && $TRAVIS_CPU_ARCH = "arm64"

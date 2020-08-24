@@ -45,12 +45,12 @@ The Seal doesn't:
 
 We would love you to. In particular, it would be great to get help with:
 
-- get more [cloud drivers](https://bloomberg.github.io/powerfulseal/in-depth-topics#custom-cloud-drivers)
-- get more [awesome filters](https://bloomberg.github.io/powerfulseal/in-depth-topics#custom-filters)
+- get more [cloud drivers](https://powerfulseal.github.io/powerfulseal/in-depth-topics#custom-cloud-drivers)
+- get more [awesome filters](https://powerfulseal.github.io/powerfulseal/in-depth-topics#custom-filters)
 - <del>__get an amazing logo__</del>
 - make the PowerfulSeal more powerful
 
-Check out our [contributing](https://bloomberg.github.io/powerfulseal/contribute) page for more information about how to contribute.
+Check out our [contributing](https://powerfulseal.github.io/powerfulseal/contribute) page for more information about how to contribute.
 
 ### Why a Seal ?
 

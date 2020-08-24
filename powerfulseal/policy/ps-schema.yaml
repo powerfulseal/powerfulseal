@@ -3,7 +3,7 @@
 # HEADER
 ###################################################################################################
 
-"$schema": https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/policy/ps-schema.yaml
+"$schema": https://github.com/powerfulseal/powerfulseal/blob/master/powerfulseal/policy/ps-schema.yaml
 title: PowerfulSeal configuration schema
 description: >
   The following configuration options document all features available

@@ -325,7 +325,7 @@ def parse_args(args):
         description=(
             'Pick one of the following options to start the Seal in the '
             'specified mode. Learn more at '
-            'https://github.com/bloomberg/powerfulseal#introduction'
+            'https://github.com/powerfulseal/powerfulseal#introduction'
         ),
         dest='mode'
     )
@@ -392,7 +392,7 @@ def parse_args(args):
             ' their \'seal/*\' labels to decide which ones to kill.'
             'There is no policy needed in this mode. '
             'To learn about supported labels, read more at '
-            'https://github.com/bloomberg/powerfulseal/ '
+            'https://github.com/powerfulseal/powerfulseal/ '
         ),
     )
     add_common_options(parser_label)

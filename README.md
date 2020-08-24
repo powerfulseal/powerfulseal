@@ -1,7 +1,7 @@
 
 # PowerfulSeal
 
-[![Travis](https://img.shields.io/travis/bloomberg/powerfulseal.svg)](https://travis-ci.com/bloomberg/powerfulseal) [![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
+[![Travis](https://img.shields.io/travis/powerfulseal/powerfulseal.svg)](https://travis-ci.com/powerfulseal/powerfulseal) [![PyPI](https://img.shields.io/pypi/v/powerfulseal.svg)](https://pypi.python.org/pypi/powerfulseal)
 
 **PowerfulSeal** injects failure into your Kubernetes clusters, so that you can detect problems as early as possible. It allows for writing scenarios describing complete [chaos experiments](https://principlesofchaos.org).
 
@@ -12,16 +12,16 @@
   <br>
 </p>
 
-## [Documentation](https://bloomberg.github.io/powerfulseal)
+## [Documentation](https://powerfulseal.github.io/powerfulseal)
 
-Please refer to the [Powerfulseal documentation](https://bloomberg.github.io/powerfulseal) to learn how to use it.
+Please refer to the [Powerfulseal documentation](https://powerfulseal.github.io/powerfulseal) to learn how to use it.
 
 ## Highlights
 
 - works with `Kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
-- `yaml` [policies](https://bloomberg.github.io/powerfulseal/policies) describing complete chaos experiments
+- `yaml` [policies](https://powerfulseal.github.io/powerfulseal/policies) describing complete chaos experiments
 - `Prometheus` and `Datadog` metrics collection
-- multiple [modes](https://bloomberg.github.io/powerfulseal/modes) for differnt use cases
+- multiple [modes](https://powerfulseal.github.io/powerfulseal/modes) for differnt use cases
 
 
 ## Hello world!
@@ -57,11 +57,11 @@ Assuming that's in `policy.yml`, you can run it like this:
 powerfulseal autonomous --policy-file ./policy.yaml
 ```
 
-[Learn more](https://bloomberg.github.io/powerfulseal)
+[Learn more](https://powerfulseal.github.io/powerfulseal)
 
 ## Installing
 
-- [docker hub](https://hub.docker.com/r/bloomberg/powerfulseal/tags): `docker pull bloomberg/powerfulseal:3.1.0`
+- [docker hub](https://hub.docker.com/r/powerfulseal/powerfulseal/tags): `docker pull powerfulseal/powerfulseal:3.1.0`
 - [pip](https://pypi.org/project/powerfulseal/): `pip install powerfulseal`
 
 

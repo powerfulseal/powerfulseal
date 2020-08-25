@@ -60,7 +60,7 @@ def test_parses_config_correctly(monkeypatch):
         LOOPS = policy.get("config").get("runStrategy").get("runs")
         assert policy.get("scenarios")[1].get("name") == crd_scenario_name
         runner.run(inventory, k8s_inventory, driver, executor)
-        assert sleep_mock.call_count == LOOPS
+        assert sleep_mock.call_count == (LOOPS - 1)
         for call in sleep_mock.call_args_list:
             args, _ = call
             assert 77 <= args[0] <= 78

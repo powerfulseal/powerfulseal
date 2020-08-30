@@ -129,6 +129,7 @@ definitions:
           - "$ref": "#/definitions/podAction"
           - "$ref": "#/definitions/nodeAction"
           - "$ref": "#/definitions/waitAction"
+          - "$ref": "#/definitions/cloneAction"
     required:
     - name
     - steps
@@ -409,6 +410,54 @@ definitions:
             default: true
     required:
     - stopHost
+
+
+  cloneAction:
+    description: >
+      Clone an existing deployment and modify the clone to inject failure.
+    type: object
+    additionalProperties: false
+    properties:
+      clone:
+        type: object
+        additionalProperties: false
+        properties:
+          replicas:
+            type: number
+            minimum: 1
+            default: 1
+          source:
+            type: object
+            description: >
+              The object to clone. It must exist on the cluster. Its specs will be used for the clone.
+            oneOf:
+            - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
+          labels:
+            type: array
+            description: >
+              Labels to add/change for the clone.
+              On top of all these, another one "chaos=true" will be added.
+              If none are specified, they will be copied from the source.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/matchService"
+              - "$ref": "#/definitions/matchLabel"
+          mutations:
+            type: array
+            description: >
+              Mutations to apply to the clone.
+              For example, you can add extra latency to the clone or modify its envvas.
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/mutationTC"
+              - "$ref": "#/definitions/mutationToxiProxy"
+              - "$ref": "#/definitions/mutationEnvironment"
+        required:
+        - source
+    required:
+    - clone
 
 
 ###################################################################################################
@@ -726,6 +775,159 @@ definitions:
     required:
     - checkPodState
 
+###################################################################################################
+# CLONE
+###################################################################################################
+
+  matchService:
+    type: object
+    description: >
+      Target the given `Kubernetes` service in a given namespace.
+    additionalProperties: false
+    properties:
+      service:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+            description: >
+              Name of the kubernetes service.
+          namespace:
+            type: string
+            description: >
+              Namespace of the kubernetes service.
+        required:
+        - name
+        - namespace
+    required:
+    - service
+
+  matchLabel:
+    type: object
+    description: >
+      Specify Kubernetes labels
+    additionalProperties: false
+    properties:
+      label:
+        type: object
+        additionalProperties: false
+        properties:
+          key:
+            type: string
+            description: >
+              The label key
+          value:
+            type: string
+            description: >
+              The label value
+        required:
+        - key
+        - value
+    required:
+    - label
+
+  mutationTC:
+    type: object
+    description: >
+      Adds an init container that executes the desired tc command.
+      Optionally, you can specify the image holding tc.
+    additionalProperties: false
+    properties:
+      tc:
+        type: object
+        additionalProperties: false
+        properties:
+          command:
+            type: string
+            description: >
+              The command to execute. Including "tc".
+          image:
+            type: string
+            default: gaiadocker/iproute2:latest
+            description: >
+              The image to use.
+        required:
+        - command
+    required:
+    - tc
+
+  mutationToxiProxy:
+    type: object
+    description: >
+      Adds a sidecar container, and proxies all incoming ports specified through itself.
+      You can also specify any extra proxies.
+    additionalProperties: false
+    properties:
+      toxiproxy:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+            description: >
+              The environment variable name
+          value:
+            type: string
+            description: >
+              The environment variable value
+          toxics:
+            type: array
+            description: >
+              Toxics to apply.
+              These directly in the format specified by toxiproxy.
+              Learn more at https://github.com/shopify/toxiproxy
+            items:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                  description: >
+                    Arbitrary name. Needs to be unique.
+                listen:
+                  type: string
+                  description: >
+                    The interface and port to listen on.
+                    For example 0.0.0.1:2222 to listen on port 2222 on all interafaces.
+                upstream:
+                  type: string
+                  description: >
+                    The server to proxy to, along with the port.
+                    For example github.com:80
+              required:
+              - name
+              - listen
+              - upstream
+        required:
+        - name
+        - value
+    required:
+    - toxiproxy
+
+  mutationEnvironment:
+    type: object
+    description: >
+      Target the given `Kubernetes` service in a given namespace.
+    additionalProperties: false
+    properties:
+      environment:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+            description: >
+              The environment variable name
+          value:
+            type: string
+            description: >
+              The environment variable value
+        required:
+        - name
+        - value
+    required:
+    - environment
 
 ###################################################################################################
 # MISC

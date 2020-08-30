@@ -2570,7 +2570,33 @@
               <div class="card-body">
                 <span class="badge badge-dark value-type">Type: object</span>
 
-            <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command">
+            <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args" onclick="setAnchor('#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args')"><span class="property-name">args</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: array of string</span><span class="description"><p>The arguments to execute as an array. For example - "qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress. https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell</p>
+</span>
+
+            <h4>Each item of this array must be:</h4>
+                    <div class="card"><div class="card-body items-definition" id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__args_array_items">
+                            
+                            <span class="badge badge-dark value-type">Type: string</span>
+
+            
+                        </div>
+                    </div>
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command">
         <div class="card">
             <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command">
                 <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command"
@@ -2582,10 +2608,17 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>The command to execute. Including "tc". For example "tc qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.</p>
+                <span class="badge badge-dark value-type">Type: array of string</span><span class="description"><p>The command to execute as an array. Entrypoint in docker. https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell</p>
 </span>
 
+            <h4>Each item of this array must be:</h4>
+                    <div class="card"><div class="card-body items-definition" id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__command_array_items">
+                            
+                            <span class="badge badge-dark value-type">Type: string</span>
+
             
+                        </div>
+                    </div>
               </div>
             </div>
         </div>
@@ -2602,6 +2635,25 @@
                  data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__image">
               <div class="card-body">
                 <span class="badge badge-dark value-type">Type: string</span> <span class="badge badge-success default-value">Default: "gaiadocker/iproute2:latest"</span><span class="description"><p>The image to use.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user" onclick="setAnchor('#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user')"><span class="property-name">user</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: string</span><span class="description"><p>The user to run as in the image.</p>
 </span>
 
             
@@ -2643,7 +2695,7 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__proxies"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__proxies">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: array of object</span><span class="description"><p>Extra proxies to be opened up by ToxiProxy. </p>
+                <span class="badge badge-dark value-type">Type: array of object</span><span class="description"><p>Extra proxies to be opened up by ToxiProxy.</p>
 </span>
 
             <h4>Each item of this array must be:</h4>

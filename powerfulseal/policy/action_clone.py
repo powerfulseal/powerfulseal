@@ -114,6 +114,7 @@ class ActionClone(ActionAbstract):
 
     # handle the mutations
     for mutation in self.schema.get("mutations", []):
+
       # handle the environment mutation
       spec = mutation.get("environment")
       if spec is not None:
@@ -124,11 +125,16 @@ class ActionClone(ActionAbstract):
               value=spec.get("value"),
             )
           )
-      # TODO handle the tc mutation
+
+      # handle the tc mutation
+      spec = mutation.get("tc")
+      if spec is not None:
+        self.mutate_traffic_control(body, spec)
+
       # TODO handle the toxiproxy mutation
       pass
 
-    # insert the extra selector
+    # always insert the extra selector
     update_labels(chaos="true")
 
     # create the clone
@@ -144,3 +150,19 @@ class ActionClone(ActionAbstract):
     # TODO add a cleanup action to remove the clone
 
     return True
+
+
+def mutate_traffic_control(self, body, spec):
+  """ Adds an init container with tc """
+  n = len(body.spec.template.spec.init_containers)
+  body.spec.template.spec.init_containers.append(
+    kubernetes.client.V1Container(
+      name="chaos-"+str(n+1),
+      command=spec.get("command"),
+      args=spec.get("args"),
+      image=spec.get("image"),
+      security_context=kubernetes.client.V1SecurityContext(
+        run_as_user=spec.get("user")
+      )
+    )
+  )

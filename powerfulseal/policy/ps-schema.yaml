@@ -839,14 +839,21 @@ definitions:
         additionalProperties: false
         properties:
           command:
-            type: string
+            type: array
             description: >
-              The command to execute. Leave empty for image default.
+              The command to execute as an array.
+              Entrypoint in docker.
+              https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+            items:
+              type: string
           args:
-            type: string
+            type: array
             description: >
-              The arguments to execute.
-              For example "qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.
+              The arguments to execute as an array.
+              For example - "qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.
+              https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+            items:
+              type: string
           user:
             type: string
             description: >

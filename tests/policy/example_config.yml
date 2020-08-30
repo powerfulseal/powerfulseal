@@ -299,8 +299,17 @@ scenarios:
             name: LOL
             value: "true"
         - tc:
-            command: tc
-            args: qdisc add dev eth0 root netem delay 200ms
+            command:
+              - tc
+            args:
+              - qdisc
+              - add
+              - dev
+              - eth0
+              - root
+              - netem
+              - delay
+              - 200ms
             image: gaiadocker/iproute2:latest
             user: root
         - toxiproxy:

@@ -22,6 +22,7 @@ from .action_nodes import ActionNodes
 from .action_pods import ActionPods
 from .action_kubectl import ActionKubectl
 from .action_probe_http import ActionProbeHTTP
+from .action_clone import ActionClone
 
 
 class Scenario():
@@ -45,6 +46,7 @@ class Scenario():
             kubectl=self.action_kubectl,
             probeHTTP=self.action_probe_http,
             wait=self.action_wait,
+            clone=self.action_clone,
         )
         self.cleanup_list = []
 
@@ -127,3 +129,11 @@ class Scenario():
         self.logger.info("Sleeping for %r seconds", sleep_time)
         time.sleep(sleep_time)
         return True
+
+    def action_clone(self, schema):
+        action = ActionClone(
+            schema=schema,
+            name=self.name,
+            k8s_inventory=self.k8s_inventory,
+        )
+        return self.execute_action(action)

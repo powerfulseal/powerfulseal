@@ -71,10 +71,39 @@ class ActionClone(ActionAbstract):
       self.logger.error("Deployment is using match_expressions. Not supported")
       return False
 
+    def update_labels(**kwargs):
+      for key, value in kwargs.items():
+        body.spec.selector.match_labels[key] = value
+        body.spec.template.metadata.labels[key] = value
+
     # handle the labels modifiers
     for label_modifier in self.schema.get("labels", []):
-      # TODO handle the labels mutations
-      pass
+
+      # handle the service selector lookup
+      spec = label_modifier.get("service")
+      if spec is not None:
+        try:
+          # get the service we're after
+          service = self.k8s_inventory.k8s_client.get_service(
+            name=spec.get("name"),
+            namespace=spec.get("namespace"),
+          )
+          # reset the existing labels
+          body.spec.selector.match_labels = dict()
+          body.spec.template.metadata.labels = dict()
+          # update with the selectors from the service
+          update_labels(**service.spec.selector)
+        except:
+          return False
+
+      # handle the static label modifications
+      spec = label_modifier.get("label")
+      if spec is not None:
+        updates = dict()
+        updates[spec.get("key")] = spec.get("value")
+        print(updates)
+        update_labels(**updates)
+
 
     # handle the mutations
     for mutation in self.schema.get("mutations", []):
@@ -84,8 +113,7 @@ class ActionClone(ActionAbstract):
       pass
 
     # insert the extra selector
-    body.spec.selector.match_labels["chaos"] = "true"
-    body.spec.template.metadata.labels["chaos"] = "true"
+    update_labels(chaos="true")
 
     # create the clone
     try:
@@ -93,7 +121,6 @@ class ActionClone(ActionAbstract):
         namespace=body.metadata.namespace,
         body=body,
       )
-      print(response)
     except:
       return False
 

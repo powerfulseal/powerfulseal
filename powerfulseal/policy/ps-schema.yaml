@@ -855,9 +855,11 @@ definitions:
             items:
               type: string
           user:
-            type: string
+            type: number
+            minimum: 0
             description: >
-              The user to run as in the image.
+              The numeric UID of user to run as in the image.
+              Root (UID 0) is not the safest option.
           image:
             type: string
             default: gaiadocker/iproute2:latest

@@ -311,7 +311,7 @@ scenarios:
               - delay
               - 200ms
             image: gaiadocker/iproute2:latest
-            user: root
+            user: 123
         - toxiproxy:
             proxies:
               - name: testproxy

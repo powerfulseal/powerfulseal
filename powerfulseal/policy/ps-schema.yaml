@@ -841,8 +841,16 @@ definitions:
           command:
             type: string
             description: >
-              The command to execute. Including "tc".
-              For example "tc qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.
+              The command to execute. Leave empty for image default.
+          args:
+            type: string
+            description: >
+              The arguments to execute.
+              For example "qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.
+          user:
+            type: string
+            description: >
+              The user to run as in the image.
           image:
             type: string
             default: gaiadocker/iproute2:latest

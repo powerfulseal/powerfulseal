@@ -23,6 +23,25 @@ from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_abstract import ActionAbstract
 
 
+class DeleteDeploymentAction():
+  def __init__(self, name, namespace, k8s_inventory, logger=None):
+    self.name = name
+    self.namespace = namespace
+    self.k8s_inventory = k8s_inventory
+    self.logger = logger or makeLogger(__name__)
+
+  def execute(self):
+    try:
+      response = self.k8s_inventory.k8s_client.delete_deployment(
+        namespace=self.namespace,
+        name=self.name,
+      )
+      self.logger.debug("Response %s", response)
+      self.logger.info("Clone deployment deleted successfully: %s in %s", self.name, self.namespace)
+    except:
+      self.logger.exception("Error deleting clone deployment: %s in %s", self.name, self.namespace)
+      return False
+
 class ActionClone(ActionAbstract):
 
   def __init__(self, name, schema, k8s_inventory, logger=None, metric_collector=None):
@@ -31,6 +50,10 @@ class ActionClone(ActionAbstract):
     self.k8s_inventory = k8s_inventory
     self.logger = logger or makeLogger(__name__, name)
     self.metric_collector = metric_collector or StdoutCollector()
+    self.cleanup_actions = []
+
+  def get_cleanup_actions(self):
+    return self.cleanup_actions
 
   def get_source_schema(self, source):
     # currently, only deployments are supported
@@ -149,7 +172,14 @@ class ActionClone(ActionAbstract):
     except:
       return False
 
-    # TODO add a cleanup action to remove the clone
+    # add a cleanup action to remove the clone when we're done
+    self.cleanup_actions.append(
+      DeleteDeploymentAction(
+        name=body.metadata.name,
+        namespace=body.metadata.namespace,
+        k8s_inventory=self.k8s_inventory,
+      )
+    )
 
     return True
 

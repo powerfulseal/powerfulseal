@@ -140,6 +140,20 @@ class K8sClient():
             self.logger.exception(e)
             raise
 
+    def create_deployment(self, namespace, body):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            ExtensionsV1beta1Api.md#create_namespaced_deployment
+        """
+        try:
+            return self.client_appsv1api.create_namespaced_deployment(
+                namespace=namespace,
+                body=body,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
     def list_pods(self, namespace, labels=None, deployment_name=None, selector=None):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/

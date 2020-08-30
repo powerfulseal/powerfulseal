@@ -15,6 +15,7 @@
 
 import requests
 import time
+import kubernetes.client
 
 from powerfulseal import makeLogger
 
@@ -41,27 +42,61 @@ class ActionClone(ActionAbstract):
     return deployment
 
   def execute(self):
-    replicas = self.schema.get("replicas", 1)
-    source = self.schema.get("source")
-    labels = self.schema.get("labels", {})
-    mutations = self.schema.get("mutations", {})
-
     # get the source deployment
     try:
-      source_schema = self.get_source_schema(source)
+      source_schema = self.get_source_schema(self.schema.get("source"))
     except:
       return False
 
-    # apply the desired replicas number
+    # build the body for the request to create
+    body = kubernetes.client.V1Deployment()
+    body.metadata = kubernetes.client.V1ObjectMeta(
+      name=source_schema.metadata.name + "-chaos",
+      namespace=source_schema.metadata.namespace,
+      annotations=dict(
+        original_deployment=source_schema.metadata.name,
+        chaos_scenario=self.name,
+      ),
+      labels = dict(
+        chaos="true",
+      ),
+    )
+    body.spec = kubernetes.client.V1DeploymentSpec(
+      replicas=self.schema.get("replicas", 1),
+      selector=source_schema.spec.selector,
+      template=source_schema.spec.template,
+    )
 
-    # apply the desired labels
+    if body.spec.selector.match_expressions is not None:
+      self.logger.error("Deployment is using match_expressions. Not supported")
+      return False
 
-    # apply the desired mutations
+    # handle the labels modifiers
+    for label_modifier in self.schema.get("labels", []):
+      # TODO handle the labels mutations
+      pass
 
-    # create the new, cloned deployment
-    print(replicas, source, labels, mutations)
-    print(source_schema)
+    # handle the mutations
+    for mutation in self.schema.get("mutations", []):
+      # TODO handle the environment mutation
+      # TODO handle the tc mutation
+      # TODO handle the toxiproxy mutation
+      pass
 
-    # add a cleanup action to remove the clone
+    # insert the extra selector
+    body.spec.selector.match_labels["chaos"] = "true"
+    body.spec.template.metadata.labels["chaos"] = "true"
+
+    # create the clone
+    try:
+      response = self.k8s_inventory.k8s_client.create_deployment(
+        namespace=body.metadata.namespace,
+        body=body,
+      )
+      print(response)
+    except:
+      return False
+
+    # TODO add a cleanup action to remove the clone
 
     return True

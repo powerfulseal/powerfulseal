@@ -128,6 +128,7 @@ class ActionClone(ActionAbstract):
         namespace=body.metadata.namespace,
         body=body,
       )
+      self.logger.info("Clone deployment created successfully")
     except:
       return False
 

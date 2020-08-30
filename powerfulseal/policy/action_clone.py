@@ -154,17 +154,23 @@ class ActionClone(ActionAbstract):
     return True
 
 
-def mutate_traffic_control(self, body, spec):
-  """ Adds an init container with tc """
-  n = len(body.spec.template.spec.init_containers)
-  body.spec.template.spec.init_containers.append(
-    kubernetes.client.V1Container(
-      name="chaos-"+str(n+1),
-      command=spec.get("command"),
-      args=spec.get("args"),
-      image=spec.get("image"),
-      security_context=kubernetes.client.V1SecurityContext(
-        run_as_user=spec.get("user")
+  def mutate_traffic_control(self, body, spec):
+    """ Adds an init container with tc """
+    if body.spec.template.spec.init_containers is None:
+      body.spec.template.spec.init_containers = []
+    body.spec.template.spec.init_containers.append(
+      kubernetes.client.V1Container(
+        name="chaos"+str(1+len(body.spec.template.spec.init_containers)),
+        command=spec.get("command"),
+        args=spec.get("args"),
+        image=spec.get("image"),
+        security_context=kubernetes.client.V1SecurityContext(
+          run_as_user=spec.get("user"),
+          capabilities=kubernetes.client.V1Capabilities(
+            add=[
+              "NET_ADMIN"
+            ]
+          )
+        )
       )
     )
-  )

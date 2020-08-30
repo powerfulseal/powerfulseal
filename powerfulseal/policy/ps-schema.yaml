@@ -913,7 +913,7 @@ definitions:
                   description: >
                     Specify the type of toxic to apply.
                     See the available ones at https://github.com/Shopify/toxiproxy#toxics
-                toxicAtributes:
+                toxicAttributes:
                   type: array
                   description: >
                     Specify the attributes of the toxic to apply.
@@ -936,7 +936,6 @@ definitions:
               required:
               - targetProxy
               - toxicType
-              - upstream
     required:
     - toxiproxy
 

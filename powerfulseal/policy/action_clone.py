@@ -114,7 +114,16 @@ class ActionClone(ActionAbstract):
 
     # handle the mutations
     for mutation in self.schema.get("mutations", []):
-      # TODO handle the environment mutation
+      # handle the environment mutation
+      spec = mutation.get("environment")
+      if spec is not None:
+        for container in body.spec.template.spec.containers:
+          container.env.append(
+            kubernetes.client.V1EnvVar(
+              name=spec.get("name"),
+              value=spec.get("value"),
+            )
+          )
       # TODO handle the tc mutation
       # TODO handle the toxiproxy mutation
       pass

@@ -139,10 +139,12 @@ class ActionClone(ActionAbstract):
 
     # create the clone
     try:
+      self.logger.debug("Body %s", body)
       response = self.k8s_inventory.k8s_client.create_deployment(
         namespace=body.metadata.namespace,
         body=body,
       )
+      self.logger.debug("Response %s", response)
       self.logger.info("Clone deployment created successfully")
     except:
       return False

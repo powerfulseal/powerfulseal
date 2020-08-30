@@ -22,6 +22,7 @@ from powerfulseal import makeLogger
 from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_abstract import ActionAbstract
 
+DEFAULT_TOXIPROXY_IMAGE = "docker.io/shopify/toxiproxy:2.1.4"
 
 class DeleteDeploymentAction():
   def __init__(self, name, namespace, k8s_inventory, logger=None):
@@ -154,8 +155,10 @@ class ActionClone(ActionAbstract):
       if spec is not None:
         self.mutate_traffic_control(body, spec)
 
-      # TODO handle the toxiproxy mutation
-      pass
+      # handle the toxiproxy mutation
+      spec = mutation.get("toxiproxy")
+      if spec is not None:
+        self.mutate_toxiproxy(body, spec)
 
     # always insert the extra selector
     update_labels(chaos="true")
@@ -183,7 +186,6 @@ class ActionClone(ActionAbstract):
 
     return True
 
-
   def mutate_traffic_control(self, body, spec):
     """ Adds an init container with tc """
     if body.spec.template.spec.init_containers is None:
@@ -204,3 +206,57 @@ class ActionClone(ActionAbstract):
         )
       )
     )
+
+
+  def mutate_toxiproxy(self, body, spec):
+    """
+      This plugs a toxiproxy in as a side-car
+      It also uses an init container with iptables to reroute
+
+    """
+    # precompute the ports that need to be proxied
+    # for every port specified in the containers' definitions
+    containers_ports = []
+    for container in body.spec.template.spec.containers:
+      for port in container.ports:
+        containers_ports.append(port.container_port)
+    containers_mapping = dict()
+    # add a mapping port, that starts at 10000
+    counter = 10000
+    for port in containers_ports:
+      while counter in containers_ports or counter in containers_mapping.values():
+        counter += 1
+      containers_mapping[port] = counter
+
+    # prepare proxies in the toxiproxy format
+    proxies = spec.get("proxies", [])
+    for ingress_port, proxy_port in containers_mapping.items():
+      proxies.append(dict(
+        name="auto%s" % ingress_port,
+        listen="0.0.0.0:%s" % proxy_port,
+        upstream="127.0.0.1:%s" % ingress_port,
+      ))
+
+    # prepare the setup command through the startup probe
+    toxiproxy_cli = "/go/bin/toxiproxy-cli"
+    populate_cmd = "true"
+    for proxy in proxies:
+      populate_cmd += " && {cli} create {name} -l {listen} -u {upstream}".format(
+        cli=toxiproxy_cli,
+        **proxy
+      )
+
+    # add the toxiproxy side-car container
+    body.spec.template.spec.containers.append(
+      kubernetes.client.V1Container(
+        name="chaos-toxiproxy",
+        image=spec.get("image", DEFAULT_TOXIPROXY_IMAGE),
+        startup_probe=kubernetes.client.V1Probe(
+          _exec=kubernetes.client.V1ExecAction(
+            command=["/bin/sh", "-c", populate_cmd],
+          )
+        ),
+      )
+    )
+
+    # precompute the iptables commands

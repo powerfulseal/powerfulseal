@@ -842,6 +842,7 @@ definitions:
             type: string
             description: >
               The command to execute. Including "tc".
+              For example "tc qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.
           image:
             type: string
             default: gaiadocker/iproute2:latest
@@ -855,7 +856,7 @@ definitions:
   mutationToxiProxy:
     type: object
     description: >
-      Adds a sidecar container, and proxies all incoming ports specified through itself.
+      Adds a sidecar container, and proxies all incoming ports of the cloned containers through itself.
       You can also specify any extra proxies.
     additionalProperties: false
     properties:
@@ -863,20 +864,10 @@ definitions:
         type: object
         additionalProperties: false
         properties:
-          name:
-            type: string
-            description: >
-              The environment variable name
-          value:
-            type: string
-            description: >
-              The environment variable value
-          toxics:
+          proxies:
             type: array
             description: >
-              Toxics to apply.
-              These directly in the format specified by toxiproxy.
-              Learn more at https://github.com/shopify/toxiproxy
+              Extra proxies to be opened up by ToxiProxy.
             items:
               type: object
               additionalProperties: false
@@ -889,7 +880,7 @@ definitions:
                   type: string
                   description: >
                     The interface and port to listen on.
-                    For example 0.0.0.1:2222 to listen on port 2222 on all interafaces.
+                    For example 0.0.0.1:2222 to listen on port 2222 on all interfaces.
                 upstream:
                   type: string
                   description: >
@@ -899,9 +890,53 @@ definitions:
               - name
               - listen
               - upstream
-        required:
-        - name
-        - value
+          toxics:
+            type: array
+            description: >
+              Toxics to apply.
+              These directly in the format specified by toxiproxy.
+              Learn more at https://github.com/shopify/toxiproxy
+            items:
+              type: object
+              additionalProperties: false
+              properties:
+                targetProxy:
+                  type: string
+                  description: >
+                    The name of the target proxy.
+                    If you'd like to target any of the automatically created proxies,
+                    use "auto<ingress port number>", for example "auto80" for port 80.
+                    If you're like to target any of the manually created proxies,
+                    just use their name directly.
+                toxicType:
+                  type: string
+                  description: >
+                    Specify the type of toxic to apply.
+                    See the available ones at https://github.com/Shopify/toxiproxy#toxics
+                toxicAtributes:
+                  type: array
+                  description: >
+                    Specify the attributes of the toxic to apply.
+                    See the available ones at https://github.com/Shopify/toxiproxy#toxics
+                  items:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                      name:
+                        type: string
+                        description: >
+                          The name of the toxic's attribute.
+                      value:
+                        type: number
+                        description: >
+                          The value of the toxic's attribute.
+                    required:
+                    - name
+                    - value
+              required:
+              - targetProxy
+              - toxicType
+              - upstream
     required:
     - toxiproxy
 

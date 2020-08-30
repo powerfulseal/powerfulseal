@@ -41,6 +41,37 @@ class ActionClone(ActionAbstract):
     )
     return deployment
 
+  def modify_labels(self, body, update_labels):
+    """
+      Modifies labels and deployment selectors as required by the schema
+    """
+    for label_modifier in self.schema.get("labels", []):
+
+      # handle the service selector lookup
+      spec = label_modifier.get("service")
+      if spec is not None:
+        try:
+          # get the service we're after
+          service = self.k8s_inventory.k8s_client.get_service(
+            name=spec.get("name"),
+            namespace=spec.get("namespace"),
+          )
+          # reset the existing labels
+          update_labels()
+          # update with the selectors from the service
+          update_labels(**service.spec.selector)
+        except:
+          return False
+
+      # handle the static label modifications
+      spec = label_modifier.get("label")
+      if spec is not None:
+        updates = dict()
+        updates[spec.get("key")] = spec.get("value")
+        update_labels(**updates)
+
+    return body
+
   def execute(self):
     # get the source deployment
     try:
@@ -71,39 +102,15 @@ class ActionClone(ActionAbstract):
       self.logger.error("Deployment is using match_expressions. Not supported")
       return False
 
+    # handle the labels modifiers
     def update_labels(**kwargs):
+      if not kwargs:
+        body.spec.selector.match_labels = dict()
+        body.spec.template.metadata.labels = dict()
       for key, value in kwargs.items():
         body.spec.selector.match_labels[key] = value
         body.spec.template.metadata.labels[key] = value
-
-    # handle the labels modifiers
-    for label_modifier in self.schema.get("labels", []):
-
-      # handle the service selector lookup
-      spec = label_modifier.get("service")
-      if spec is not None:
-        try:
-          # get the service we're after
-          service = self.k8s_inventory.k8s_client.get_service(
-            name=spec.get("name"),
-            namespace=spec.get("namespace"),
-          )
-          # reset the existing labels
-          body.spec.selector.match_labels = dict()
-          body.spec.template.metadata.labels = dict()
-          # update with the selectors from the service
-          update_labels(**service.spec.selector)
-        except:
-          return False
-
-      # handle the static label modifications
-      spec = label_modifier.get("label")
-      if spec is not None:
-        updates = dict()
-        updates[spec.get("key")] = spec.get("value")
-        print(updates)
-        update_labels(**updates)
-
+    self.modify_labels(body, update_labels)
 
     # handle the mutations
     for mutation in self.schema.get("mutations", []):

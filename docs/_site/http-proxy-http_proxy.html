@@ -1,0 +1,42 @@
+<h1 class="no_toc" id="different-proxies-for-probes">Different proxies for probes</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#scenario" id="markdown-toc-scenario">Scenario</a></li>
+  <li><a href="#scenario-1" id="markdown-toc-scenario-1">Scenario</a></li>
+</ol>
+
+<hr />
+
+<h2 id="scenario">Scenario</h2>
+
+<p>Sometimes you need different proxies for different HTTP probes.</p>
+
+<h2 id="scenario-1">Scenario</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Proxies</span>
+  <span class="na">steps</span><span class="pi">:</span>
+
+  <span class="c1"># no proxies needed in cluster</span>
+  <span class="pi">-</span> <span class="na">probeHTTP</span><span class="pi">:</span>
+      <span class="na">target</span><span class="pi">:</span>
+        <span class="na">service</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">myservice</span>
+          <span class="na">namespace</span><span class="pi">:</span> <span class="s">example</span>
+          <span class="na">port</span><span class="pi">:</span> <span class="m">8000</span>
+
+  <span class="c1"># for this url, we need a special proxy</span>
+  <span class="pi">-</span> <span class="na">probeHTTP</span><span class="pi">:</span>
+      <span class="na">target</span><span class="pi">:</span>
+        <span class="na">url</span><span class="pi">:</span> <span class="s">https://something.somewhere.com</span>
+      <span class="na">proxy</span><span class="pi">:</span> <span class="s">http://some-proxy:8080</span>
+
+  <span class="c1"># note, that this will ignore HTTP_PROXY and HTTPS_PROXY in the env</span>
+  <span class="c1"># at will go without proxies</span>
+  <span class="pi">-</span> <span class="na">probeHTTP</span><span class="pi">:</span>
+      <span class="na">target</span><span class="pi">:</span>
+        <span class="na">url</span><span class="pi">:</span> <span class="s">https://something.somewhere.com</span>
+
+</code></pre></div></div>

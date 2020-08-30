@@ -1,0 +1,189 @@
+<h1 class="no_toc" id="getting-started">Getting started</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#local-installation" id="markdown-toc-local-installation">Local installation</a>    <ol>
+      <li><a href="#prerequisites" id="markdown-toc-prerequisites">Prerequisites</a>        <ol>
+          <li><a href="#python" id="markdown-toc-python">Python</a></li>
+          <li><a href="#setting-up-a-virtualenv" id="markdown-toc-setting-up-a-virtualenv">Setting up a virtualenv</a></li>
+        </ol>
+      </li>
+      <li><a href="#installing-through-pip" id="markdown-toc-installing-through-pip">Installing through pip</a></li>
+      <li><a href="#starting-the-seal" id="markdown-toc-starting-the-seal">Starting the Seal</a></li>
+    </ol>
+  </li>
+  <li><a href="#running-from-docker" id="markdown-toc-running-from-docker">Running from Docker</a>    <ol>
+      <li><a href="#download-docker-image" id="markdown-toc-download-docker-image">Download docker image</a></li>
+      <li><a href="#run-docker-image" id="markdown-toc-run-docker-image">Run docker image</a></li>
+    </ol>
+  </li>
+  <li><a href="#hello-world" id="markdown-toc-hello-world">Hello world!</a></li>
+  <li><a href="#modes-of-operation" id="markdown-toc-modes-of-operation">Modes of operation</a></li>
+</ol>
+
+<hr />
+
+<h2 id="local-installation">Local installation</h2>
+
+<p><code class="language-plaintext highlighter-rouge">PowerfulSeal</code> is available to install through <a href="https://pypi.org/project/powerfulseal/">pip</a>.</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<h4 id="python">Python</h4>
+
+<p>You’re going to need <a href="https://www.python.org/downloads/"><code class="language-plaintext highlighter-rouge">python</code></a> 3.7+.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">--version</span>
+Python 3.7.6
+</code></pre></div></div>
+
+<h4 id="setting-up-a-virtualenv">Setting up a virtualenv</h4>
+
+<p>Though optional, it is a good practice to use a <a href="https://virtualenv.pypa.io/en/stable/">virtualenv</a>. You can create and activate one like this:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python <span class="nt">-m</span> virtualenv <span class="nb">env
+source env</span>/bin/activate
+</code></pre></div></div>
+
+<h3 id="installing-through-pip">Installing through pip</h3>
+
+<p>Installing from <a href="https://pypi.org/project/powerfulseal/">pip</a> is easy:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip <span class="nb">install </span>powerfulseal
+</code></pre></div></div>
+
+<h3 id="starting-the-seal">Starting the Seal</h3>
+
+<p>To see the syntax of the commands, you can always run:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>powerfulseal <span class="nt">--help</span>
+</code></pre></div></div>
+
+<p>If you have a <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/"><code class="language-plaintext highlighter-rouge">kubeconfig</code></a> file ready (for example in <code class="language-plaintext highlighter-rouge">~/.kube/config</code>) and working with <code class="language-plaintext highlighter-rouge">Kubernetes</code>, you can start the seal on defaults:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>powerfulseal interactive
+</code></pre></div></div>
+
+<p>This will start a command line, <a href="./interactive-mode">interactive CLI</a>, just like the following. You can type commands inside of it.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">(</span>seal<span class="o">)</span> <span class="err">$</span>
+</code></pre></div></div>
+
+<p>Try listing pods from the <code class="language-plaintext highlighter-rouge">kube-system</code> namespace:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">(</span>seal<span class="o">)</span> <span class="nv">$ </span>pods kube-system
+</code></pre></div></div>
+
+<p>For help, just type <code class="language-plaintext highlighter-rouge">help</code>. For more information about the modes, see our <a href="./modes">docs on modes</a>.</p>
+
+<h2 id="running-from-docker">Running from Docker</h2>
+
+<h3 id="download-docker-image">Download docker image</h3>
+
+<p>For each <a href="https://github.com/bloomberg/powerfulseal/releases">release</a> a <code class="language-plaintext highlighter-rouge">docker</code> image is built and published to the <a href="https://hub.docker.com/_/powerfulseal">docker hub</a>.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull store/bloomberg/powerfulseal:3.1.1
+</code></pre></div></div>
+
+<h3 id="run-docker-image">Run docker image</h3>
+
+<p>You can use the <code class="language-plaintext highlighter-rouge">docker</code> image in a similar fashion to running locally. You will just need to pass it your <code class="language-plaintext highlighter-rouge">kubeconfig</code>.</p>
+
+<p>Below is an example of using the <code class="language-plaintext highlighter-rouge">-v</code> flag to inject your local <code class="language-plaintext highlighter-rouge">kubeconfig</code> to the image (<code class="language-plaintext highlighter-rouge">-v ~/.kube:/root/.kube</code>)</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-it</span> <span class="se">\</span>
+    <span class="nt">-v</span> ~/.kube:/root/.kube <span class="se">\</span>
+    docker.io/store/bloomberg/powerfulseal:2.8.0 <span class="se">\</span>
+    interactive
+</code></pre></div></div>
+
+<p>To see how to use other modes, see our <a href="./modes">docs on modes</a></p>
+
+<h2 id="hello-world">Hello world!</h2>
+
+<p>Write the following hello world policy to <code class="language-plaintext highlighter-rouge">policy.yml</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Hello chaos!</span>
+  <span class="na">description</span><span class="pi">:</span> <span class="pi">&gt;</span>
+    <span class="s">Verifies that after a pod is killed,</span>
+    <span class="s">it's succesfully rescheduled after 30 seconds.</span>
+  <span class="na">steps</span><span class="pi">:</span>
+  <span class="c1"># kill a kube-system pod</span>
+  <span class="pi">-</span> <span class="na">podAction</span><span class="pi">:</span>
+      <span class="na">matches</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+      <span class="na">filters</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">randomSample</span><span class="pi">:</span>
+            <span class="na">size</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">actions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">kill</span><span class="pi">:</span>
+            <span class="na">probability</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="pi">-</span> <span class="na">wait</span><span class="pi">:</span>
+      <span class="na">seconds</span><span class="pi">:</span> <span class="m">30</span>
+  <span class="c1"># make sure all pods are running in the namespace</span>
+  <span class="pi">-</span> <span class="na">podAction</span><span class="pi">:</span>
+      <span class="na">matches</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+      <span class="na">actions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">checkPodState</span><span class="pi">:</span>
+            <span class="na">state</span><span class="pi">:</span> <span class="s">Running</span>
+</code></pre></div></div>
+
+<p>You can then run the hello world policy in <a href="./autonomous-mode">autonomus mode</a> (the most flexible and powerful mode). Run the following command:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>powerfulseal autonomous <span class="nt">--policy-file</span> ./policy.yaml
+</code></pre></div></div>
+
+<p>You will see an output similar to the following one. Note, that the Seal killed a pod, and then verified that it was successfuly restarted. By default, it will continue to run this experiment over and over, so feel free to press <code class="language-plaintext highlighter-rouge">Ctrl-C</code> to kill it.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>powerfulseal autonomous <span class="nt">--policy-file</span> stuff/policy1.yml
+2020-06-05 12:42:03 INFO __main__ verbosity: None<span class="p">;</span> log level: INFO<span class="p">;</span> handler level: INFO
+2020-06-05 12:42:03 INFO __main__ Creating kubernetes client with config /Users/chaos/.kube/config <span class="o">(</span>path found <span class="k">for </span>backwards compatibility<span class="o">)</span>
+2020-06-05 12:42:03 INFO k8s_client Initializing with config: /Users/chaos/.kube/config
+2020-06-05 12:42:03 INFO __main__ No cloud driver - some functionality disabled
+2020-06-05 12:42:04 INFO __main__ Using stdout metrics collector
+2020-06-05 12:42:04 INFO __main__ Starting the UI server <span class="o">(</span>0.0.0.0:8000<span class="o">)</span>
+2020-06-05 12:42:04 INFO __main__ STARTING AUTONOMOUS MODE
+2020-06-05 12:42:04 INFO scenario.Hello chaos! Starting scenario <span class="s1">'Hello chaos!'</span> <span class="o">(</span>3 steps<span class="o">)</span>
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Matching <span class="s1">'namespace'</span> <span class="o">{</span><span class="s1">'namespace'</span>: <span class="s1">'kube-system'</span><span class="o">}</span>
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Matched 37 pods <span class="k">in </span>namespace kube-system
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Filtered <span class="nb">set </span>length: 1
+2020-06-05 12:42:04 INFO action_nodes_pods.Hello chaos! Pod killed: <span class="o">[</span>pod <span class="c">#32 name=kube-state-metrics-7b4944dfbb-zrlrz namespace=kube-system containers=1 ...]</span>
+2020-06-05 12:42:04 INFO scenario.Hello chaos! Sleeping <span class="k">for </span>30 seconds
+2020-06-05 12:42:34 INFO action_nodes_pods.Hello chaos! Matching <span class="s1">'namespace'</span> <span class="o">{</span><span class="s1">'namespace'</span>: <span class="s1">'kube-system'</span><span class="o">}</span>
+2020-06-05 12:42:35 INFO action_nodes_pods.Hello chaos! Matched 37 pods <span class="k">in </span>namespace kube-system
+2020-06-05 12:42:35 INFO action_nodes_pods.Hello chaos! Filtered <span class="nb">set </span>length: 37
+2020-06-05 12:42:35 INFO scenario.Hello chaos! Scenario finished
+</code></pre></div></div>
+
+<p>We just verified experimentally, that the <code class="language-plaintext highlighter-rouge">Kubernetes</code> cluster was able to successfully restart a pod within 30 seconds. Now, what would happen if you changed the wait to 1 second?</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+  <span class="pi">-</span> <span class="na">wait</span><span class="pi">:</span>
+      <span class="na">seconds</span><span class="pi">:</span> <span class="m">1</span>
+</code></pre></div></div>
+
+<p>Most likely this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...
+2020-06-05 12:53:26 INFO action_nodes_pods.Hello chaos! Pod killed: [pod #14 name=kube-apiserver-metrics-pkh6n namespace=kube-system containers=1 ...]
+2020-06-05 12:53:26 INFO scenario.Hello chaos! Sleeping for 1 seconds
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Matching 'namespace' {'namespace': 'kube-system'}
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Matched 37 pods in namespace kube-system
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Initial set length: 37
+2020-06-05 12:53:27 INFO action_nodes_pods.Hello chaos! Filtered set length: 37
+2020-06-05 12:53:27 ERROR action_nodes_pods.Hello chaos! Expected pod in state 'Running', got 'ContainerCreating' ([pod #14 name=kube-apiserver-metrics-f98lw namespace=kube-system containers=1 ...])
+2020-06-05 12:53:27 WARNING scenario.Hello chaos! Step returned failure {'podAction': {'matches': [{'namespace': 'kube-system'}], 'actions': [{'checkPodState': {'state': 'Running'}}]}}. Finishing scenario early
+2020-06-05 12:53:27 ERROR policy_runner Exiting early
+2020-06-05 12:53:27 ERROR __main__ Policy runner finishes with an error
+</code></pre></div></div>
+
+<p>OK, so that’s a taste of what powerfulseal policies are capable of. Learn more about <a href="./policies">policies here</a>.</p>
+
+<h2 id="modes-of-operation">Modes of operation</h2>
+
+<p>Powerfulseal supports multiple modes of operation.</p>
+
+<p><a href="./modes" class="btn btn-secondary fs-5 mb-4 mb-md-0 mr-2">Learn about modes now</a></p>

@@ -1,0 +1,53 @@
+<h1 class="no_toc" id="mixing-nodes-and-pods">Mixing nodes and pods</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#scenario" id="markdown-toc-scenario">Scenario</a></li>
+  <li><a href="#scenario-1" id="markdown-toc-scenario-1">Scenario</a></li>
+</ol>
+
+<hr />
+
+<h2 id="scenario">Scenario</h2>
+
+<p>A single scenario can have actions on both nodes and pods (don’t forget to configure a cloud driver).</p>
+
+<p>For example, imagine that you have a service which resolves to a daemonset, and you want to check that the service won’t return an error if a node is taken down.</p>
+
+<h2 id="scenario-1">Scenario</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Check service responds when one node lost</span>
+  <span class="na">steps</span><span class="pi">:</span>
+
+  <span class="c1"># take down a single master VM</span>
+  <span class="pi">-</span> <span class="na">nodeAction</span><span class="pi">:</span>
+      <span class="c1"># pick all master VMs</span>
+      <span class="na">matches</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">property</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">name"</span>
+            <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">.*master.*"</span>
+      <span class="na">filters</span><span class="pi">:</span>
+        <span class="c1"># only pick the VMs which are in UP state</span>
+        <span class="pi">-</span> <span class="na">property</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">state"</span>
+            <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">UP"</span>
+        <span class="c1"># and only pick a single VM</span>
+        <span class="pi">-</span> <span class="na">randomSample</span><span class="pi">:</span>
+            <span class="na">size</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">actions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">stop</span><span class="pi">:</span>
+            <span class="na">force</span><span class="pi">:</span> <span class="no">false</span>
+
+  <span class="c1"># make sure the service responds</span>
+  <span class="pi">-</span> <span class="na">probeHTTP</span><span class="pi">:</span>
+      <span class="na">target</span><span class="pi">:</span>
+        <span class="na">service</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">myservice</span>
+          <span class="na">namespace</span><span class="pi">:</span> <span class="s">example</span>
+          <span class="na">port</span><span class="pi">:</span> <span class="m">8000</span>
+      <span class="c1"># assuming we had a 100 nodes, and it goes in round-robin</span>
+      <span class="c1"># we can make 100 calls to the service</span>
+      <span class="na">count</span><span class="pi">:</span> <span class="m">100</span>
+</code></pre></div></div>

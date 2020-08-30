@@ -1,0 +1,55 @@
+<p><img src="./media/powerful-seal.png" alt="image-title-here" class="img-responsive" width="150px" /></p>
+
+<h1 class="fs-9" id="a-powerful-chaos-engineering-tool-for-kubernetes-clusters">A powerful chaos engineering tool for Kubernetes clusters</h1>
+
+<p class="fs-6 fw-300"><strong>PowerfulSeal</strong> injects failure into your Kubernetes clusters, so that you can detect problems as early as possible. It allows for writing scenarios describing complete <a href="https://principlesofchaos.org">chaos experiments</a>.</p>
+
+<p><a href="./getting-started" class="btn btn-primary fs-5 mb-4 mb-md-0 mr-2">Get started now</a> <a href="https://github.com/bloomberg/powerfulseal" class="btn fs-5 mb-4 mb-md-0">View it on GitHub</a></p>
+
+<hr />
+
+<h2 id="highlights">Highlights</h2>
+
+<ul>
+  <li>works with <code class="language-plaintext highlighter-rouge">Kubernetes</code>, <code class="language-plaintext highlighter-rouge">OpenStack</code>, <code class="language-plaintext highlighter-rouge">AWS</code>, <code class="language-plaintext highlighter-rouge">Azure</code>, <code class="language-plaintext highlighter-rouge">GCP</code> and local machines</li>
+  <li><code class="language-plaintext highlighter-rouge">Prometheus</code> and <code class="language-plaintext highlighter-rouge">Datadog</code> metrics collection</li>
+  <li><code class="language-plaintext highlighter-rouge">yaml</code> <a href="#policies">policies</a> describing chaos experiments</li>
+  <li>multiple <a href="./modes">modes</a></li>
+</ul>
+
+<hr />
+
+<h2 id="policies">Policies</h2>
+
+<p>Just to give you a taste, here’s an example policy. It will kill a single pod, and then check that the service continues responding to HTTP probes, to verify its resiliency to one of its pods going down.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Kill one pod in my namespace, make sure the service responds</span>
+  <span class="na">steps</span><span class="pi">:</span>
+  <span class="c1"># kill a pod from `myapp` namespace</span>
+  <span class="pi">-</span> <span class="na">podAction</span><span class="pi">:</span>
+      <span class="na">matches</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespace</span><span class="pi">:</span> <span class="s">myapp</span>
+      <span class="na">filters</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">randomSample</span><span class="pi">:</span>
+            <span class="na">size</span><span class="pi">:</span> <span class="m">1</span>
+      <span class="na">actions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">kill</span><span class="pi">:</span>
+            <span class="na">probability</span><span class="pi">:</span> <span class="m">0.75</span>
+  <span class="c1"># check my service continues working</span>
+  <span class="pi">-</span> <span class="na">probeHTTP</span><span class="pi">:</span>
+      <span class="na">target</span><span class="pi">:</span>
+        <span class="na">service</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">my-service</span>
+          <span class="na">namespace</span><span class="pi">:</span> <span class="s">myapp</span>
+      <span class="na">endpoint</span><span class="pi">:</span> <span class="s">/healthz</span>
+</code></pre></div></div>
+
+<p><a href="./policies" class="btn btn-primary fs-5 mb-4 mb-md-0 mr-2">Learn how to write your own policies</a></p>
+
+<hr />
+
+<h3 id="license">License</h3>
+
+<p>Powerfulseal is distributed by an <a href="https://github.com/bloomberg/powerfulseal/blob/master/LICENSE">Apache-2.0</a>.</p>
+

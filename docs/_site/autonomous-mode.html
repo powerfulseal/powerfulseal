@@ -1,0 +1,40 @@
+<h1 class="no_toc" id="autonomous-mode">Autonomous mode</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#writing-policies" id="markdown-toc-writing-policies">Writing policies</a></li>
+  <li><a href="#metrics-collection" id="markdown-toc-metrics-collection">Metrics collection</a></li>
+  <li><a href="#web-user-interface" id="markdown-toc-web-user-interface">Web User Interface</a></li>
+</ol>
+
+<hr />
+
+<p>Autonomous mode is the workhorse of the seal. Once you know what kind of experiment you’re after, you can write a yaml file to describe that. For more information on running the autonomous mode, see the help:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>seal autonomous <span class="nt">--help</span>
+</code></pre></div></div>
+
+<h2 id="writing-policies">Writing policies</h2>
+
+<p>To learn how to write policies, visit the <a href="./policies">policies section</a></p>
+
+<h2 id="metrics-collection">Metrics collection</h2>
+
+<p>Autonomous mode also comes with the ability for metrics useful for monitoring to be collected. PowerfulSeal currently has a <code class="language-plaintext highlighter-rouge">stdout</code>, Prometheus and Datadog collector. However, metric collectors are easily extensible so it is easy to add your own. More details can be found <a href="./in-depth-topics#metric-collection">here</a>.</p>
+
+<p>For example, getting prometheus metrics is as simple as adding the flag <code class="language-plaintext highlighter-rouge">--prometheus-collector</code> when starting the seal.</p>
+
+<h2 id="web-user-interface">Web User Interface</h2>
+
+<p>⚠️ If you’re not going to use the UI, use the flag <code class="language-plaintext highlighter-rouge">--headless</code> to disable it</p>
+
+<p>PowerfulSeal comes with a web interface to help you navigate Autonomous Mode. Features include:</p>
+
+<ul>
+  <li>viewing logs</li>
+  <li>viewing the policy</li>
+</ul>
+
+<p><a href="https://github.com/bloomberg/powerfulseal/blob/master/docs/media/web.png"><img src="./media/web.png" alt="web interface" /></a></p>
+

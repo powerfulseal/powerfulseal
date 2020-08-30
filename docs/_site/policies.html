@@ -1,0 +1,99 @@
+<h1 class="no_toc" id="policies">Policies</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#syntax" id="markdown-toc-syntax">Syntax</a></li>
+  <li><a href="#basic-structure" id="markdown-toc-basic-structure">Basic structure</a>    <ol>
+      <li><a href="#empty-scenario" id="markdown-toc-empty-scenario">Empty scenario</a></li>
+      <li><a href="#kitchen-sink" id="markdown-toc-kitchen-sink">Kitchen sink</a></li>
+    </ol>
+  </li>
+  <li><a href="#scenarios" id="markdown-toc-scenarios">Scenarios</a></li>
+  <li><a href="#config" id="markdown-toc-config">Config</a>    <ol>
+      <li><a href="#number-of-runs" id="markdown-toc-number-of-runs">Number of runs</a></li>
+      <li><a href="#order-of-scenarios" id="markdown-toc-order-of-scenarios">Order of scenarios</a></li>
+      <li><a href="#exit-strategy" id="markdown-toc-exit-strategy">Exit strategy</a></li>
+    </ol>
+  </li>
+  <li><a href="#examples" id="markdown-toc-examples">Examples</a></li>
+</ol>
+
+<hr />
+
+<h2 id="syntax">Syntax</h2>
+
+<p>Policies describe the chaos experiments for powerfulseal to execute in autonomous mode. The syntax is formally defined <a href="https://github.com/bloomberg/powerfulseal/blob/master/powerfulseal/policy/ps-schema.yaml">here</a>. If you want to browse the available options, see below:</p>
+
+<p><a href="./schema" class="btn btn-secondary fs-5 mb-4 mb-md-0 mr-2">Browse the syntax documentation</a></p>
+
+<h2 id="basic-structure">Basic structure</h2>
+
+<h3 id="empty-scenario">Empty scenario</h3>
+
+<p>A policy file is a yaml file. The most basic policy you can write is the following:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+
+<p>It will validate, but will not do anything interesting.</p>
+
+<h3 id="kitchen-sink">Kitchen sink</h3>
+
+<p>If you’d like to see all possible options in an example config, you <a href="https://github.com/bloomberg/powerfulseal/blob/master/tests/policy/example_config.yml">this policy</a>. We use it to test that it validates to detect any regressions when new features are added.</p>
+
+<h2 id="scenarios">Scenarios</h2>
+
+<p>Every scenario has a name and an array of steps to do. For example:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Example scenario</span>
+  <span class="na">description</span><span class="pi">:</span> <span class="pi">&gt;</span>
+    <span class="s">A longer description of the scenario.</span>
+    <span class="s">Can have multiple lines etc.</span>
+  <span class="na">steps</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+
+<p>The steps will be executed in the order specified.</p>
+
+<h2 id="config">Config</h2>
+
+<p>You can also tweak certain parameters directly from the policy file.</p>
+
+<h3 id="number-of-runs">Number of runs</h3>
+
+<p>For example, by default the seal will continuosly run your scenario and only stop on errors.</p>
+
+<p>If you’d like to run an experiment as part of your CI pipeline, you might want to run it a single time and then exit. The return code will tell you whether the experiment succeeded or not.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">config</span><span class="pi">:</span>
+  <span class="na">runStrategy</span><span class="pi">:</span>
+    <span class="na">runs</span><span class="pi">:</span> <span class="m">1</span>
+<span class="na">scenarios</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+
+<h3 id="order-of-scenarios">Order of scenarios</h3>
+
+<p>By default, the seal runs the scenarios in the order specified (<code class="language-plaintext highlighter-rouge">round-robin</code>). You can change that to run them in a random order:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">config</span><span class="pi">:</span>
+  <span class="na">runStrategy</span><span class="pi">:</span>
+    <span class="na">strategy</span><span class="pi">:</span> <span class="s">random</span>
+<span class="na">scenarios</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+
+<h3 id="exit-strategy">Exit strategy</h3>
+
+<p>By default, if a scenario fails, the seal will report the error so that you can alert on it, and keep going.</p>
+
+<p>If you’d like it to exit (for example if you’re running it as a job), you can use the <code class="language-plaintext highlighter-rouge">fail-fast</code> exit strategy:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">config</span><span class="pi">:</span>
+  <span class="na">exitStrategy</span><span class="pi">:</span>
+    <span class="na">strategy</span><span class="pi">:</span> <span class="s">fail-fast</span>
+<span class="na">scenarios</span><span class="pi">:</span> <span class="pi">[]</span>
+</code></pre></div></div>
+
+<h2 id="examples">Examples</h2>
+
+<p>To see examples of policies, use the menu on the left.</p>

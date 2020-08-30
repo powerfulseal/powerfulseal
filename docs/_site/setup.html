@@ -1,0 +1,103 @@
+<h1 class="no_toc" id="setup-powerfulseal">Setup Powerfulseal</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#running-on-kubernetes" id="markdown-toc-running-on-kubernetes">Running on Kubernetes</a></li>
+  <li><a href="#running-outside-of-the-cluster" id="markdown-toc-running-outside-of-the-cluster">Running outside of the cluster</a></li>
+  <li><a href="#kubectl" id="markdown-toc-kubectl">Kubectl</a>    <ol>
+      <li><a href="#kubectl-action-permissions" id="markdown-toc-kubectl-action-permissions"><code class="language-plaintext highlighter-rouge">kubectl</code> action permissions</a></li>
+    </ol>
+  </li>
+  <li><a href="#exec-ing-into-a-running-pod" id="markdown-toc-exec-ing-into-a-running-pod">Exec-ing into a running pod</a></li>
+  <li><a href="#cloud-drivers" id="markdown-toc-cloud-drivers">Cloud drivers</a></li>
+  <li><a href="#minikube" id="markdown-toc-minikube">Minikube</a></li>
+  <li><a href="#kubectl-1" id="markdown-toc-kubectl-1">Kubectl</a></li>
+</ol>
+
+<hr />
+
+<p><code class="language-plaintext highlighter-rouge">PowerfulSeal</code> has two main modes of operation: through <code class="language-plaintext highlighter-rouge">Kubernetes</code> or through <code class="language-plaintext highlighter-rouge">SSH</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Kubernetes</code> mode is the default, and it’s easier to use. It kills pods by deleting them through the API.</p>
+
+<p><code class="language-plaintext highlighter-rouge">SSH</code> works by SSH-ing into the machine itself and executing command like <code class="language-plaintext highlighter-rouge">docker kill &lt;pod ip&gt;</code>. The pods then show as crashing. Unfortunately, it requires <code class="language-plaintext highlighter-rouge">SSH</code> access to all machines you’re going to be doing chaos on, which is sometimes troublesome.</p>
+
+<h2 id="running-on-kubernetes">Running on Kubernetes</h2>
+
+<p>Running on <code class="language-plaintext highlighter-rouge">Kubernetes</code> is easy. You can do that by:</p>
+
+<ul>
+  <li>creating <a href="https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/rbac.yml">RBAC rules</a> to allow the seal to list, get and delete pods and nodes,
+    <ul>
+      <li>you might need to adjust it depending on what you are planning to do with the Seal</li>
+    </ul>
+  </li>
+  <li>creating a <a href="https://github.com/bloomberg/powerfulseal/blob/master/kubernetes/powerfulseal.yml">configmap and deployment</a>
+    <ul>
+      <li>your scenarios will live in the configmap</li>
+      <li>if you’d like to use the UI, you’ll probably also need a service and ingress</li>
+    </ul>
+  </li>
+</ul>
+
+<p>That’s it. The Seal will self-discover the way to connect to <code class="language-plaintext highlighter-rouge">Kubernetes</code> and start executing your policy</p>
+
+<h2 id="running-outside-of-the-cluster">Running outside of the cluster</h2>
+
+<p>If you’re running outside of your cluster, the setup will involve:</p>
+
+<ul>
+  <li>pointing PowerfulSeal at your Kubernetes cluster by giving it a Kubernetes config file</li>
+  <li>pointing PowerfulSeal at your cloud by specifying the cloud driver to use and providing credentials</li>
+  <li>making sure the Seal can <code class="language-plaintext highlighter-rouge">SSH</code> into the nodes in order to execute <code class="language-plaintext highlighter-rouge">docker kill</code> command</li>
+  <li>writing a set of policies</li>
+</ul>
+
+<p>It should look something like <a href="https://github.com/bloomberg/powerfulseal/blob/master/docs/media/setup.png">this</a>.</p>
+
+<h2 id="kubectl">Kubectl</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">powerfulseal</code> image packages a <code class="language-plaintext highlighter-rouge">kubectl</code> binary to execute the <code class="language-plaintext highlighter-rouge">kubectl</code> actions with.
+When executing the commands, the <code class="language-plaintext highlighter-rouge">http{s}_proxy</code> variables are overwritten by the contents of the <code class="language-plaintext highlighter-rouge">proxy</code> parameter from inside of the scenario.</p>
+
+<p>If you exec into the pod, you can <code class="language-plaintext highlighter-rouge">kubectl</code> directly, using the same RBAC permissions.</p>
+
+<p>For example, in the <a href="https://github.com/bloomberg/powerfulseal/tree/master/kubernetes">./kubernetes</a> contains RBAC which allows the seal to:</p>
+
+<ul>
+  <li>read from all namespaces</li>
+  <li>delete pods in all namespaces</li>
+  <li>do everything inside of the special <code class="language-plaintext highlighter-rouge">powerfulseal-sandbox</code> namespace
+    <ul>
+      <li>all creation of new pods will need to happen inside of that namespace</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="kubectl-action-permissions"><code class="language-plaintext highlighter-rouge">kubectl</code> action permissions</h3>
+
+<p>Remember, that in order to be able to execute the <code class="language-plaintext highlighter-rouge">kubectl</code> action payloads, you’re going to need to give you pod necessary permissions.</p>
+
+<h2 id="exec-ing-into-a-running-pod">Exec-ing into a running pod</h2>
+
+<p>If you have a running <code class="language-plaintext highlighter-rouge">powerfulseal</code> pod executing scenario, you can always <code class="language-plaintext highlighter-rouge">kubectl exec -ti ps-pod -- bash</code> and then run <code class="language-plaintext highlighter-rouge">powerfulseal interactive</code> from inside of it.</p>
+
+<h2 id="cloud-drivers">Cloud drivers</h2>
+
+<p>In order to interact with VMs, you’re going to need to configure a cloud driver. <a href="./cloud-provider-requirements">Learn more</a></p>
+
+<h2 id="minikube">Minikube</h2>
+
+<p>It’s easy to use <code class="language-plaintext highlighter-rouge">minikube</code> with the Seal. It should run well on the default settings. If you choose to use SSH access, you’re going to need these options:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">--ssh-allow-missing-host-keys</span> <span class="se">\</span>
+<span class="nt">--remote-user</span> docker <span class="se">\</span>
+<span class="nt">--ssh-path-to-private-key</span> <span class="sb">`</span>minikube ssh-key<span class="sb">`</span> <span class="se">\</span>
+<span class="nt">--ssh-password</span> <span class="sb">`</span>minikube ssh-password<span class="sb">`</span> <span class="se">\</span>
+<span class="nt">--override-ssh-host</span> <span class="sb">`</span>minikube ip<span class="sb">`</span> <span class="se">\</span>
+</code></pre></div></div>
+
+<h2 id="kubectl-1">Kubectl</h2>
+
+<p>In order to use <code class="language-plaintext highlighter-rouge">kubectl</code> action, you’re going to need <code class="language-plaintext highlighter-rouge">kubectl</code> accessible in your path. The official images ship with the latest minor version of <code class="language-plaintext highlighter-rouge">kubectl</code> inside of the container.</p>

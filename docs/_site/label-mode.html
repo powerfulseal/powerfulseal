@@ -1,0 +1,77 @@
+<h1 id="label-mode">Label Mode</h1>
+
+<p>Label mode is a more imperative alternative to autonomous mode, allowing you to specify <em>per-pod</em> whether a pod should be killed, the days/times it can be killed and the probability of it being killed.</p>
+
+<p>Label mode is a good way to have more granular control over which pods are killed at the expense of greater verbosity. This trade-off is especially useful if you have a large number of pods (in the hundreds or even greater magnitudes) but only want to run PowerfulSeal on a few pods, or if your Kubernetes cluster has pods where you want full confidence that PowerfulSeal would not kill.</p>
+
+<p><strong>note</strong>: while called <em>label</em> mode, you can use both labels and annotations to mark pods for destruction.</p>
+
+<h2 id="usage">Usage</h2>
+
+<p>Labels can be manually set using the <code class="language-plaintext highlighter-rouge">kubectl label pods [POD NAME] [LABEL]</code> or <code class="language-plaintext highlighter-rouge">kubectl annotate pods [POD NAME] [LABEL]</code> command. Once labels are set, label mode can be run by using the <code class="language-plaintext highlighter-rouge">--label</code> flag. You may also wish to set the <code class="language-plaintext highlighter-rouge">--min-seconds-between-runs</code> and <code class="language-plaintext highlighter-rouge">--max-seconds-between-runs</code> flags which default to <code class="language-plaintext highlighter-rouge">0</code> and <code class="language-plaintext highlighter-rouge">300</code> respectively.</p>
+
+<p>To reduce the processing time needed to filter a large number of pods, you can instruct PowerfulSeal to only look up pods under a specific namespace by using the <code class="language-plaintext highlighter-rouge">--kubernetes-namespace</code> argument. This behaves similar to <code class="language-plaintext highlighter-rouge">kubectl</code>, where not specifying the argument defaults PowerfulSeal to the <code class="language-plaintext highlighter-rouge">default</code> namespace, whereas specifying an empty value (<code class="language-plaintext highlighter-rouge">--kubernetes-namespace=</code>) retrieves all pods across all namespaces.</p>
+
+<h2 id="annotations">Annotations</h2>
+
+<p>The values labels can have in Kubernetes is restricted, so some of the configuration below is not possible with labels (<code class="language-plaintext highlighter-rouge">seal/days</code> at the moment). To work around this, you can use any of the labels specified here as annotations instead. If you specify a key both as a label and an annotation, the label value will be preferred.</p>
+
+<h2 id="example">Example</h2>
+
+<p>Suppose we have pods <code class="language-plaintext highlighter-rouge">my-app-1</code>, <code class="language-plaintext highlighter-rouge">my-app-2</code>, etc. under the <code class="language-plaintext highlighter-rouge">default</code> namespace in a system which is designed to handle the failure of one <code class="language-plaintext highlighter-rouge">my-app</code> pod. In this case, we can make the decision to label the first application pod:</p>
+
+<ol>
+  <li>To allow PowerfulSeal to act on the pod, run <code class="language-plaintext highlighter-rouge">kubectl label pods my-app-1 seal/enabled=true</code></li>
+  <li>To next increase the randomness of when the pod can fail (reflecting the unexpectedness of real world failures), run <code class="language-plaintext highlighter-rouge">kubectl label pods my-app-1 seal/kill-probability=0.5</code></li>
+  <li>Finally, to ensure we’re present in the office if the resilience of the system fails, we can set annotations so that our pod is only killed during working hours with <code class="language-plaintext highlighter-rouge">seal/days="mon,tue,way,thu,fri"</code>, <code class="language-plaintext highlighter-rouge">seal/start-time=10-00-00</code> and <code class="language-plaintext highlighter-rouge">seal/end-time=17-30-00</code>. Note, that commas are not allowed in labels, so you need to use <code class="language-plaintext highlighter-rouge">kube annotate pods my-pod seal/days="mon,tue,way,thu,fri"</code> to achieve this.</li>
+</ol>
+
+<p>All of these labels are optional. For additional labels and their defaults, see the reference below.</p>
+
+<p>To finally get PowerfulSeal running, assuming our <code class="language-plaintext highlighter-rouge">kube-config</code> is at <code class="language-plaintext highlighter-rouge">~/.kube/config</code> driver, run: <code class="language-plaintext highlighter-rouge">powerfulseal label --kube-config ~/.kube/config</code>.</p>
+
+<p>If we were to change the namespace of the <code class="language-plaintext highlighter-rouge">my-app-*</code> pods to, for example, <code class="language-plaintext highlighter-rouge">production</code>, PowerfulSeal can be either run with the <code class="language-plaintext highlighter-rouge">--kubernetes-namespace=production</code> argument to get all pods with the <code class="language-plaintext highlighter-rouge">production</code> namespace, or <code class="language-plaintext highlighter-rouge">--kubernetes-namespace=</code> to get all pods across all namespaces (not recommended due to poor performance when is a large number of pods).</p>
+
+<h2 id="reference">Reference</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Label</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>seal/enabled</td>
+      <td>Either “true” or “false”</td>
+      <td>“false”</td>
+    </tr>
+    <tr>
+      <td>seal/force-kill</td>
+      <td>Either “true” or “false”</td>
+      <td>“false”</td>
+    </tr>
+    <tr>
+      <td>seal/kill-probability</td>
+      <td>A value between “0” and “1” inclusive describing the probability that a pod should be killed</td>
+      <td>“1”</td>
+    </tr>
+    <tr>
+      <td>seal/days</td>
+      <td>A comma-separated string consisting of “mon”, “tue”, “wed”, “thu”, “fri”, “sat”, “sun”, describing the days which the pod can be killed</td>
+      <td>“mon,tue,wed,thu,fri”</td>
+    </tr>
+    <tr>
+      <td>seal/start-time</td>
+      <td>A value “HH-MM-SS” describing the inclusive start boundary of when a pod can be killed in the local timezone</td>
+      <td>“10-00-00”</td>
+    </tr>
+    <tr>
+      <td>seal/end-time</td>
+      <td>A value “HH-MM-SS” describing the exclusive end boundary of when a pod can be killed in the local time zone</td>
+      <td>“17-30-00”</td>
+    </tr>
+  </tbody>
+</table>

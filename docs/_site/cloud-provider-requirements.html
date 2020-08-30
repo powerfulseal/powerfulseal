@@ -1,0 +1,60 @@
+<h2 class="no_toc" id="cloud-provider-requirements">Cloud Provider Requirements</h2>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#azure" id="markdown-toc-azure">Azure</a></li>
+  <li><a href="#aws" id="markdown-toc-aws">AWS</a></li>
+  <li><a href="#openstack" id="markdown-toc-openstack">OpenStack</a></li>
+  <li><a href="#gcp" id="markdown-toc-gcp">GCP</a></li>
+</ol>
+
+<hr />
+
+<h2 id="azure">Azure</h2>
+
+<p>The credentials to connect to Azure may be specified in one of two ways:</p>
+
+<ol>
+  <li>Supply the full path to an Azure credentials file in the environment variable <code class="language-plaintext highlighter-rouge">AZURE_AUTH_LOCATION</code>.<br />
+This is the easiest method.  The credentials file can be generated via <code class="language-plaintext highlighter-rouge">az aks get-credentials -n &lt;cluster name&gt; -g &lt;resource group&gt; -a -f &lt;destination credentials file&gt;</code></li>
+  <li>Supply the individual credentials in the environment variables: <code class="language-plaintext highlighter-rouge">AZURE_SUBSCRIPTION_ID</code>, <code class="language-plaintext highlighter-rouge">AZURE_CLIENT_ID</code>, <code class="language-plaintext highlighter-rouge">AZURE_CLIENT_SECRET</code>, <code class="language-plaintext highlighter-rouge">AZURE_TENANT_ID</code></li>
+</ol>
+
+<h2 id="aws">AWS</h2>
+
+<p>The credentials to connect to AWS are specified the same as for the <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">AWS CLI</a></p>
+
+<h2 id="openstack">OpenStack</h2>
+
+<p>The easiest way to use PowerfulSeal, is to download and source the OpenRC file you can get from Horizon. It should ask you for your password, and it should set all the <code class="language-plaintext highlighter-rouge">OS_*</code> variables for you. Alternatively, you can set them yourself.</p>
+
+<p>Both approaches are detailed in <a href="https://docs.openstack.org/mitaka/user-guide/common/cli_set_environment_variables_using_openstack_rc.html">the official documentation</a>.</p>
+
+<h2 id="gcp">GCP</h2>
+
+<blockquote>
+  <p>Google Cloud SDK and kubectl are required</p>
+</blockquote>
+
+<p>The GCP cloud driver supports managed (GKE) and custom Kubernetes clusters running on top of Google Cloud Compute.</p>
+
+<p>For setting up <code class="language-plaintext highlighter-rouge">PowerfulSeal</code>, the first step is configuring gcloud SDK (as <code class="language-plaintext highlighter-rouge">PowerfulSeal</code> will work with your configured <a href="https://cloud.google.com/resource-manager/docs/creating-managing-projects">project</a> and <a href="https://cloud.google.com/compute/docs/regions-zones/changing-default-zone-region">region</a>) and pointing kubectl to your cluster. Both can be configured easily following <a href="https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl">this</a> tutorial (For GKE!). In case you don’t want to use the default project/region of gcloud SDK, you can point <code class="language-plaintext highlighter-rouge">PowerfulSeal</code> to the correct one (in json) with <code class="language-plaintext highlighter-rouge">--gcp-config-file</code> argument.</p>
+
+<p>For being able to run node related commands, credentials have to be specified in one of these <a href="https://cloud.google.com/docs/authentication/">ways</a>:</p>
+
+<ol>
+  <li>Service account (Recommended): a Google account that is associated with your GCP project, as opposed to a specific user. <code class="language-plaintext highlighter-rouge">PowerfulSeal</code> uses the environment variable and is pretty straightforward to set up using <a href="https://cloud.google.com/docs/authentication/getting-started">this</a> tutorial.</li>
+  <li>User account: Not recommended as you can reach easily reach a “quota exceeded” or “API not enabled” error. <code class="language-plaintext highlighter-rouge">PowerfulSeal</code> uses auto-discovery and to get it working just follow <a href="https://cloud.google.com/docs/authentication/end-user">this</a>.</li>
+</ol>
+
+<p>Having configuration ready and ssh connection to the node instances working, you can start playing with <code class="language-plaintext highlighter-rouge">PowerfulSeal</code> with this example:
+<code class="language-plaintext highlighter-rouge">powerfulseal interactive --kubeconfig ~/.kube/config --gcp --inventory-kubernetes --ssh-allow-missing-host-keys --ssh-path-to-private-key ~/.ssh/google_compute_engine --remote-user myuser</code></p>
+
+<blockquote>
+  <p>Note: In case of running inside Pyenv and getting <code class="language-plaintext highlighter-rouge">python2 command not found</code> error when running gcloud (and you want to run <code class="language-plaintext highlighter-rouge">PowerfulSeal</code> with Python 3+), <a href="https://github.com/pyenv/pyenv/issues/1159#issuecomment-453906182">this</a> might be useful, as gcloud requires Python2.</p>
+</blockquote>
+
+<blockquote>
+  <p>Note: With GCP, running <code class="language-plaintext highlighter-rouge">gcloud compute config-ssh</code> makes SSHing to node instances easier by adding an alias for each instance to the user SSH configuration (~/.ssh/config) file and then being able to use the generated file with <code class="language-plaintext highlighter-rouge">--ssh-path-to-private-key</code> argument.</p>
+</blockquote>

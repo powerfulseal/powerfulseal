@@ -1,0 +1,94 @@
+<h1 class="no_toc" id="new-pod-startup-slo">New pod startup SLO</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#scenario" id="markdown-toc-scenario">Scenario</a></li>
+  <li><a href="#policy" id="markdown-toc-policy">Policy</a></li>
+</ol>
+
+<hr />
+
+<h2 id="scenario">Scenario</h2>
+
+<p>Let’s say we want to make sure that a new pod you create responds quickly enough.</p>
+
+<h2 id="policy">Policy</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">scenarios</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Test deployment SLO</span>
+  <span class="na">description</span><span class="pi">:</span> <span class="pi">&gt;</span>
+    <span class="s">Verifies that after a new deployment and a service are scheduled,</span>
+    <span class="s">it can be called within 30 seconds.</span>
+  <span class="na">steps</span><span class="pi">:</span>
+
+  <span class="c1"># you can use this to setup kubernetes artifacts</span>
+  <span class="pi">-</span> <span class="na">kubectl</span><span class="pi">:</span>
+      <span class="c1"># with auto delete, it will delete what's created here at the end of scenario</span>
+      <span class="na">autoDelete</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="c1"># equivalent to `kubectl apply -f -`</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">apply</span>
+      <span class="na">payload</span><span class="pi">:</span> <span class="pi">|</span>
+        <span class="s">---</span>
+        <span class="s">apiVersion: v1</span>
+        <span class="s">kind: ConfigMap</span>
+        <span class="s">metadata:</span>
+          <span class="s">name: sealpolicy</span>
+        <span class="s">data:</span>
+          <span class="s">policy.yml: |-</span>
+            <span class="s">scenarios:</span>
+            <span class="s">- name: "noop"</span>
+              <span class="s">steps:</span>
+              <span class="s">- wait:</span>
+                  <span class="s">seconds: 1000</span>
+        <span class="s">---</span>
+        <span class="s">apiVersion: apps/v1</span>
+        <span class="s">kind: Deployment</span>
+        <span class="s">metadata:</span>
+          <span class="s">name: powerfulseal</span>
+        <span class="s">spec:</span>
+          <span class="s">replicas: 1</span>
+          <span class="s">template:</span>
+            <span class="s">metadata:</span>
+              <span class="s">labels:</span>
+                <span class="s">name: powerfulseal</span>
+            <span class="s">spec:</span>
+              <span class="s">containers:</span>
+                <span class="s">- name: powerfulseal</span>
+                  <span class="s">image: store/bloomberg/powerfulseal:3.1.1</span>
+                  <span class="s">args:</span>
+                  <span class="s">- autonomous</span>
+                  <span class="s">- --policy-file=/policy.yml</span>
+                  <span class="s">volumeMounts:</span>
+                    <span class="s">- name: policyfile</span>
+                      <span class="s">mountPath: /policy.yml</span>
+                      <span class="s">subPath: policy.yml</span>
+              <span class="s">volumes:</span>
+                <span class="s">- name: policyfile</span>
+                  <span class="s">configMap:</span>
+                    <span class="s">name: sealpolicy</span>
+        <span class="s">---</span>
+        <span class="s">apiVersion: v1</span>
+        <span class="s">kind: Service</span>
+        <span class="s">metadata:</span>
+        <span class="s">name: powerfulseal</span>
+        <span class="s">spec:</span>
+        <span class="s">ports:</span>
+        <span class="s">- name: powerfulseal</span>
+            <span class="s">port: 8000</span>
+        <span class="s">selector:</span>
+            <span class="s">name: powerfulseal</span>
+
+  <span class="c1"># wait the minimal time for the SLO</span>
+  <span class="pi">-</span> <span class="na">wait</span><span class="pi">:</span>
+      <span class="na">seconds</span><span class="pi">:</span> <span class="m">30</span>
+
+  <span class="c1"># make sure the service responds</span>
+  <span class="pi">-</span> <span class="na">probeHTTP</span><span class="pi">:</span>
+      <span class="na">target</span><span class="pi">:</span>
+        <span class="na">service</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">some-service</span>
+          <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">port</span><span class="pi">:</span> <span class="m">8000</span>
+          <span class="na">protocol</span><span class="pi">:</span> <span class="s">http</span>
+</code></pre></div></div>

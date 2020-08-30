@@ -1,0 +1,213 @@
+<h1 class="no_toc" id="in-depth-topics">In-depth topics</h1>
+
+<h2 class="no_toc text-delta" id="table-of-contents">Table of contents</h2>
+
+<ol id="markdown-toc">
+  <li><a href="#metric-collection" id="markdown-toc-metric-collection">Metric collection</a>    <ol>
+      <li><a href="#description" id="markdown-toc-description">Description</a></li>
+      <li><a href="#usage" id="markdown-toc-usage">Usage</a>        <ol>
+          <li><a href="#stdoutcollector-default" id="markdown-toc-stdoutcollector-default">StdoutCollector (default)</a></li>
+          <li><a href="#prometheuscollector" id="markdown-toc-prometheuscollector">PrometheusCollector</a></li>
+          <li><a href="#datadogcollector" id="markdown-toc-datadogcollector">DatadogCollector</a></li>
+        </ol>
+      </li>
+      <li><a href="#use-case-prometheus--grafana--alertmanager" id="markdown-toc-use-case-prometheus--grafana--alertmanager">Use Case: Prometheus + Grafana + AlertManager</a></li>
+      <li><a href="#use-case-datadog" id="markdown-toc-use-case-datadog">Use Case: Datadog</a></li>
+    </ol>
+  </li>
+  <li><a href="#inventory-file" id="markdown-toc-inventory-file">Inventory file</a></li>
+  <li><a href="#extend-powerfulseal" id="markdown-toc-extend-powerfulseal">Extend Powerfulseal</a>    <ol>
+      <li><a href="#custom-metric-collectors" id="markdown-toc-custom-metric-collectors">Custom Metric Collectors</a></li>
+      <li><a href="#custom-cloud-drivers" id="markdown-toc-custom-cloud-drivers">Custom Cloud Drivers</a></li>
+      <li><a href="#custom-filters" id="markdown-toc-custom-filters">Custom Filters</a></li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="metric-collection">Metric collection</h2>
+
+<h3 id="description">Description</h3>
+
+<p>The purpose of metric collection is to keep track of events which you may consider useful to be monitored (e.g., via Grafana). Three metric collectors have been implemented:</p>
+
+<ul>
+  <li>StdoutCollector, a “no-op” collector which simply prints that an event has occurred to <code class="language-plaintext highlighter-rouge">stdout</code></li>
+  <li>PrometheusCollector, which sends metrics to the default Prometheus registry and exposes them via Prometheus internal web server</li>
+  <li>DatadogCollector, which sends metrics to the <a href="https://docs.datadoghq.com/developers/dogstatsd/">DogStatsD</a> aggregation service bundled with the Datadog Agent.</li>
+</ul>
+
+<p>Like cloud drivers, metric collectors are extensible by subscribing to the <code class="language-plaintext highlighter-rouge">AbstractCollector</code> interface. Likewise, <code class="language-plaintext highlighter-rouge">AbstractCollector</code> makes it easy to add your own metrics.</p>
+
+<p>The metric collectors collect the following events:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th>Labels (Metadata)</th>
+      <th>Description</th>
+      <th>Justification</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>seal_pod_kills_total</td>
+      <td>status, namespace, name</td>
+      <td>Number of pods killed (including failures)</td>
+      <td>Example alerts include number of pod kills failing in the past five minutes or the ratio between successful and failed pod kills in a time range. If a pod cannot be killed, it could be an an unresponsive state or there may be a problem with keeping Kubernetes synchronised to the node.</td>
+    </tr>
+    <tr>
+      <td>seal_nodes_stopped_total</td>
+      <td>status, uid, name</td>
+      <td>Number of nodes killed (including failures)</td>
+      <td>Example alerts include number of node stops failing in the past five minutes or the ratio between successful and failed node stops. If a node cannot be stopped, it could be in an unresponsive state.</td>
+    </tr>
+    <tr>
+      <td>seal_execute_failed_total</td>
+      <td>uid, name</td>
+      <td>Tracks failure of command executions</td>
+      <td>Commands executions failing is a general case of errors which should be brought to the user’s attention.</td>
+    </tr>
+    <tr>
+      <td>seal_empty_filter_total</td>
+      <td>N/A</td>
+      <td>Cases where filtering returns an empty result</td>
+      <td>If the user’s policy is designed to model common levels of failures, then having no nodes/pods after filtering could mean that insufficient resources have been provisioned for the system to withstand failure.</td>
+    </tr>
+    <tr>
+      <td>seal_probability_filter_not_passed_total</td>
+      <td>N/A</td>
+      <td>Cases where the probability filter decides to skip all nodes</td>
+      <td>Useful to track long-term in order to ensure that probability distribution is as expected.</td>
+    </tr>
+    <tr>
+      <td>seal_empty_match_total</td>
+      <td>source (either <code class="language-plaintext highlighter-rouge">nodes</code> or <code class="language-plaintext highlighter-rouge">pods</code>)</td>
+      <td>Cases where matching returns an empty result</td>
+      <td>See <code class="language-plaintext highlighter-rouge">seal_empty_filter_total</code></td>
+    </tr>
+    <tr>
+      <td>add_scenario_counter_metric</td>
+      <td>name of the scenario, success or fail</td>
+      <td>Counts scenarios and their results</td>
+      <td>Can be used to alert on when a scenario starts failing</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="usage">Usage</h3>
+
+<h4 id="stdoutcollector-default">StdoutCollector (default)</h4>
+
+<p>To print metrics to <code class="language-plaintext highlighter-rouge">stdout</code>, use the <code class="language-plaintext highlighter-rouge">--stdout-collector</code> flag.</p>
+
+<h4 id="prometheuscollector">PrometheusCollector</h4>
+
+<p>To collect metrics, run PowerfulSeal with the <code class="language-plaintext highlighter-rouge">--prometheus-collector</code> flag, along with the <code class="language-plaintext highlighter-rouge">--prometheus-host</code> and <code class="language-plaintext highlighter-rouge">--prometheus-port</code> flags. Metrics will be exposed under a web server with URL <code class="language-plaintext highlighter-rouge">http://HOST:PORT/metrics</code>.</p>
+
+<h4 id="datadogcollector">DatadogCollector</h4>
+
+<p>This collector relies on <a href="https://docs.datadoghq.com/developers/dogstatsd/">DogStatsD</a> server (bundled with the <a href="https://docs.datadoghq.com/agent/">Datadog Agent</a>), so a working instance is expected.</p>
+
+<p>To collect metrics, run PowerfulSeal with the <code class="language-plaintext highlighter-rouge">--datadog-collector</code> flag.</p>
+
+<h3 id="use-case-prometheus--grafana--alertmanager">Use Case: Prometheus + Grafana + AlertManager</h3>
+
+<p><a href="https://github.com/bloomberg/powerfulseal/blob/master/docs/media/grafana.png"><img src="./media/grafana.png" alt="Grafana example example" /></a></p>
+
+<p>A common use case is to use a combination of Prometheus, Grafana and AlertManager in order to increase visibility of potential issues.</p>
+
+<p>In order to configure this integration, follow the steps below. (The below instructions assume that Prometheus and Grafana are already set up.)</p>
+
+<ol>
+  <li>Open your Prometheus configuration file (e.g., <code class="language-plaintext highlighter-rouge">/etc/prometheus/prometheus.yml</code>) and add a <code class="language-plaintext highlighter-rouge">scrape_configs</code> job with the host IP and a chosen port for the server PowerfulSeal will be run on:
+ ```yaml
+ scrape_configs:
+    <ul>
+      <li>job_name: powerfulseal
+scrape_interval: 5s
+scrape_timeout: 5s
+metrics_path: /metrics
+scheme: http
+static_configs:
+        <ul>
+          <li>targets:
+            <ul>
+              <li>
+                <p>labels:
+name: powerfulseal
+ ```</p>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Add an alert file (e.g., <code class="language-plaintext highlighter-rouge">seal.alerts.yml</code>) to your Prometheus configuration path with your alerting rules (<a href="https://github.com/bloomberg/powerfulseal/blob/master/docs/examples/seal.alerts.yml">example here</a>)</li>
+  <li>Update <code class="language-plaintext highlighter-rouge">alertmanager.yml</code> to handle the alerting rules, for example:
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">global</span><span class="pi">:</span>
+   <span class="na">resolve_timeout</span><span class="pi">:</span> <span class="s">5m</span>
+    
+ <span class="na">route</span><span class="pi">:</span>
+   <span class="na">receiver</span><span class="pi">:</span> <span class="s1">'</span><span class="s">default'</span>
+   <span class="na">routes</span><span class="pi">:</span>
+   <span class="pi">-</span> <span class="na">receiver</span><span class="pi">:</span> <span class="s1">'</span><span class="s">seal'</span>
+     <span class="na">match</span><span class="pi">:</span>
+       <span class="na">type</span><span class="pi">:</span> <span class="s">seal</span>
+    
+ <span class="c1"># A list of notification receivers.</span>
+ <span class="na">receivers</span><span class="pi">:</span>
+   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+     <span class="na">email_configs</span><span class="pi">:</span>
+    
+   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">seal</span>
+     <span class="na">email_configs</span><span class="pi">:</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Start PowerfulSeal with the <code class="language-plaintext highlighter-rouge">--prometheus-collector</code>, <code class="language-plaintext highlighter-rouge">--prometheus-host</code> and <code class="language-plaintext highlighter-rouge">--prometheus-port</code> flags, and restart Prometheus. Metrics should begin to appear.</li>
+  <li>Ensure Grafana has your Prometheus server added as a data source and create a new Grafana dashboard with the metrics (<a href="https://github.com/bloomberg/powerfulseal/blob/master/examples/docs/grafana.json">example here</a> - note that the data source name may need to be changed)</li>
+</ol>
+
+<h3 id="use-case-datadog">Use Case: Datadog</h3>
+
+<p><a href="https://github.com/bloomberg/powerfulseal/blob/master/docs/media/datadog.png"><img src="./media/datadog.png" alt="Datadog example example" /></a></p>
+
+<p>It’s common to use Datadog in order to increase visibility of potential issues.</p>
+
+<p>In order to configure this properly, follow the steps below. (The below instructions assume that Datadog Agent is already set up.)</p>
+
+<ol>
+  <li>
+    <p>Start PowerfulSeal with the <code class="language-plaintext highlighter-rouge">--datadog-collector</code> flag. Metrics should begin to appear on Datadog.</p>
+  </li>
+  <li>
+    <p>Create a new dashboard with the collected metrics (<a href="https://github.com/bloomberg/powerfulseal/blob/master/examples/docs/datadog.json">example here</a>).</p>
+  </li>
+  <li>
+    <p>Configure alerting with <a href="https://docs.datadoghq.com/monitors/">Monitors</a>, to give you the ability to know when critical changes are occurring.</p>
+  </li>
+</ol>
+
+<h2 id="inventory-file">Inventory file</h2>
+<p><code class="language-plaintext highlighter-rouge">PowerfulSeal</code> can use an ansible-style inventory file (in ini format)</p>
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[mygroup]</span>
+<span class="err">myhost01</span>
+
+<span class="nn">[mygroup2]</span>
+<span class="err">myhost02</span>
+
+<span class="nn">[some_hosts]</span>
+<span class="err">myhost01</span>
+<span class="err">myhost02</span>
+</code></pre></div></div>
+
+<h2 id="extend-powerfulseal">Extend Powerfulseal</h2>
+
+<h3 id="custom-metric-collectors">Custom Metric Collectors</h3>
+
+<h3 id="custom-cloud-drivers">Custom Cloud Drivers</h3>
+
+<h3 id="custom-filters">Custom Filters</h3>

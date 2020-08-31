@@ -23,7 +23,7 @@ from ..metriccollectors.stdout_collector import StdoutCollector
 from .action_abstract import ActionAbstract
 
 DEFAULT_TOXIPROXY_IMAGE = "docker.io/shopify/toxiproxy:2.1.4"
-
+DEFAULT_IPTABLES_IMAGE = "gaiadocker/iproute2:latest"
 class DeleteDeploymentAction():
   def __init__(self, name, namespace, k8s_inventory, logger=None):
     self.name = name
@@ -235,6 +235,7 @@ class ActionClone(ActionAbstract):
         name="auto%s" % ingress_port,
         listen="0.0.0.0:%s" % proxy_port,
         upstream="127.0.0.1:%s" % ingress_port,
+        ingress_port=ingress_port,
       ))
 
     # prepare the setup command through the startup probe
@@ -259,4 +260,41 @@ class ActionClone(ActionAbstract):
       )
     )
 
-    # precompute the iptables commands
+    # precompute the iptables command
+    def get_port(listen_string):
+      parts = listen_string.split(":")
+      if len(parts) == 2:
+        return parts[-1]
+      return "80"
+    iptables_cmd = "iptables -t filter -A INPUT -s 127.0.0.1 -j ACCEPT"
+    for proxy in proxies:
+      ingress_port = proxy.get("ingress_port")
+      if ingress_port is not None:
+        iptables_cmd += (
+          ' && iptables -t nat -A PREROUTING -i eth0'
+          ' -p tcp --dport {ingress_port}'
+          ' -j REDIRECT --to-port {egress_port}'
+          ' -m comment --comment "{comment}"'
+        ).format(
+          ingress_port=str(ingress_port),
+          egress_port=get_port(proxy.get("listen")),
+          comment=proxy.get("name")
+        )
+
+    # add an init container with the iptables config
+    body.spec.template.spec.containers.append(
+      kubernetes.client.V1Container(
+        name="iptables-setup",
+        command=["/bin/sh", "-c", iptables_cmd],
+        args=[],
+        image=spec.get("image", DEFAULT_IPTABLES_IMAGE),
+        security_context=kubernetes.client.V1SecurityContext(
+          run_as_user=spec.get("user", 0),
+          capabilities=kubernetes.client.V1Capabilities(
+            add=[
+              "NET_ADMIN"
+            ]
+          )
+        )
+      )
+    )

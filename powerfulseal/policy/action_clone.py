@@ -212,7 +212,6 @@ class ActionClone(ActionAbstract):
     """
       This plugs a toxiproxy in as a side-car
       It also uses an init container with iptables to reroute
-
     """
     # precompute the ports that need to be proxied
     # for every port specified in the containers' definitions
@@ -245,6 +244,20 @@ class ActionClone(ActionAbstract):
       populate_cmd += " && {cli} create {name} -l {listen} -u {upstream}".format(
         cli=toxiproxy_cli,
         **proxy
+      )
+
+    # prepare the toxics
+    toxics = spec.get("toxics", [])
+    for toxic in toxics:
+      populate_cmd += " && {cli} toxic add {name} -t {type} {attributes}".format(
+        cli=toxiproxy_cli,
+        name=toxic.get("targetProxy"),
+        type=toxic.get("toxicType"),
+        attributes=" ".join([
+          "-a {name}={value}".format(
+            **attr
+          ) for attr in toxic.get("toxicAttributes", [])
+        ])
       )
 
     # add the toxiproxy side-car container
@@ -285,7 +298,7 @@ class ActionClone(ActionAbstract):
     body.spec.template.spec.containers.append(
       kubernetes.client.V1Container(
         name="iptables-setup",
-        command=["/bin/sh", "-c", iptables_cmd],
+        command=["/bin/sh", "-c", iptables_cmd + " && sleep 100000"],
         args=[],
         image=spec.get("image", DEFAULT_IPTABLES_IMAGE),
         security_context=kubernetes.client.V1SecurityContext(

@@ -2653,7 +2653,7 @@
                  class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user"
                  data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user">
               <div class="card-body">
-                <span class="badge badge-dark value-type">Type: number</span><span class="description"><p>The numeric UID of user to run as in the image. Root (UID 0) is not the safest option.</p>
+                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 0</span><span class="description"><p>The numeric UID of user to run as in the image. Root (UID 0) is not the safest option.</p>
 </span>
 
             <p><span class="badge badge-light restriction numeric-restriction" id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option1__tc__user_number">Value must be greater or equal to <code>0</code></span></p>
@@ -2683,7 +2683,45 @@
               <div class="card-body">
                 <span class="badge badge-dark value-type">Type: object</span>
 
-            <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__proxies">
+            <div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables" onclick="setAnchor('#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables')"><span class="property-name">imageIptables</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageIptables">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: string</span> <span class="badge badge-success default-value">Default: "gaiadocker/iproute2:latest"</span><span class="description"><p>The image to use to run iptables commands. iptables command needs to be in the path.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy" onclick="setAnchor('#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy')"><span class="property-name">imageToxiproxy</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__imageToxiproxy">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: string</span> <span class="badge badge-success default-value">Default: "docker.io/shopify/toxiproxy:2.1.4"</span><span class="description"><p>The image to use to deploy toxiproxy. It needs to start toxiproxy server by default and provide toxiproxy-cli in the path.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__proxies">
         <div class="card">
             <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__proxies">
                 <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__proxies"
@@ -2891,6 +2929,44 @@
     </div>
                         </div>
                     </div>
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli" onclick="setAnchor('#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli')"><span class="property-name">toxiproxyCli</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__toxiproxyCli">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: string</span> <span class="badge badge-success default-value">Default: "/go/bin/toxiproxy-cli"</span><span class="description"><p>The path to the toxiproxy cli in the toxiproxy image.</p>
+</span>
+
+            
+              </div>
+            </div>
+        </div>
+    </div><div class="accordion" id="accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user">
+        <div class="card">
+            <div class="card-header" id="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user">
+                <h2 class="mb-0"><button class="btn btn-link property-name-button" type="button" data-toggle="collapse" data-target="#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user"
+                            aria-expanded="False" aria-controls="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user" onclick="setAnchor('#scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user')"><span class="property-name">user</span></button>
+                </h2>
+            </div>
+
+            <div id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user"
+                 class="collapse property-definition-div" aria-labelledby="headingscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user"
+                 data-parent="#accordionscenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user">
+              <div class="card-body">
+                <span class="badge badge-dark value-type">Type: number</span> <span class="badge badge-success default-value">Default: 0</span><span class="description"><p>The numeric UID of user to run as in the image. Root (UID 0) is not the safest option.</p>
+</span>
+
+            <p><span class="badge badge-light restriction numeric-restriction" id="scenarios_array_items__steps_array_items__option6__clone__mutations_array_items__option2__toxiproxy__user_number">Value must be greater or equal to <code>0</code></span></p>
               </div>
             </div>
         </div>

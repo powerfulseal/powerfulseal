@@ -214,7 +214,7 @@ class ActionClone(ActionAbstract):
       This plugs a toxiproxy in as a side-car
       It also uses an init container with iptables to reroute
     """
-    # precompute the ports that need to be proxied
+    # 1. Precompute the ports that need to be proxied
     # for every port specified in the containers' definitions
     containers_ports = []
     for container in body.spec.template.spec.containers:
@@ -228,7 +228,7 @@ class ActionClone(ActionAbstract):
         counter += 1
       containers_mapping[port] = counter
 
-    # prepare proxies in the toxiproxy format
+    # 2. Prepare proxies in the toxiproxy format
     proxies = spec.get("proxies", [])
     for ingress_port, proxy_port in containers_mapping.items():
       proxies.append(dict(
@@ -238,16 +238,14 @@ class ActionClone(ActionAbstract):
         ingress_port=ingress_port,
       ))
 
-    # prepare the setup command through the startup probe
-    toxiproxy_cli = "/go/bin/toxiproxy-cli"
+    # 3. Prepare the Toxiproxy setup command through the startup probe
+    toxiproxy_cli = spec.get("toxiproxyCli", "/go/bin/toxiproxy-cli")
     populate_cmd = "true"
     for proxy in proxies:
       populate_cmd += " && {cli} create {name} -l {listen} -u {upstream}".format(
         cli=toxiproxy_cli,
         **proxy
       )
-
-    # prepare the toxics
     toxics = spec.get("toxics", [])
     for toxic in toxics:
       populate_cmd += " && {cli} toxic add {name} -t {type} {attributes}".format(
@@ -265,7 +263,7 @@ class ActionClone(ActionAbstract):
     body.spec.template.spec.containers.append(
       kubernetes.client.V1Container(
         name="chaos-toxiproxy",
-        image=spec.get("image", DEFAULT_TOXIPROXY_IMAGE),
+        image=spec.get("imageToxiproxy", DEFAULT_TOXIPROXY_IMAGE),
         startup_probe=kubernetes.client.V1Probe(
           _exec=kubernetes.client.V1ExecAction(
             command=["/bin/sh", "-c", populate_cmd],
@@ -306,12 +304,14 @@ class ActionClone(ActionAbstract):
     )
 
     # add an init container with the iptables config
-    body.spec.template.spec.containers.append(
+    if body.spec.template.spec.init_containers is None:
+      body.spec.template.spec.init_containers = []
+    body.spec.template.spec.init_containers.append(
       kubernetes.client.V1Container(
         name="iptables-setup",
-        command=["/bin/sh", "-c", iptables_cmd + " && sleep 100000"],
+        command=["/bin/sh", "-c", iptables_cmd],
         args=[],
-        image=spec.get("image", DEFAULT_IPTABLES_IMAGE),
+        image=spec.get("imageIptables", DEFAULT_IPTABLES_IMAGE),
         security_context=kubernetes.client.V1SecurityContext(
           run_as_user=spec.get("user", 0),
           capabilities=kubernetes.client.V1Capabilities(

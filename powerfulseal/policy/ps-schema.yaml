@@ -857,6 +857,7 @@ definitions:
           user:
             type: number
             minimum: 0
+            default: 0
             description: >
               The numeric UID of user to run as in the image.
               Root (UID 0) is not the safest option.
@@ -881,6 +882,31 @@ definitions:
         type: object
         additionalProperties: false
         properties:
+          user:
+            type: number
+            minimum: 0
+            default: 0
+            description: >
+              The numeric UID of user to run as in the image.
+              Root (UID 0) is not the safest option.
+          imageIptables:
+            type: string
+            default: gaiadocker/iproute2:latest
+            description: >
+              The image to use to run iptables commands.
+              iptables command needs to be in the path.
+          imageToxiproxy:
+            type: string
+            default: docker.io/shopify/toxiproxy:2.1.4
+            description: >
+              The image to use to deploy toxiproxy.
+              It needs to start toxiproxy server by default
+              and provide toxiproxy-cli in the path.
+          toxiproxyCli:
+            type: string
+            default: /go/bin/toxiproxy-cli
+            description: >
+              The path to the toxiproxy cli in the toxiproxy image.
           proxies:
             type: array
             description: >

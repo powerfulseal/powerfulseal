@@ -948,7 +948,7 @@ definitions:
                   description: >
                     The name of the target proxy.
                     If you'd like to target any of the automatically created proxies,
-                    use "auto<ingress port number>", for example "auto80" for port 80.
+                    just specify the port number.
                     If you're like to target any of the manually created proxies,
                     just use their name directly.
                 toxicType:

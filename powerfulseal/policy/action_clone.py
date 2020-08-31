@@ -24,6 +24,8 @@ from .action_abstract import ActionAbstract
 
 DEFAULT_TOXIPROXY_IMAGE = "docker.io/shopify/toxiproxy:2.1.4"
 DEFAULT_IPTABLES_IMAGE = "gaiadocker/iproute2:latest"
+
+
 class DeleteDeploymentAction():
   def __init__(self, name, namespace, k8s_inventory, logger=None):
     self.name = name
@@ -206,7 +208,6 @@ class ActionClone(ActionAbstract):
         )
       )
     )
-
 
   def mutate_toxiproxy(self, body, spec):
     """

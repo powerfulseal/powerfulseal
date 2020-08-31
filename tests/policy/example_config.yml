@@ -313,6 +313,10 @@ scenarios:
             image: gaiadocker/iproute2:latest
             user: 123
         - toxiproxy:
+            imageToxiproxy: docker.io/shopify/toxiproxy:2.1.4
+            imageIptables: gaiadocker/iproute2:latest
+            toxiproxyCli: /go/bin/toxiproxy-cli
+            user: 0
             proxies:
               - name: testproxy
                 listen: "0.0.0.0:8000"

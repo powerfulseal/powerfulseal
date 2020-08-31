@@ -280,6 +280,7 @@ class ActionClone(ActionAbstract):
         return parts[-1]
       return "80"
     iptables_cmd = "iptables -t filter -A INPUT -s 127.0.0.1 -j ACCEPT"
+    names = []
     for proxy in proxies:
       ingress_port = proxy.get("ingress_port")
       if ingress_port is not None:
@@ -293,6 +294,15 @@ class ActionClone(ActionAbstract):
           egress_port=get_port(proxy.get("listen")),
           comment=proxy.get("name")
         )
+        names.append(
+          "{src}->{dst}".format(
+            src=ingress_port,
+            dst=get_port(proxy.get("listen")),
+          )
+        )
+    iptables_cmd += ' && echo "iptables rules setup successfully: {names}"'.format(
+      names=", ".join(names)
+    )
 
     # add an init container with the iptables config
     body.spec.template.spec.containers.append(

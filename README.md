@@ -77,6 +77,11 @@ powerfulseal autonomous --policy-file ./policy.yaml
 - https://www.infoq.com/news/2018/01/powerfulseal-chaos-kubernetes
 - [PowerfulSeal presentation at KubeCon 2017 Austin](https://youtu.be/00BMn0UjsG4)
 
+
+## Tools consuming PowerfulSeal
+
+- Chaos and resiliency testing tool for Kubernetes and OpenShift: https://github.com/openshift-scale/kraken
+
 ---
 
 ## Footnotes

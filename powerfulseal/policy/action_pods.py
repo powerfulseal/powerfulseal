@@ -183,6 +183,9 @@ class ActionPods(ActionNodesPods):
             if host is None:
                 self.logger.warning("Couldn't find host with IP %r", host_ip)
                 return False
+            # check that we're not self-destructing
+            if len(self.dont_self_destruct([host])) == 0:
+                continue
             self.logger.info("Action stop on host %r (pods %s)", host, pods)
             try:
                 self.inventory.driver.stop(host)

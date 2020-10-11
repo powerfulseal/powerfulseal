@@ -154,6 +154,13 @@ definitions:
             items:
               oneOf:
               - "$ref": "#/definitions/filterPropertyNode"
+          retries:
+            type: object
+            description: >
+              An object of retry criteria to rerun set actions
+            oneOf:
+              - "$ref": "#/definitions/retriesCount"
+              - "$ref": "#/definitions/retriesTimeout"
           filters:
             type: array
             description: >
@@ -217,6 +224,13 @@ definitions:
               - "$ref": "#/definitions/filterDayTime"
               - "$ref": "#/definitions/filterRandomSample"
               - "$ref": "#/definitions/filterProbability"
+          retries:
+            type: object
+            description: >
+              An object of retry criteria to rerun set actions
+            oneOf:
+              - "$ref": "#/definitions/retriesCount"
+              - "$ref": "#/definitions/retriesTimeout"
           actions:
             type: array
             description: >
@@ -646,6 +660,52 @@ definitions:
     required:
     - property
 
+
+###################################################################################################
+# Retries
+###################################################################################################
+
+  retriesCount:
+    type: object
+    description: >
+      Retry the given action a set amount of times with a sleep in between
+    additionalProperties: false
+    properties:
+      retriesCount:
+        type: object
+        additionalProperties: false
+        properties:
+          count:
+            type: number
+            minimum: 0
+          sleep:
+            type: number
+            minimum: 0
+        required:
+          - count
+    required:
+      - retriesCount
+
+  retriesTimeout:
+    type: object
+    description: >
+      Retry the given action for a set amount of time with a sleep in between
+    additionalProperties: false
+    properties:
+      retriesTimeout:
+        type: object
+        additionalProperties: false
+        properties:
+          timeout:
+            type: number
+            minimum: 0
+          sleep:
+            type: number
+            minimum: 0
+        required:
+          - timeout
+    required:
+      - retriesTimeout
 
 ###################################################################################################
 # ACTIONS

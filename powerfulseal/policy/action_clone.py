@@ -320,7 +320,7 @@ class ActionClone(ActionAbstract):
         args=[],
         image=spec.get("imageIptables", DEFAULT_IPTABLES_IMAGE),
         security_context=kubernetes.client.V1SecurityContext(
-          run_as_user=spec.get("user", 0),
+          run_as_user=spec.get("user"),
           capabilities=kubernetes.client.V1Capabilities(
             add=[
               "NET_ADMIN"

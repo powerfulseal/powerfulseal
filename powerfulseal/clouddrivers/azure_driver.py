@@ -7,7 +7,7 @@ from . import AbstractDriver
 from ..node import Node, NodeState
 
 from azure.common.client_factory import get_client_from_auth_file
-from azure.common.credentials import ServicePrincipalCredentials
+from azure.identity import DefaultAzureCredential
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.compute import ComputeManagementClient
@@ -22,11 +22,7 @@ def create_connection_from_config():
     except KeyError:
         try:
             subscription_id = os.environ['AZURE_SUBSCRIPTION_ID']
-            credentials = ServicePrincipalCredentials(
-                client_id=os.environ['AZURE_CLIENT_ID'],
-                secret=os.environ['AZURE_CLIENT_SECRET'],
-                tenant=os.environ['AZURE_TENANT_ID']
-            )
+            credentials = DefaultAzureCredential()
         except KeyError:
             sys.exit("No Azure Connection Defined")
         else:

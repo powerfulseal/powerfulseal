@@ -1,4 +1,6 @@
+import json
 import os
+import requests
 import sys
 from powerfulseal import makeLogger
 from . import AbstractDriver
@@ -63,6 +65,23 @@ def create_node_from_server(compute_client,server,int_ip, ext_ip):
         state=server_state(compute_client,server)
     )
 
+def get_auth_token():
+    client_id = os.getenv('AZURE_CLIENT_ID')
+    secret = os.getenv('AZURE_CLIENT_SECRET')
+    tenant = os.getenv('AZURE_TENANT_ID')
+
+    creds = {
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": secret,
+        "resource": "https://management.azure.com/",
+        "tenant": tenant
+    }
+    if creds['client_id'] and creds['client_secret'] and creds['tenant']:
+        res_json = json.loads(requests.post('https://login.microsoftonline.com/'+tenant+'/oauth2/token', data=creds).text)
+        return res_json['access_token']
+    return None
+
 class AzureDriver(AbstractDriver):
     """
         Concrete implementation of the Azure cloud driver.
@@ -75,6 +94,7 @@ class AzureDriver(AbstractDriver):
         self.cluster_rg = cluster_rg_name
         self.cluster_node_rg = cluster_node_rg_name
         self.ipconfig_cache = {}
+        self.access_token = get_auth_token()
 
     def get_all_ips(self, instance, network_client):
         """ Returns the private and public ip addresses of an Azure instances
@@ -115,7 +135,7 @@ class AzureDriver(AbstractDriver):
 
     def getResourceGroups(self):
         """ Find nodeResourceGroup for the cluster.
-            This can be determined by finding the resource groups that are managed_by 
+            This can be determined by finding the resource groups that are managed_by
             the cluater resource group ID
         """
         self.logger.debug("++ Azure cluster_rg: %s", self.cluster_rg)
@@ -149,23 +169,46 @@ class AzureDriver(AbstractDriver):
         """ Downloads a fresh set of nodes form the API.
         """
         self.logger.debug("Synchronizing remote nodes")
-        """only get the resource group for the current cluster 
+        """only get the resource group for the current cluster
         """
         self.getResourceGroups()
         self.remote_servers = []
         if self.cluster_node_rg is not None:
             self.remote_servers = list(self.compute_client.virtual_machines.list(self.cluster_node_rg))
+            self.remote_servers.extend(self.get_scaleset_vms())
         else:
             self.logger.warning("No Azure cluster node resource group was found, the node list may be incorrect.")
             self.remote_servers = list(self.compute_client.virtual_machines.list_all())
 
         self.logger.info("Fetched %s remote servers" % len(self.remote_servers))
 
+    def get_scaleset_vms(self):
+        """ Get vms in a scaleset. This is used for AKS nodes.
+        """
+        self.logger.debug("Getting AKS nodes")
+        vmss = self.compute_client.virtual_machine_scale_sets.list(self.cluster_rg)
+        scalesetvms = []
+        vms = []
+
+        for scaleset in vmss:
+            scalesetvms = self.compute_client.virtual_machine_scale_set_vms.list(self.cluster_rg, scaleset.name)
+
+            for vm in scalesetvms:
+                vms.append(vm)
+
+        return vms
+
+
     def get_by_ip(self, ip):
         """ Retrieve an instance of Node by its IP.
         """
         for server in self.remote_servers:
-            addresses = self.get_all_ips(server, self.network_client)
+            addresses = []
+            if server.type == 'Microsoft.Compute/virtualMachines':
+                addresses = self.get_all_ips(server, self.network_client)
+            elif server.type == 'Microsoft.Compute/virtualMachineScaleSets/virtualMachines':
+                addresses = self.get_vmss_ips(self.cluster_rg, server.name.split("_")[0])
+
             if not addresses:
                 self.logger.warning("No ip addresses found: %s", server.__dict__)
             else:
@@ -176,20 +219,65 @@ class AzureDriver(AbstractDriver):
                         return new_node
         return None
 
+    def get_vmss_ips(self, resource_group_name, virtual_machine_scale_set_name):
+        if self.access_token == None:
+            self.access_token = get_auth_token()
+        subscription_id = os.getenv('AZURE_SUBSCRIPTION_ID')
+
+        ips = []
+        res_json = {}
+        if subscription_id and resource_group_name and virtual_machine_scale_set_name:
+            url = 'https://management.azure.com/subscriptions/' + subscription_id + \
+                '/resourceGroups/' + resource_group_name + \
+                '/providers/microsoft.Compute/virtualMachineScaleSets/' + virtual_machine_scale_set_name + \
+                '/networkInterfaces/?api-version=2018-10-01'
+
+            headers = {
+                "Authorization": "Bearer " + self.access_token,
+                "Content-Type": "application/json"
+            }
+            res_json = json.loads(requests.get(url, headers=headers).text)
+            self.logger.debug("Trying to get VMSS ips")
+
+        for i in res_json['value']:
+            ips.append((i['properties']['ipConfigurations'][0]['properties']['privateIPAddress'], None))
+        return ips
+
     def stop(self, node):
         """ Stop a Node.
         """
-        async_vm_start = self.compute_client.virtual_machines.power_off(self.cluster_node_rg, node.name)
+        if 'vmss_' in node.name:
+            name_split = node.id.split('/')
+            rg_name = name_split[4]
+            ss_name = name_split[8]
+            node_id = name_split[-1]
+            async_vm_start = self.compute_client.virtual_machine_scale_set_vms.power_off(rg_name, ss_name, node_id)
+        else:
+            async_vm_start = self.compute_client.virtual_machines.power_off(self.cluster_node_rg, node.name)
         async_vm_start.wait()
 
     def start(self, node):
         """ Start a Node.
         """
-        async_vm_restart = self.compute_client.virtual_machines.start(self.cluster_node_rg, node.name)
+        if 'vmss_' in node.name:
+            name_split = node.id.split('/')
+            rg_name = name_split[4]
+            ss_name = name_split[8]
+            node_id = name_split[-1]
+            async_vm_restart = self.compute_client.virtual_machine_scale_set_vms.start(rg_name, ss_name, node_id)
+        else:
+            async_vm_restart = self.compute_client.virtual_machines.start(self.cluster_node_rg, node.name)
         async_vm_restart.wait()
 
     def delete(self, node):
         """ Delete a Node permanently.
         """
-        async_vm_delete = self.compute_client.virtual_machines.delete(self.cluster_node_rg, node.name)
+        if 'vmss_' in node.name:
+            name_split = node.id.split('/')
+            rg_name = name_split[4]
+            ss_name = name_split[8]
+            node_id = name_split[-1]
+            async_vm_delete = self.compute_client.virtual_machine_scale_set_vms.delete(rg_name, ss_name, node_id)
+        else:
+            async_vm_delete = self.compute_client.virtual_machines.delete(self.cluster_node_rg, node.name)
         async_vm_delete.wait()

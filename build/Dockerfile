@@ -2,11 +2,15 @@
 FROM python:3.7-slim-buster as builder
 
 # install all the build dependencies
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y build-essential curl libffi-dev libssl-dev && \
+    apt-get install -y build-essential curl libffi-dev libssl-dev ca-certificates && \
     apt-get clean && \
     apt-get autoclean && \
     apt-get autoremove
+
+# force update ca-certificates
+RUN update-ca-certificates --fresh
 
 ARG http_proxy
 ARG https_proxy
@@ -33,6 +37,11 @@ RUN pip install . && pip list .
 FROM python:3.7-slim-buster
 LABEL MAINTAINER="Mikolaj Pawlikowski <opensource@bloomberg.net>"
 
+# set default ca certs file
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+
+# copy fresh ca-certs file from builder
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 # copy over the site-packages from builder
 COPY --from=builder /usr/local/lib/python3.7/site-packages /usr/local/lib/python3.7/site-packages
 # also copy over the executable helpers

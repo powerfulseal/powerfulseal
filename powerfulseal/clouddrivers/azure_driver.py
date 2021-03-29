@@ -256,6 +256,7 @@ class AzureDriver(AbstractDriver):
     def start(self, node):
         """ Start a Node.
         """
+
         if 'vmss_' in node.name:
             name_split = node.id.split('/')
             rg_name = name_split[4]

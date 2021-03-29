@@ -250,6 +250,7 @@ class AzureDriver(AbstractDriver):
             async_vm_start = self.compute_client.virtual_machine_scale_set_vms.power_off(rg_name, ss_name, node_id)
         else:
             async_vm_start = self.compute_client.virtual_machines.power_off(self.cluster_node_rg, node.name)
+
         async_vm_start.wait()
 
     def start(self, node):
@@ -263,6 +264,7 @@ class AzureDriver(AbstractDriver):
             async_vm_restart = self.compute_client.virtual_machine_scale_set_vms.start(rg_name, ss_name, node_id)
         else:
             async_vm_restart = self.compute_client.virtual_machines.start(self.cluster_node_rg, node.name)
+
         async_vm_restart.wait()
 
     def delete(self, node):
@@ -276,4 +278,5 @@ class AzureDriver(AbstractDriver):
             async_vm_delete = self.compute_client.virtual_machine_scale_set_vms.delete(rg_name, ss_name, node_id)
         else:
             async_vm_delete = self.compute_client.virtual_machines.delete(self.cluster_node_rg, node.name)
+            
         async_vm_delete.wait()

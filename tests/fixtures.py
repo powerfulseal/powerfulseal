@@ -19,6 +19,7 @@ from powerfulseal.policy.action_probe_http import ActionProbeHTTP
 from powerfulseal.policy.action_nodes import ActionNodes
 from powerfulseal.policy.action_pods import ActionPods
 from powerfulseal.policy.action_nodes_pods import ActionNodesPods
+from powerfulseal.policy.action_alertmanager import ActionAlertManager, ActionUnmuteAlertManager
 from powerfulseal.execute import SSHExecutor
 
 
@@ -139,5 +140,23 @@ def action_probe_http():
             )
         ),
         k8s_inventory=k8s_inventory,
+        logger=logger,
+    )
+
+
+@pytest.fixture
+def action_alertmanager():
+    logger = MagicMock()
+    return ActionAlertManager(
+        name="test alert manager action",
+        schema=dict(
+            targets = [
+                dict(url="http://example.com")
+            ],
+            actions= [
+                dict(mute = dict())
+            ],
+            proxies=dict(http='http',https='https')
+        ),
         logger=logger,
     )

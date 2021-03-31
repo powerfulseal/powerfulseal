@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import time
-
 from powerfulseal import makeLogger
 
 from ..metriccollectors.stdout_collector import StdoutCollector
@@ -23,7 +22,7 @@ from .action_pods import ActionPods
 from .action_kubectl import ActionKubectl
 from .action_probe_http import ActionProbeHTTP
 from .action_clone import ActionClone
-
+from .action_alertmanager import ActionAlertManager
 
 class Scenario():
     """
@@ -47,6 +46,7 @@ class Scenario():
             probeHTTP=self.action_probe_http,
             wait=self.action_wait,
             clone=self.action_clone,
+            alertManagerAction=self.action_alertmanager
         )
         self.cleanup_list = []
 
@@ -178,3 +178,11 @@ class Scenario():
             k8s_inventory=self.k8s_inventory,
         )
         return self.execute_action(action)
+
+    def action_alertmanager(self, schema):
+        action = ActionAlertManager(
+            schema=schema,
+            name=self.name
+        )
+        return self.execute_action(action)
+

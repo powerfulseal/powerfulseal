@@ -22,6 +22,8 @@ from .action_abstract import ActionAbstract
 from datetime import datetime, timedelta
 import requests
 
+DEFAULT_SILENCE_DURATION = 900 # seconds
+
 # Action class to delete generated silences in ActionAlertManager
 class ActionUnmuteAlertManager():
     def __init__(self, name, silence_id, alertmanager_url, proxies={}, logger=None):
@@ -89,9 +91,13 @@ class ActionAlertManager(ActionAbstract):
     def action_mute(self, params):
         success = True
         # automute is True unless explicitly set to False
-        autoUnmute = params.get('autoUnmute', True) if type(params) is dict else True
+        autoUnmute = True
+        duration = DEFAULT_SILENCE_DURATION
+        if type(params) is dict:
+            autoUnmute = params.get('autoUnmute', True)
+            duration = params.get('duration', DEFAULT_SILENCE_DURATION)
         for alert_manager in self.silences:
-            self.silences[alert_manager] = self.mute(alert_manager)
+            self.silences[alert_manager] = self.mute(alert_manager, duration)
             if self.silences[alert_manager] is not None:
                 if autoUnmute is True:
                     # add unmute action for cleaning up when mute action generates silence
@@ -108,11 +114,10 @@ class ActionAlertManager(ActionAbstract):
         return success
 
 
-    def mute(self, url):
+    def mute(self, url, duration):
         self.logger.info("Silencing alerts for alert manager %s", url)
         startTime = datetime.now()
-        # mute all alerts for 15 mins (900 secs)
-        endTime = startTime + timedelta(seconds=900)
+        endTime = startTime + timedelta(seconds=duration)
         payload = {
             'comment': 'silence all alerts',
             'createdBy': 'powerfulseal',

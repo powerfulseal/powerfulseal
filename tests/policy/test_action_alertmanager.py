@@ -16,6 +16,8 @@ def test_happy_path(action_alertmanager):
         'http://example.com': 'silence_id'
     })
     assert(action_alertmanager.proxies == dict(http='http',https='https'))
+    # test default silence duration
+    action_alertmanager.mute.assert_called_once_with('http://example.com', 900)
 
     # muting should push unmuting action for cleaning up
     cleanup_action = action_alertmanager.cleanup_actions[0]
@@ -43,6 +45,15 @@ def test_mute_is_none(action_alertmanager):
     action_alertmanager.schema["actions"][0]["mute"] = None
     action_alertmanager.mute = MagicMock()
     action_alertmanager.execute()
+    # test default silence duration
+    action_alertmanager.mute.assert_called_once_with('http://example.com', 900)
+
+def test_duration_override(action_alertmanager):
+    action_alertmanager.schema["actions"][0]["mute"] = {'duration': 123}
+    action_alertmanager.mute = MagicMock()
+    action_alertmanager.execute()
+    # test default silence duration
+    action_alertmanager.mute.assert_called_once_with('http://example.com', 123)
 
 # multiple targets cases
 @patch.object(ActionAlertManager, 'mute')

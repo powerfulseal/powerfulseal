@@ -115,8 +115,9 @@ class ActionAlertManager(ActionAbstract):
 
 
     def mute(self, url, duration):
-        self.logger.info("Silencing alerts for alert manager %s", url)
-        startTime = datetime.now()
+        self.logger.info("Silencing alerts for alert manager %s...", url)
+        # the local OS time zone will be assumed and included after astimezone call
+        startTime = datetime.now().astimezone()
         endTime = startTime + timedelta(seconds=duration)
         payload = {
             'comment': 'silence all alerts',
@@ -150,6 +151,8 @@ class ActionAlertManager(ActionAbstract):
             )
             resp.raise_for_status()
             silenceId = resp.json()['silenceID']
+            self.logger.info("Silenced alerts from %s to %s",
+                startTime.isoformat(), endTime.isoformat())
         except:
             self.logger.exception("Exception while calling %s", url)
         return silenceId

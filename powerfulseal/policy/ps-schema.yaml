@@ -130,6 +130,8 @@ definitions:
           - "$ref": "#/definitions/nodeAction"
           - "$ref": "#/definitions/waitAction"
           - "$ref": "#/definitions/cloneAction"
+          - "$ref": "#/definitions/alertManagerAction"
+
     required:
     - name
     - steps
@@ -472,6 +474,51 @@ definitions:
         - source
     required:
     - clone
+
+  alertManagerAction:
+    description: >
+      Allows to interact with alert managers such as muting all alerts
+    type: object
+    properties:
+      alertManagerAction:
+        type: object
+        targets:
+          type: array
+          items:
+            oneOf:
+            - "$ref": "#/definitions/targetURL"
+        actions:
+          type: array
+          description: >
+            An array of actions to be applied to each alert manager target.
+          items:
+            type: object
+            oneOf:
+            - "$ref": "#/definitions/actionMuteAlertManager"
+        retries:
+          type: object
+          description: >
+            An object of retry criteria to rerun set actions
+          oneOf:
+            - "$ref": "#/definitions/retriesCount"
+            - "$ref": "#/definitions/retriesTimeout"
+        proxies:
+          type: object
+          description: >
+            Specify the http and https proxies needed to reach alert manager targets
+          additionalProperties: false
+          properties:
+            http:
+              type: string
+              default: ""
+            https:
+              type: string
+              default: ""
+        required:
+          - targets
+          - actions
+    required:
+    - alertManagerAction
 
 
 ###################################################################################################
@@ -1067,6 +1114,34 @@ definitions:
     - environment
 
 ###################################################################################################
+# ALERT MANAGER
+###################################################################################################
+
+  actionMuteAlertManager:
+    type: object
+    description: >
+      mute all alerts of an alert manager
+    additionalProperties: false
+    properties:
+      mute:
+        type: object
+        additionalProperties: false
+        properties:
+          duration:
+            type: integer
+            description: >
+              Number of seconds alerts are muted for
+            minimum: 60
+            maximum: 86400
+          autoUnmute:
+            type: boolean
+            description:
+              When set to true, powerfulseal will unmute alerts during cleanup
+            default: true
+    required:
+    - mute
+
+###################################################################################################
 # MISC
 ###################################################################################################
 
@@ -1146,3 +1221,4 @@ definitions:
         - namespace
     required:
     - service
+

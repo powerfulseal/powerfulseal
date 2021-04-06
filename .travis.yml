@@ -33,16 +33,16 @@ script:
 # push images to DockerHub and PyPI on tags
 deploy:
   - provider: script
-    script: bash build/docker_deploy.sh
-    skip_cleanup: true
-    on:
-      tags: true
-      python: "3.7"
-      condition: -n "$DOCKER_PASSWORD"
-  - provider: script
     script:  python -m pip install tox && tox -vve pypi_publish
     skip_cleanup: true
     on:
       tags: true
       python: "3.7"
       condition: -n "$TWINE_PASSWORD" && $TRAVIS_CPU_ARCH = "amd64"
+  - provider: script
+    script: bash build/docker_deploy.sh
+    skip_cleanup: true
+    on:
+      tags: true
+      python: "3.7"
+      condition: -n "$DOCKER_PASSWORD"

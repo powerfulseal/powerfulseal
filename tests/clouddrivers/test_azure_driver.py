@@ -3,7 +3,7 @@ from mock import patch, MagicMock
 from powerfulseal.clouddrivers import azure_driver
 from powerfulseal.node import Node, NodeState
 
-PRIVATE_IPS = ['198.168.1.1', '198.168.1.2', '198.168.1.3']
+PRIVATE_IPS = ['198.168.1.1', '198.168.1.2', '198.168.1.3', '192.168.1.4']
 PUBLIC_IPS = ['31.31.31.31', '41.41.41.41']
 INVALID_IP = '198.168.3.1'
 
@@ -54,7 +54,7 @@ class VMNetworkClient():
 
 class VMNetID():
     def __init__(self,rg, ifname):
-        self.id='/subscriptions/a32253aa-111111/resourceGroups/'+rg+'/providers/Microsoft.Network/networkInterfaces/'+ifname 
+        self.id='/subscriptions/a32253aa-111111/resourceGroups/'+rg+'/providers/Microsoft.Network/networkInterfaces/'+ifname
 
 class VMNetworkProfile():
     def __init__(self, rg, ifname):
@@ -77,22 +77,67 @@ class VMCompute():
         self.virtual_machines = VMServerMachine(id, state)
 
 class VMInstance():
-    def __init__(self, id, name, zone, state, rg, ifname, priv_ip, pub_ip_name, pub_ip):
+    def __init__(self, id, name, zone, type, state, rg, ifname, priv_ip, pub_ip_name, pub_ip):
         self.id = id
         self.network_profile=VMNetworkProfile(rg, ifname)
         self.location = zone
+        self.type = type
         self.name = name
         self.state = state
         self.network_stuff = VMNetworkClient(rg, ifname, priv_ip, pub_ip_name, pub_ip)
         self.compute_stuff = VMCompute(id, state)
 
-   
+@pytest.fixture
+def test():
+    return True
+
 @pytest.fixture
 def vm_instances():
     return [
-        VMInstance(id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachines/aks-workers-67219403-0", name="aks-workers-67219403-0", zone="westus", state="PowerState/running", rg="MC_test-rg-2_westus", ifname="two",priv_ip="198.168.1.1", pub_ip_name="publicIp01",pub_ip="31.31.31.31"),
-        VMInstance(id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachines/aks-workers-67219403-1", name="aks-workers-67219403-1", zone="westus", state="PowerState/stopped", rg="MC_test-rg-2_westus", ifname="four",priv_ip="198.168.1.2", pub_ip_name="publicIp02", pub_ip="41.41.41.41"),
-        VMInstance(id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachines/aks-workers-67219403-2", name="aks-workers-67219403-2", zone="westus", state="UNKNOWN", rg="MC_test-rg-2_westus", ifname="six",priv_ip="198.168.1.3", pub_ip_name=None, pub_ip=None),
+        VMInstance(
+            id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachines/aks-workers-67219403-0",
+            name="aks-workers-67219403-0",
+            zone="westus",
+            type="Microsoft.Compute/virtualMachines",
+            state="PowerState/running",
+            rg="MC_test-rg-2_westus",
+            ifname="two",
+            priv_ip="198.168.1.1",
+            pub_ip_name="publicIp01",
+            pub_ip="31.31.31.31"),
+        VMInstance(
+            id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachines/aks-workers-67219403-1",
+            name="aks-workers-67219403-1",
+            zone="westus",
+            type="Microsoft.Compute/virtualMachines",
+            state="PowerState/stopped",
+            rg="MC_test-rg-2_westus",
+            ifname="four",
+            priv_ip="198.168.1.2",
+            pub_ip_name="publicIp02",
+            pub_ip="41.41.41.41"),
+        VMInstance(
+            id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachines/aks-workers-67219403-2",
+            name="aks-workers-67219403-2",
+            zone="westus",
+            type="Microsoft.Compute/virtualMachines",
+            state="UNKNOWN",
+            rg="MC_test-rg-2_westus",
+            ifname="six",
+            priv_ip="198.168.1.3",
+            pub_ip_name=None,
+            pub_ip=None),
+        VMInstance(
+            id="/subscriptions/a32253aa-111111/resourceGroups/MC_test-rg-2_westus/providers/Microsoft.Compute/virtualMachineScaleSets/aks-default-67219403-vmss/virtualMachines/0",
+            name="aks-default-67219403-vmss_0",
+            zone="eastus",
+            type="Microsoft.Compute/virtualMachineScaleSets/virtualMachines",
+            state="UNKNOWN",
+            rg="MC_test-rg-2_westus",
+            ifname="five",
+            priv_ip="192.168.1.4",
+            pub_ip_name=None,
+            pub_ip=None),
 ]
 
 
@@ -120,9 +165,24 @@ def test_get_by_ip_public_ip_nodes(create_connection_from_config, vm_instances):
     assert vm_instances[node_index].network_stuff.network_interfaces.theif.ip_configurations[0].public_ip_address.ip_address== nodes.extIp
 
 @patch('powerfulseal.clouddrivers.azure_driver.create_connection_from_config', return_value=(None, None, None))
+@patch.object(azure_driver.AzureDriver, 'get_vmss_ips', return_value=('192.168.1.4', None))
 def test_get_by_ip_no_nodes(create_connection_from_config, vm_instances):
     driver = azure_driver.AzureDriver()
     driver.remote_servers = vm_instances
     driver.network_client = vm_instances[2].network_stuff
     nodes = driver.get_by_ip(INVALID_IP)
     assert nodes is None
+
+@patch('powerfulseal.clouddrivers.azure_driver.create_connection_from_config', return_value=(None, None, None))
+@patch.object(azure_driver.AzureDriver, 'get_vmss_ips', return_value=('192.168.1.4', None))
+def test_get_by_ip_private_ip_vmss(test, create_connection_from_config, vm_instances):
+    driver = azure_driver.AzureDriver()
+    driver.remote_servers = vm_instances
+    node_index = 3
+    driver.network_client = vm_instances[node_index].network_stuff
+    nodes = driver.get_by_ip(PRIVATE_IPS[node_index])
+    print(type(vm_instances))
+    assert vm_instances[node_index].id is nodes.id
+    assert vm_instances[node_index].location is nodes.az
+    assert vm_instances[node_index].type is nodes.type
+    assert vm_instances[node_index].type == 'fooo'

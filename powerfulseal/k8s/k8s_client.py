@@ -32,6 +32,15 @@ class K8sClient():
             kubernetes.config.load_kube_config(config_file=kube_config)
         else:
             kubernetes.config.load_incluster_config()
+
+        proxy_url = os.getenv('HTTP_PROXY', None)
+        if proxy_url:
+            kubernetes.client.Configuration._default.proxy = proxy_url
+
+        ca_cert_file = os.getenv('SSL_CERT_FILE', None)
+        if ca_cert_file:    
+            kubernetes.client.Configuration._default.ssl_ca_cert = ca_cert_file
+
         self.kube_config = kube_config
         self.client_corev1api = kubernetes.client.CoreV1Api()
         self.client_appsv1api = kubernetes.client.AppsV1Api()

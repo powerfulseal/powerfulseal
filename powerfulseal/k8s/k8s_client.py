@@ -62,6 +62,15 @@ class K8sClient():
         if payload:
             return ",".join(self.make_selector(*item) for item in payload.items())
 
+    def selector_or_labels(self, labels, selector):
+        """ Helper to select labels over selector.
+        """
+        if selector is None:
+            selector = ""
+        if labels is not None:
+            selector = self.dict_to_selector(labels)
+        return selector
+
     def get_nodes_groups(self):
         """ Returns an inventory of nodes which form the Kubernetes cluster.
             Returns a dict of group name -> list of nodes.
@@ -105,15 +114,6 @@ class K8sClient():
         except ApiException as e:
             self.logger.exception(e)
             raise
-
-    def selector_or_labels(self, labels, selector):
-        """ Helper to select labels over selector.
-        """
-        if selector is None:
-            selector = ""
-        if labels is not None:
-            selector = self.dict_to_selector(labels)
-        return selector
 
     def list_deployments(self, namespace, labels=None, selector=None):
         """

@@ -149,6 +149,20 @@ class K8sClient():
             self.logger.exception(e)
             raise
 
+    def get_deployment(self, namespace, name):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            AppsV1Api.md#read_namespaced_deployment
+        """
+        try:
+            return self.client_appsv1api.read_namespaced_deployment(
+                namespace=namespace,
+                name=name,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
     def list_deployments(self, namespace, labels=None, selector=None):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
@@ -176,20 +190,6 @@ class K8sClient():
                 deployment = self.get_deployment(namespace, deployment_name)
                 selector = self.dict_to_selector(deployment.spec.selector.match_labels)
             return self.list_pods(namespace, None, selector) # Prefer deployment selector over labels
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def get_deployment(self, namespace, name):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            AppsV1Api.md#read_namespaced_deployment
-        """
-        try:
-            return self.client_appsv1api.read_namespaced_deployment(
-                namespace=namespace,
-                name=name,
-            )
         except ApiException as e:
             self.logger.exception(e)
             raise

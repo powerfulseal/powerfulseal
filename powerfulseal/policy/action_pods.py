@@ -97,7 +97,8 @@ class ActionPods(ActionNodesPods):
         deployment_name = params.get("name")
         pods = self.k8s_inventory.find_pods(
             namespace=namespace,
-            deployment_name=deployment_name,
+            app="deployment",
+            name=deployment_name,
         )
         self.logger.info("Matched %d pods for deploy %s in namespace %s",
                  len(pods), deployment_name, namespace

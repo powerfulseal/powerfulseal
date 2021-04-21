@@ -390,7 +390,8 @@ class PSCmd(cmd.Cmd):
         deployment_name = cmd.get(1)
         for pod in self.k8s_inventory.find_pods(
             namespace=namespace,
-            deployment_name=deployment_name,
+            app="deployment",
+            name=deployment_name,
         ):
             print(colour_output(str(pod)))
 

@@ -71,6 +71,18 @@ class K8sClient():
             selector = self.dict_to_selector(labels)
         return selector
 
+    def list_nodes(self):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md##list_node
+        """
+        try:
+            resp = self.client_corev1api.list_node()
+            return resp.items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
     def get_nodes_groups(self):
         """ Returns an inventory of nodes which form the Kubernetes cluster.
             Returns a dict of group name -> list of nodes.
@@ -90,18 +102,6 @@ class K8sClient():
                         group.append(ip)
                 groups[value] = group
         return groups
-
-    def list_nodes(self):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            CoreV1Api.md##list_node
-        """
-        try:
-            resp = self.client_corev1api.list_node()
-            return resp.items
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
 
     def list_namespaces(self):
         """

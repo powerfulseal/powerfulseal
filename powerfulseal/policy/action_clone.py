@@ -26,28 +26,38 @@ DEFAULT_TOXIPROXY_IMAGE = "docker.io/shopify/toxiproxy:2.1.4"
 DEFAULT_IPTABLES_IMAGE = "gaiadocker/iproute2:latest"
 
 
-class DeleteDeploymentAction():
-  def __init__(self, name, namespace, k8s_inventory, logger=None):
+class DeleteAppAction():
+  def __init__(self, name, type, namespace, k8s_inventory, logger=None):
     self.name = name
+    self.type = type
     self.namespace = namespace
     self.k8s_inventory = k8s_inventory
     self.logger = logger or makeLogger(__name__)
 
   def execute(self):
     try:
-      response = self.k8s_inventory.k8s_client.delete_deployment(
-        namespace=self.namespace,
-        name=self.name,
-      )
+      if self.type == "deployment":
+        response = self.k8s_inventory.k8s_client.delete_deployment(
+          namespace=self.namespace,
+          name=self.name,
+        )
+      elif self.type == "stateful_set":
+        response = self.k8s_inventory.k8s_client.delete_stateful_set(
+          namespace=self.namespace,
+          name=self.name,
+        )
+      else:
+        raise Exception("Unsupported type " + self.type)
       self.logger.debug("Response %s", response)
-      self.logger.info("Clone deployment deleted successfully: %s in %s", self.name, self.namespace)
+      self.logger.info("Clone app deleted successfully: %s %s in %s", self.type, self.name, self.namespace)
     except:
-      self.logger.exception("Error deleting clone deployment: %s in %s", self.name, self.namespace)
+      self.logger.exception("Error deleting clone app: %s %s in %s", self.type, self.name, self.namespace)
       return False
 
 class ActionClone(ActionAbstract):
 
   def __init__(self, name, schema, k8s_inventory, logger=None, metric_collector=None):
+    self.type = None
     self.name = name
     self.schema = schema
     self.k8s_inventory = k8s_inventory
@@ -59,13 +69,25 @@ class ActionClone(ActionAbstract):
     return self.cleanup_actions
 
   def get_source_schema(self, source):
-    # currently, only deployments are supported
+    # currently, only deployments and statefulsets are supported
     source_deployment = source.get("deployment")
-    deployment = self.k8s_inventory.k8s_client.get_deployment(
-      name=source_deployment.get("name"),
-      namespace=source_deployment.get("namespace"),
-    )
-    return deployment
+    source_stateful_set = source.get("statefulset")
+
+    if source_deployment:
+      self.type = "deployment"
+      return self.k8s_inventory.k8s_client.get_deployment(
+        name=source_deployment.get("name"),
+        namespace=source_deployment.get("namespace"),
+      )
+
+    if source_stateful_set:
+      self.type = "stateful_set"
+      return self.k8s_inventory.k8s_client.get_stateful_set(
+        name=source_stateful_set.get("name"),
+        namespace=source_stateful_set.get("namespace"),
+      )
+
+    raise Exception("Unable to parse Source Schema")
 
   def modify_labels(self, body, update_labels):
     """
@@ -99,34 +121,44 @@ class ActionClone(ActionAbstract):
     return body
 
   def execute(self):
-    # get the source deployment
+    # get the source app
     try:
       source_schema = self.get_source_schema(self.schema.get("source"))
     except:
       return False
 
     # build the body for the request to create
-    body = kubernetes.client.V1Deployment()
+    if self.type == "deployment":
+      body = kubernetes.client.V1Deployment()
+      body.spec = kubernetes.client.V1DeploymentSpec(
+        replicas=self.schema.get("replicas", 1),
+        selector=source_schema.spec.selector,
+        template=source_schema.spec.template,
+      )
+    elif self.type == "stateful_set":
+      body = kubernetes.client.V1StatefulSet()
+      body.spec = kubernetes.client.V1StatefulSetSpec(
+        replicas=self.schema.get("replicas", 1),
+        service_name=source_schema.spec.service_name,
+        selector=source_schema.spec.selector,
+        template=source_schema.spec.template,
+      )
+
+    if body.spec.selector.match_expressions is not None:
+      self.logger.error("App is using match_expressions. Not supported")
+      return False
+
     body.metadata = kubernetes.client.V1ObjectMeta(
       name=source_schema.metadata.name + "-chaos",
       namespace=source_schema.metadata.namespace,
       annotations=dict(
-        original_deployment=source_schema.metadata.name,
+        original_app=source_schema.metadata.name,
         chaos_scenario=self.name,
       ),
       labels = dict(
         chaos="true",
       ),
     )
-    body.spec = kubernetes.client.V1DeploymentSpec(
-      replicas=self.schema.get("replicas", 1),
-      selector=source_schema.spec.selector,
-      template=source_schema.spec.template,
-    )
-
-    if body.spec.selector.match_expressions is not None:
-      self.logger.error("Deployment is using match_expressions. Not supported")
-      return False
 
     # handle the labels modifiers
     def update_labels(**kwargs):
@@ -168,10 +200,17 @@ class ActionClone(ActionAbstract):
     # create the clone
     try:
       self.logger.debug("Body %s", body)
-      response = self.k8s_inventory.k8s_client.create_deployment(
-        namespace=body.metadata.namespace,
-        body=body,
-      )
+      if self.type == "deployment":
+        response = self.k8s_inventory.k8s_client.create_deployment(
+          namespace=body.metadata.namespace,
+          body=body,
+        )
+      elif self.type == "stateful_set":
+        response = self.k8s_inventory.k8s_client.create_stateful_set(
+          namespace=body.metadata.namespace,
+          body=body,
+        )
+
       self.logger.debug("Response %s", response)
       self.logger.info("Clone deployment created successfully")
     except:
@@ -179,8 +218,9 @@ class ActionClone(ActionAbstract):
 
     # add a cleanup action to remove the clone when we're done
     self.cleanup_actions.append(
-      DeleteDeploymentAction(
+      DeleteAppAction(
         name=body.metadata.name,
+        type=self.type,
         namespace=body.metadata.namespace,
         k8s_inventory=self.k8s_inventory,
       )

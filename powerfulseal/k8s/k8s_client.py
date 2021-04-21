@@ -71,6 +71,40 @@ class K8sClient():
             selector = self.dict_to_selector(labels)
         return selector
 
+    def list_pods(self, namespace, labels=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#list_namespaced_pod
+            Get pods by label first, then selector
+        """
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            return self.client_corev1api.list_namespaced_pod(
+                namespace=namespace,
+                label_selector=selector,
+            ).items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def delete_pods(self, pods):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#delete_namespaced_pod
+            Delete all pods synchronously
+        """
+        for pod in pods:
+            try:
+                self.client_corev1api.delete_namespaced_pod(
+                    name=pod.name,
+                    namespace=pod.namespace,
+                    grace_period_seconds=0
+                )
+            except ApiException as e:
+                self.logger.exception(e)
+                return False
+        return True
+
     def list_nodes(self):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
@@ -130,6 +164,22 @@ class K8sClient():
             self.logger.exception(e)
             raise
 
+    def list_deployment_pods(self, namespace, labels=None, deployment_name=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#list_namespaced_pod
+            If deployment_name is provided, it will ignore selector, and use the deployment's
+        """
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            if deployment_name:
+                deployment = self.get_deployment(namespace, deployment_name)
+                selector = self.dict_to_selector(deployment.spec.selector.match_labels)
+            return self.list_pods(namespace, None, selector) # Prefer deployment selector over labels
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
     def get_deployment(self, namespace, name):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
@@ -172,43 +222,6 @@ class K8sClient():
         except ApiException as e:
             self.logger.exception(e)
             raise
-
-    def list_pods(self, namespace, labels=None, deployment_name=None, selector=None):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            CoreV1Api.md#list_namespaced_pod
-            If deployment_name is provided, it will ignore selector, and use the deployment's
-        """
-        try:
-            selector = self.selector_or_labels(labels, selector)
-            if deployment_name:
-                deployment = self.get_deployment(namespace, deployment_name)
-                selector = self.dict_to_selector(deployment.spec.selector.match_labels)
-            return self.client_corev1api.list_namespaced_pod(
-                namespace=namespace,
-                label_selector=selector,
-            ).items
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def delete_pods(self, pods):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            CoreV1Api.md#delete_namespaced_pod
-            Delete all pods synchronously
-        """
-        for pod in pods:
-            try:
-                self.client_corev1api.delete_namespaced_pod(
-                    name=pod.name,
-                    namespace=pod.namespace,
-                    grace_period_seconds=0
-                )
-            except ApiException as e:
-                self.logger.exception(e)
-                return False
-        return True
 
     def get_service(self, namespace, name):
         """

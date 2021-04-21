@@ -178,16 +178,16 @@ class K8sClient():
             self.logger.exception(e)
             raise
 
-    def list_deployment_pods(self, namespace, labels=None, deployment_name=None, selector=None):
+    def list_deployment_pods(self, namespace, labels=None, name=None, selector=None):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
             CoreV1Api.md#list_namespaced_pod
-            If deployment_name is provided, it will ignore selector, and use the deployment's
+            If deployment name is provided, it will ignore selector and label, and use the deployment's
         """
         try:
             selector = self.selector_or_labels(labels, selector)
-            if deployment_name:
-                deployment = self.get_deployment(namespace, deployment_name)
+            if name:
+                deployment = self.get_deployment(namespace, name)
                 selector = self.dict_to_selector(deployment.spec.selector.match_labels)
             return self.list_pods(namespace, None, selector) # Prefer deployment selector over labels
         except ApiException as e:
@@ -216,6 +216,80 @@ class K8sClient():
         """
         try:
             return self.client_appsv1api.delete_namespaced_deployment(
+                namespace=namespace,
+                name=name,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def get_stateful_set(self, namespace, name):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            AppsV1Api.md#read_namespaced_stateful_set
+        """
+        try:
+            return self.client_appsv1api.read_namespaced_stateful_set(
+                namespace=namespace,
+                name=name,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def list_stateful_set(self, namespace, labels=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            AppsV1Api.md#list_namespaced_stateful_set
+        """
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            return self.client_appsv1api.list_namespaced_stateful_set(
+                namespace=namespace,
+                label_selector=selector,
+            ).items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def list_stateful_set_pods(self, namespace, labels=None, name=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#list_namespaced_pod
+            If stateful_set name is provided, it will ignore selector and label, and use the stateful_set's
+        """
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            if name:
+                stateful_set = self.get_stateful_set(namespace, name)
+                selector = self.dict_to_selector(stateful_set.spec.selector.match_labels)
+            return self.list_pods(namespace, None, selector) # Prefer stateful_set selector over labels
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def create_stateful_set(self, namespace, body):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            AppsV1Api.md#create_namespaced_stateful_set
+        """
+        try:
+            return self.client_appsv1api.create_namespaced_stateful_set(
+                namespace=namespace,
+                body=body,
+            )
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+
+    def delete_stateful_set(self, namespace, name):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            AppsV1Api.md#delete_namespaced_stateful_set
+        """
+        try:
+            return self.client_appsv1api.delete_namespaced_stateful_set(
                 namespace=namespace,
                 name=name,
             )

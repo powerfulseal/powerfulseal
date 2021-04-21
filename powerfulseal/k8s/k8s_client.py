@@ -118,7 +118,7 @@ class K8sClient():
     def list_deployments(self, namespace, labels=None, selector=None):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            ExtensionsV1beta1Api.md#list_namespaced_deployment
+            AppsV1Api.md#list_namespaced_deployment
         """
         try:
             selector = self.selector_or_labels(labels, selector)
@@ -133,7 +133,7 @@ class K8sClient():
     def get_deployment(self, namespace, name):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            ExtensionsV1beta1Api.md#read_namespaced_deployment
+            AppsV1Api.md#read_namespaced_deployment
         """
         try:
             return self.client_appsv1api.read_namespaced_deployment(
@@ -147,7 +147,7 @@ class K8sClient():
     def create_deployment(self, namespace, body):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            ExtensionsV1beta1Api.md#create_namespaced_deployment
+            AppsV1Api.md#create_namespaced_deployment
         """
         try:
             return self.client_appsv1api.create_namespaced_deployment(
@@ -162,7 +162,7 @@ class K8sClient():
     def delete_deployment(self, namespace, name):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            ExtensionsV1beta1Api.md#delete_namespaced_deployment
+            AppsV1Api.md#delete_namespaced_deployment
         """
         try:
             return self.client_appsv1api.delete_namespaced_deployment(
@@ -227,7 +227,7 @@ class K8sClient():
     def get_scenarios(self, namespaces="", labels=None, selector=None):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            ExtensionsV1beta1Api.md#list_namespaced_deployment
+            AppsV1Api.md#list_namespaced_deployment
         """
         try:
             crds = self.client_extensionsApi.list_custom_resource_definition().to_dict()['items']

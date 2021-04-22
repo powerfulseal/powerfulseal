@@ -34,8 +34,8 @@ class PolicyRunner():
         "scenarios": []
     }
 
-    def __init__(self, config_file, k8s_client, logger=None):
-        self.config_file = config_file
+    def __init__(self, policy_config, k8s_client, logger=None):
+        self.policy_config = policy_config
         self.k8s_client = k8s_client
         self.logger = logger or makeLogger(__name__)
 
@@ -43,10 +43,14 @@ class PolicyRunner():
         """
             Read configuration
         """
-        if self.config_file is None:
+        if self.policy_config is None:
             policy = copy.deepcopy(PolicyRunner.DEFAULT_POLICY)
+        elif isinstance(self.policy_config, str):
+            policy = PolicyRunner.load_file(self.policy_config)
+        elif isinstance(self.policy_config, dict):
+            policy = self.policy_config
         else:
-            policy = PolicyRunner.load_file(self.config_file)
+            policy = copy.deepcopy(PolicyRunner.DEFAULT_POLICY)
 
         # Load scenarios from K8S crd extending file scenarios
         scenarios = self.k8s_client.get_scenarios()

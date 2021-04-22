@@ -27,9 +27,9 @@ DEFAULT_IPTABLES_IMAGE = "gaiadocker/iproute2:latest"
 
 
 class DeleteAppAction():
-  def __init__(self, name, type, namespace, k8s_inventory, logger=None):
-    self.name = name
+  def __init__(self, type, name, namespace, k8s_inventory, logger=None):
     self.type = type
+    self.name = name
     self.namespace = namespace
     self.k8s_inventory = k8s_inventory
     self.logger = logger or makeLogger(__name__)
@@ -57,13 +57,13 @@ class DeleteAppAction():
 class ActionClone(ActionAbstract):
 
   def __init__(self, name, schema, k8s_inventory, logger=None, metric_collector=None):
-    self.type = None
     self.name = name
     self.schema = schema
     self.k8s_inventory = k8s_inventory
     self.logger = logger or makeLogger(__name__, name)
     self.metric_collector = metric_collector or StdoutCollector()
     self.cleanup_actions = []
+    self.type = None
 
   def get_cleanup_actions(self):
     return self.cleanup_actions

@@ -28,8 +28,10 @@ class K8sClient():
     """
 
     def __init__(self, kube_config=None, logger=None):
-        if kube_config:
+        if isinstance(kube_config, str):
             kubernetes.config.load_kube_config(config_file=kube_config)
+        elif isinstance(kube_config, dict):
+            kubernetes.config.load_kube_config_from_dict(config_dict=kube_config)
         else:
             kubernetes.config.load_incluster_config()
         self.kube_config = kube_config

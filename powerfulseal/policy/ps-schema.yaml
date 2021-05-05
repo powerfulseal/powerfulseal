@@ -953,6 +953,36 @@ definitions:
         type: object
         additionalProperties: false
         properties:
+          setup:
+            type: object
+            command:
+              type: array
+              description: >
+                The command to execute as an array.
+                Entrypoint in docker.
+                https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+              items:
+                type: string
+            args:
+              type: array
+              description: >
+                The arguments to execute as an array.
+                For example - "qdisc add dev eth0 root netem delay 200ms" to add 200ms delay on egress.
+                https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+              items:
+                type: string
+            user:
+              type: number
+              minimum: 0
+              default: 0
+              description: >
+                The numeric UID of user to run as in the image.
+                Root (UID 0) is not the safest option.
+            image:
+              type: string
+              default: gaiadocker/iproute2:latest
+              description: >
+                The image to use.
           command:
             type: array
             description: >

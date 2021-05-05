@@ -189,12 +189,31 @@ class ActionClone(ActionAbstract):
     return True
 
   def mutate_traffic_control(self, body, spec):
-    """ Adds an init container with tc """
+    """ Adds an init container with tc setup """
     if body.spec.template.spec.init_containers is None:
       body.spec.template.spec.init_containers = []
+    setup_spec = spec.get("setup")
     body.spec.template.spec.init_containers.append(
       kubernetes.client.V1Container(
-        name="chaos"+str(1+len(body.spec.template.spec.init_containers)),
+        name="chaos-setup-"+str(1+len(body.spec.template.spec.init_containers)),
+        command=setup_spec.get("command", "/bin/sh"),
+        args=setup_spec.get("args", "tc show eth0 && tc qdisc add dev eth0 root handle 1: prio bands 2 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 && tc show eth0"),
+        image=setup_spec.get("image",spec.get("image")),
+        security_context=kubernetes.client.V1SecurityContext(
+          run_as_user=setup_spec.get("user",spec.get("user")),
+          capabilities=kubernetes.client.V1Capabilities(
+            add=[
+              "NET_ADMIN"
+            ]
+          )
+        )
+      )
+    )
+
+    # add the toxiproxy side-car container
+    body.spec.template.spec.containers.append(
+      kubernetes.client.V1Container(
+        name="chaos-tc",
         command=spec.get("command"),
         args=spec.get("args"),
         image=spec.get("image"),

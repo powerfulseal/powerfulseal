@@ -81,8 +81,8 @@ class Scenario():
                 timer = 0
                 while timer < final_timeout:
                     ret = action_method(schema=step_action)
-                    if ret:
-                        return ret
+                    if ret > 0:
+                        return True
                     else:
                         self.logger.warning("Failure in action. Sleeping %s and retrying", retry_sleep)
                         #  wait a little
@@ -97,8 +97,8 @@ class Scenario():
                 counter = 0
                 while counter < final_count:
                     ret = action_method(schema=step_action)
-                    if ret:
-                        return ret
+                    if ret > 0:
+                        return True
                     else:
                         self.logger.warning("Failure in action. Sleeping %s and retrying", retry_sleep)
                         #  wait a little
@@ -109,7 +109,10 @@ class Scenario():
 
         else:
             ret = action_method(schema=step_action)
-        return ret
+            if ret >= 0:
+                return True
+            else:
+                False
 
     def cleanup(self):
         if not self.cleanup_list:

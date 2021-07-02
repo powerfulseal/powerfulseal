@@ -43,13 +43,11 @@ class PolicyRunner():
         """
             Read configuration
         """
-        if self.policy_config is None:
-            policy = copy.deepcopy(PolicyRunner.DEFAULT_POLICY)
-        elif isinstance(self.policy_config, str):
+        if isinstance(self.policy_config, str):
             policy = PolicyRunner.load_file(self.policy_config)
         elif isinstance(self.policy_config, dict):
             policy = self.policy_config
-        else:
+        else: #  is None or unsupported
             policy = copy.deepcopy(PolicyRunner.DEFAULT_POLICY)
 
         # Load scenarios from K8S crd extending file scenarios

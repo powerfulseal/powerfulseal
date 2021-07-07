@@ -210,7 +210,7 @@ class ActionClone(ActionAbstract):
       )
     )
 
-    # add the toxiproxy side-car container
+    # add the delayed tc side-car container
     body.spec.template.spec.containers.append(
       kubernetes.client.V1Container(
         name="chaos-tc",

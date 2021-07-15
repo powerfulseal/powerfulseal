@@ -78,18 +78,22 @@ class ActionProbeHTTP(ActionAbstract):
             "Making a call: %s, %s, %r, %d, %d, %s, %s, %s",
             url, method, headers, timeout, code, body, proxy, verify
         )
-        resp = requests.request(
-            method.upper(),
-            url,
-            headers=headers,
-            timeout=timeout/1000,
-            data=body.encode("utf-8"),
-            proxies=dict(
-                http=proxy or "",
-                https=proxy or "",
-            ),
-            verify=verify,
-        )
+        try:
+            resp = requests.request(
+                method.upper(),
+                url,
+                headers=headers,
+                timeout=timeout/1000,
+                data=body.encode("utf-8"),
+                proxies=dict(
+                    http=proxy or "",
+                    https=proxy or "",
+                ),
+                verify=verify,
+            )
+        except:
+            self.logger.exception("Exception while calling %s", url)
+            return False
         if resp.status_code != code:
             self.logger.error(
                 "Expected response code %s, got %s instead. Response: %s",

@@ -91,7 +91,8 @@ class ActionProbeHTTP(ActionAbstract):
                 ),
                 verify=verify,
             )
-            resp.raise_for_status()
+            if resp.status_code != code:
+                resp.raise_for_status()
             self.logger.info("Response: %s", resp.text)
             return True
         except:

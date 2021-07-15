@@ -120,15 +120,14 @@ def test_get_url_code_does_not_match(action_probe_http):
     mock_response = MagicMock()
     mock_response.status_code = 404
     mock_response.text = "some response"
-    mock_response.raise_for_status = MagicMock(side_effect=Exception("404 Bad"))
     mock_request = MagicMock(return_value=mock_response)
 
     with patch("requests.request", mock_request):
         execute_result = action_probe_http.execute()
 
     assert mock_request.call_count == 1
-    assert mock_response.raise_for_status.call_count == 1
     assert execute_result is False
+
 
 def test_get_url_proxy(action_probe_http):
     schema = dict(

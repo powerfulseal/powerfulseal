@@ -765,9 +765,7 @@ definitions:
     additionalProperties: false
     properties:
       start:
-        type:
-        - object
-        - 'null'
+        type: object
         additionalProperties: false
     required:
     - start

@@ -19,8 +19,8 @@ function removeKey(obj, keyNames) {
 }
 
 function updateCRDFile(crdFilename, jsonSchemaFilename) {
-    let jsonSchema = yaml.safeLoad(fs.readFileSync(jsonSchemaFilename, 'utf8'));
-    let crd = yaml.safeLoad(fs.readFileSync(crdFilename, 'utf8'));
+    let jsonSchema = yaml.load(fs.readFileSync(jsonSchemaFilename, 'utf8'));
+    let crd = yaml.load(fs.readFileSync(crdFilename, 'utf8'));
     $RefParser.dereference(jsonSchema, (err, schemaDereferenced) => {
         if (err) {
             console.error(err);
@@ -29,6 +29,10 @@ function updateCRDFile(crdFilename, jsonSchemaFilename) {
             const openApiSchema = toOpenApi(schemaDereferenced);
             scenarioSchema = openApiSchema.properties.scenarios.items
             removeKey(scenarioSchema, ["additionalProperties", "default"])
+            stepSchema = scenarioSchema.properties.steps.items.oneOf
+            removeKey(stepSchema, ["description", "type"])
+            scenarioSchema.properties.steps.items.oneOf = stepSchema
+            scenarioSchema.properties.steps.items.type = "object"
             var validationSchema = {
                 "type": "object",
                 "required": ["spec"],
@@ -36,11 +40,11 @@ function updateCRDFile(crdFilename, jsonSchemaFilename) {
                     "spec": scenarioSchema
                 }
             }
-            crd.spec.validation.openAPIV3Schema = validationSchema
-            let yamlStr = yaml.safeDump(crd);
+            crd.spec.versions[0].schema.openAPIV3Schema = validationSchema
+            let yamlStr = yaml.dump(crd);
             fs.writeFileSync(crdFilename, yamlStr, 'utf8');
         }
     })
 }
 
-updateCRDFile('../kubernetes/crd.yaml', '../powerfulseal/policy/ps-schema.yaml')
+updateCRDFile('../kubernetes/crd.yml', '../powerfulseal/policy/ps-schema.yaml')

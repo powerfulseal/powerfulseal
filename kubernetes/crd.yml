@@ -1,10 +1,9 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: scenarios.powerfulseal.io
 spec:
   group: powerfulseal.io
-  version: v1
   scope: Namespaced
   names:
     plural: scenarios
@@ -16,733 +15,633 @@ spec:
     - name: v1
       served: true
       storage: true
-  validation:
-    openAPIV3Schema:
-      type: object
-      required:
-        - spec
-      properties:
-        spec:
+      schema:
+        openAPIV3Schema:
           type: object
-          description: >
-            A scenario contains all the steps necessary to prepare, implement
-            and validate a chaos engineering experiment.
+          required:
+            - spec
           properties:
-            name:
-              type: string
+            spec:
+              type: object
               description: >
-                A brief, descriptive name of the scenario. Will be used to
-                identify the scenario in logs.
-              minLength: 3
-              maxLength: 80
-            description:
-              type: string
-              description: >
-                A longer description, helping to understand what the scenario is
-                doing when reading the yaml file. Optional.
-            steps:
-              type: array
-              description: >
-                The sequence of events to prepare, validate, execute and analyse
-                the chaos engineering experiment.
-              items:
-                oneOf:
-                  - description: |
-                      Issue an HTTP request and validate the response.
-                    type: object
-                    properties:
-                      probeHTTP:
-                        type: object
-                        properties:
-                          target:
-                            type: object
-                            oneOf:
-                              - type: object
-                                description: |
-                                  A target of a static URL.
-                                properties:
-                                  url:
-                                    type: string
-                                    description: >
-                                      The fully qualified url to issue the
-                                      request to. For example:
-                                      `http://example.com`.
-                                required:
-                                  - url
-                              - type: object
-                                description: >
-                                  Target the given `Kubernetes` service in a
-                                  given namespace. It will use directly the IP
-                                  of the given service, so make sure it
-                                  resolves.
-                                properties:
-                                  service:
-                                    type: object
-                                    properties:
-                                      name:
-                                        type: string
-                                        description: |
-                                          Name of the kubernetes service.
-                                      namespace:
-                                        type: string
-                                        description: |
-                                          Namespace of the kubernetes service.
-                                      port:
-                                        type: number
-                                        minimum: 1
-                                        maximum: 65535
-                                        description: >
-                                          Port number to hit. Independent of what
-                                          the service defines.
-                                      protocol:
-                                        type: string
-                                        enum:
-                                          - http
-                                          - https
-                                        description: |
-                                          Protocol to use for the probe.
+                A scenario contains all the steps necessary to prepare,
+                implement and validate a chaos engineering experiment.
+              properties:
+                name:
+                  type: string
+                  description: >
+                    A brief, descriptive name of the scenario. Will be used to
+                    identify the scenario in logs.
+                  minLength: 3
+                  maxLength: 80
+                description:
+                  type: string
+                  description: >
+                    A longer description, helping to understand what the
+                    scenario is doing when reading the yaml file. Optional.
+                steps:
+                  type: array
+                  description: >
+                    The sequence of events to prepare, validate, execute and
+                    analyse the chaos engineering experiment.
+                  items:
+                    oneOf:
+                      - properties:
+                          probeHTTP:
+                            properties:
+                              target:
+                                oneOf:
+                                  - properties:
+                                      url: {}
                                     required:
-                                      - name
-                                      - namespace
-                                required:
-                                  - service
-                          retries:
-                            type: number
-                            description: >
-                              Number of retries before failing the probe.
-                              Ignored, if there are no errors on the probe.
-                            minimum: 1
-                          delay:
-                            type: number
-                            description: |
-                              Delay in ms between retries.
-                            minimum: 1
-                          timeout:
-                            type: number
-                            description: |
-                              Request timeout in ms.
-                            minimum: 1
-                          code:
-                            type: number
-                            description: |
-                              Expected status code.
-                            minimum: 1
-                            maximum: 599
-                          count:
-                            type: number
-                            description: |
-                              Number of requests to make.
-                            minimum: 1
-                          endpoint:
-                            type: string
-                            description: >
-                              Endpoint to add to the url. For example
-                              `/healthz`. Works for both url and service.
-                          method:
-                            type: string
-                            description: |
-                              HTTP method to use.
-                            enum:
-                              - get
-                              - post
-                              - patch
-                              - head
-                              - delete
-                          body:
-                            type: string
-                            description: |
-                              Body of the HTTP request.
-                          headers:
-                            description: |
-                              Give any additional headers to the request.
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                name:
-                                  type: string
-                                value:
-                                  type: string
-                          proxy:
-                            type: string
-                            description: >
-                              Proxy to use with the requests. If not set no
-                              proxy will be used. NOTE, that the probe ignores
-                              (and overrides) HTTP{S}_PROXY envvars.
-                          insecure:
-                            type: boolean
-                            description: >
-                              If you'd like to skip the SSL validation. For
-                              example for self-signed certs.
-                        required:
-                          - target
-                    required:
-                      - probeHTTP
-                  - description: >
-                      Allows to execute a `kubectl apply` or `kubectl delete`
-                      command as part of the scenario.
-                    type: object
-                    properties:
-                      kubectl:
-                        type: object
-                        properties:
-                          action:
-                            type: string
-                            enum:
-                              - apply
-                              - delete
-                          payload:
-                            type: string
-                            description: >
-                              Free-form, kubectl-compatible payload, which will
-                              be passed to kubectl as is.
-                          autoDelete:
-                            type: boolean
-                            description: >-
-                              When set to true, all the `kubectl apply` commands
-                              will be `kubectl delete`ed at the end of the
-                              scenario.
-                          proxy:
-                            type: string
-                            description: >
-                              Proxy to use with the kubectl command. If not set
-                              no proxy will be used. NOTE, that the probe
-                              ignores (and overrides) HTTP{S}_PROXY envvars.
-                          kubectlBinary:
-                            type: string
-                            description: |
-                              The path to the binary of kubectl.
-                        required:
-                          - action
-                          - payload
-                    required:
-                      - kubectl
-                  - description: >
-                      Match, filter and action on pods in your kubernetes
-                      cluster. Matchers create the initial set. That set is
-                      de-duplicated and passed on to the filters. Filters can
-                      exclude items. Whatever is passed through the filters will
-                      then be actioned with every action in the action array.
-                      See below for the details of the configuration available.
-                    type: object
-                    properties:
-                      podAction:
-                        type: object
-                        properties:
-                          matches:
-                            type: array
-                            description: >
-                              An array of match criteria to select a set of
-                              pods. Will be deduplicated.
-                            items:
-                              oneOf:
-                                - type: object
-                                  description: >
-                                    Pick all pods for a deployment in a
-                                    namespace.
-                                  properties:
-                                    namespace:
-                                      type: string
-                                  required:
-                                    - namespace
-                                - type: object
-                                  description: >
-                                    Pick all pods for a deployment in a
-                                    namespace.
-                                  properties:
-                                    deployment:
-                                      type: object
-                                      properties:
-                                        name:
-                                          type: string
-                                        namespace:
-                                          type: string
-                                      required:
-                                        - name
-                                        - namespace
-                                  required:
-                                    - deployment
-                                - type: object
-                                  description: >
-                                    Pick all pods matching the particular set of
-                                    labels in a namespace.
-                                  properties:
-                                    labels:
-                                      type: object
-                                      properties:
-                                        selector:
-                                          type: string
-                                        namespace:
-                                          type: string
-                                      required:
-                                        - selector
-                                        - namespace
-                                  required:
-                                    - labels
-                          filters:
-                            type: array
-                            description: >
-                              An array of filters to only select certain pods
-                              from the initial set.
-                            items:
-                              type: object
-                              oneOf:
-                                - type: object
-                                  description: |
-                                    Select pods by property values.
-                                  properties:
-                                    property:
-                                      type: object
-                                      properties:
-                                        name:
-                                          type: string
-                                          enum:
-                                            - name
-                                            - state
-                                        value:
-                                          type: string
-                                        negative:
-                                          type: boolean
-                                          description: >-
-                                            Set to true to negate the match (logical
-                                            NOT)
-                                      required:
-                                        - name
-                                        - value
-                                  required:
-                                    - property
-                                - type: object
-                                  description: >
-                                    Only pass the filter during specific time of
-                                    the day and week.
-                                  properties:
-                                    dayTime:
-                                      type: object
-                                      properties:
-                                        onlyDays:
-                                          type: array
-                                          items:
-                                            type: string
+                                      - url
+                                  - properties:
+                                      service:
+                                        properties:
+                                          name: {}
+                                          namespace: {}
+                                          port:
+                                            minimum: 1
+                                            maximum: 65535
+                                          protocol:
                                             enum:
-                                              - monday
-                                              - tuesday
-                                              - wednesday
-                                              - thursday
-                                              - friday
-                                              - saturday
-                                              - sunday
-                                        startTime:
-                                          type: object
-                                          description: >
-                                            Describes a time of the day, in the
-                                            local timezone.
-                                          properties:
-                                            hour:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 23
-                                            minute:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                            second:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                          required:
-                                            - hour
-                                            - minute
-                                            - second
-                                        endTime:
-                                          type: object
-                                          description: >
-                                            Describes a time of the day, in the
-                                            local timezone.
-                                          properties:
-                                            hour:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 23
-                                            minute:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                            second:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                          required:
-                                            - hour
-                                            - minute
-                                            - second
+                                              - http
+                                              - https
+                                        required:
+                                          - name
+                                          - namespace
+                                    required:
+                                      - service
+                              retries:
+                                minimum: 1
+                              delay:
+                                minimum: 1
+                              timeout:
+                                minimum: 1
+                              code:
+                                minimum: 1
+                                maximum: 599
+                              count:
+                                minimum: 1
+                              endpoint: {}
+                              method:
+                                enum:
+                                  - get
+                                  - post
+                                  - patch
+                                  - head
+                                  - delete
+                              body: {}
+                              headers:
+                                items:
+                                  properties:
+                                    name: {}
+                                    value: {}
+                              proxy: {}
+                              insecure: {}
+                            required:
+                              - target
+                        required:
+                          - probeHTTP
+                      - properties:
+                          kubectl:
+                            properties:
+                              action:
+                                enum:
+                                  - apply
+                                  - delete
+                              payload: {}
+                              autoDelete: {}
+                              proxy: {}
+                              kubectlBinary: {}
+                            required:
+                              - action
+                              - payload
+                        required:
+                          - kubectl
+                      - properties:
+                          podAction:
+                            properties:
+                              matches:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        namespace: {}
                                       required:
-                                        - onlyDays
-                                        - startTime
-                                        - endTime
-                                  required:
-                                    - dayTime
-                                - type: object
-                                  description: >
-                                    Take a random sample. Either a specific size
-                                    (up to N), or a ratio (0.5 == 50%) of the
-                                    initial size.
-                                  properties:
-                                    randomSample:
-                                      type: object
-                                      properties:
-                                        size:
-                                          type: number
-                                          minimum: 1
-                                        ratio:
-                                          type: number
-                                          minimum: 0
-                                          maximum: 1
-                                  required:
-                                    - randomSample
-                                - type: object
-                                  description: >
-                                    Only pass the filter with a desired
-                                    probability.
-                                  properties:
-                                    probability:
-                                      type: number
-                                      minimum: 0
-                                      maximum: 1
-                                  required:
-                                    - probability
-                          actions:
-                            type: array
-                            description: >
-                              An array of actions to be applied to each pod from
-                              the set.
-                            items:
-                              type: object
-                              oneOf:
-                                - type: object
-                                  description: |
-                                    Kill a pod.
-                                  properties:
-                                    kill:
-                                      type: object
-                                      properties:
+                                        - namespace
+                                    - properties:
+                                        deployment:
+                                          properties:
+                                            name: {}
+                                            namespace: {}
+                                          required:
+                                            - name
+                                            - namespace
+                                      required:
+                                        - deployment
+                                    - properties:
+                                        labels:
+                                          properties:
+                                            selector: {}
+                                            namespace: {}
+                                          required:
+                                            - selector
+                                            - namespace
+                                      required:
+                                        - labels
+                              filters:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        property:
+                                          properties:
+                                            name:
+                                              enum:
+                                                - name
+                                                - state
+                                            value: {}
+                                            negative: {}
+                                          required:
+                                            - name
+                                            - value
+                                      required:
+                                        - property
+                                    - properties:
+                                        dayTime:
+                                          properties:
+                                            onlyDays:
+                                              items:
+                                                enum:
+                                                  - monday
+                                                  - tuesday
+                                                  - wednesday
+                                                  - thursday
+                                                  - friday
+                                                  - saturday
+                                                  - sunday
+                                            startTime:
+                                              properties:
+                                                hour:
+                                                  minimum: 0
+                                                  maximum: 23
+                                                minute:
+                                                  minimum: 0
+                                                  maximum: 59
+                                                second:
+                                                  minimum: 0
+                                                  maximum: 59
+                                              required:
+                                                - hour
+                                                - minute
+                                                - second
+                                            endTime:
+                                              properties:
+                                                hour:
+                                                  minimum: 0
+                                                  maximum: 23
+                                                minute:
+                                                  minimum: 0
+                                                  maximum: 59
+                                                second:
+                                                  minimum: 0
+                                                  maximum: 59
+                                              required:
+                                                - hour
+                                                - minute
+                                                - second
+                                          required:
+                                            - onlyDays
+                                            - startTime
+                                            - endTime
+                                      required:
+                                        - dayTime
+                                    - properties:
+                                        randomSample:
+                                          properties:
+                                            size:
+                                              minimum: 1
+                                            ratio:
+                                              minimum: 0
+                                              maximum: 1
+                                      required:
+                                        - randomSample
+                                    - properties:
                                         probability:
-                                          type: number
                                           minimum: 0
                                           maximum: 1
-                                        force:
-                                          type: boolean
-                                  required:
-                                    - kill
-                                - type: object
-                                  description: |
-                                    Wait some seconds.
-                                  properties:
-                                    wait:
-                                      type: object
-                                      properties:
-                                        seconds:
-                                          type: number
+                                      required:
+                                        - probability
+                              retries:
+                                oneOf:
+                                  - properties:
+                                      retriesCount:
+                                        properties:
+                                          count:
+                                            minimum: 0
+                                          sleep:
+                                            minimum: 0
+                                        required:
+                                          - count
+                                    required:
+                                      - retriesCount
+                                  - properties:
+                                      retriesTimeout:
+                                        properties:
+                                          timeout:
+                                            minimum: 0
+                                          sleep:
+                                            minimum: 0
+                                        required:
+                                          - timeout
+                                    required:
+                                      - retriesTimeout
+                              actions:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        kill:
+                                          properties:
+                                            probability:
+                                              minimum: 0
+                                              maximum: 1
+                                            force: {}
+                                      required:
+                                        - kill
+                                    - properties:
+                                        wait:
+                                          properties:
+                                            seconds:
+                                              minimum: 0
+                                          required:
+                                            - seconds
+                                      required:
+                                        - wait
+                                    - properties:
+                                        checkPodState:
+                                          properties:
+                                            state: {}
+                                          required:
+                                            - state
+                                      required:
+                                        - checkPodState
+                                    - properties:
+                                        checkPodCount:
+                                          properties:
+                                            count: {}
+                                          required:
+                                            - count
+                                      required:
+                                        - checkPodCount
+                                    - properties:
+                                        stopHost:
+                                          properties:
+                                            autoRestart: {}
+                                      required:
+                                        - stopHost
+                            required:
+                              - matches
+                              - actions
+                        required:
+                          - podAction
+                      - properties:
+                          nodeAction:
+                            properties:
+                              matches:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        property:
+                                          properties:
+                                            name:
+                                              enum:
+                                                - name
+                                                - ip
+                                                - group
+                                                - az
+                                                - state
+                                            value: {}
+                                            negative: {}
+                                          required:
+                                            - name
+                                            - value
+                                      required:
+                                        - property
+                              retries:
+                                oneOf:
+                                  - properties:
+                                      retriesCount:
+                                        properties:
+                                          count:
+                                            minimum: 0
+                                          sleep:
+                                            minimum: 0
+                                        required:
+                                          - count
+                                    required:
+                                      - retriesCount
+                                  - properties:
+                                      retriesTimeout:
+                                        properties:
+                                          timeout:
+                                            minimum: 0
+                                          sleep:
+                                            minimum: 0
+                                        required:
+                                          - timeout
+                                    required:
+                                      - retriesTimeout
+                              filters:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        property:
+                                          properties:
+                                            name:
+                                              enum:
+                                                - name
+                                                - ip
+                                                - group
+                                                - az
+                                                - state
+                                            value: {}
+                                            negative: {}
+                                          required:
+                                            - name
+                                            - value
+                                      required:
+                                        - property
+                                    - properties:
+                                        dayTime:
+                                          properties:
+                                            onlyDays:
+                                              items:
+                                                enum:
+                                                  - monday
+                                                  - tuesday
+                                                  - wednesday
+                                                  - thursday
+                                                  - friday
+                                                  - saturday
+                                                  - sunday
+                                            startTime:
+                                              properties:
+                                                hour:
+                                                  minimum: 0
+                                                  maximum: 23
+                                                minute:
+                                                  minimum: 0
+                                                  maximum: 59
+                                                second:
+                                                  minimum: 0
+                                                  maximum: 59
+                                              required:
+                                                - hour
+                                                - minute
+                                                - second
+                                            endTime:
+                                              properties:
+                                                hour:
+                                                  minimum: 0
+                                                  maximum: 23
+                                                minute:
+                                                  minimum: 0
+                                                  maximum: 59
+                                                second:
+                                                  minimum: 0
+                                                  maximum: 59
+                                              required:
+                                                - hour
+                                                - minute
+                                                - second
+                                          required:
+                                            - onlyDays
+                                            - startTime
+                                            - endTime
+                                      required:
+                                        - dayTime
+                                    - properties:
+                                        randomSample:
+                                          properties:
+                                            size:
+                                              minimum: 1
+                                            ratio:
+                                              minimum: 0
+                                              maximum: 1
+                                      required:
+                                        - randomSample
+                                    - properties:
+                                        probability:
                                           minimum: 0
+                                          maximum: 1
                                       required:
-                                        - seconds
-                                  required:
-                                    - wait
-                                - type: object
-                                  description: >
-                                    Check that all pods are in the desired
-                                    state, fail otherwise.
-                                  properties:
-                                    checkPodState:
-                                      type: object
-                                      properties:
-                                        state:
-                                          description: >
-                                            Status, as returned by kubernetes
-                                            (`Running`, `Terminating`, etc).
-                                          type: string
+                                        - probability
+                              actions:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        start: {}
                                       required:
-                                        - state
-                                  required:
-                                    - checkPodState
-                                - type: object
-                                  description: >
-                                    Count the pods and fail if they don't match
-                                    the desired number.
-                                  properties:
-                                    checkPodCount:
-                                      type: object
+                                        - start
+                                    - properties:
+                                        stop:
+                                          properties:
+                                            force: {}
+                                            autoRestart: {}
+                                      required:
+                                        - stop
+                                    - properties:
+                                        execute:
+                                          properties:
+                                            cmd: {}
+                                          required:
+                                            - cmd
+                                      required:
+                                        - execute
+                                    - properties:
+                                        wait:
+                                          properties:
+                                            seconds:
+                                              minimum: 0
+                                          required:
+                                            - seconds
+                                      required:
+                                        - wait
+                            required:
+                              - matches
+                              - actions
+                        required:
+                          - nodeAction
+                      - properties:
+                          wait:
+                            properties:
+                              seconds:
+                                minimum: 0
+                            required:
+                              - seconds
+                        required:
+                          - wait
+                      - properties:
+                          clone:
+                            properties:
+                              replicas:
+                                minimum: 1
+                              source:
+                                oneOf:
+                                  - properties:
+                                      deployment:
+                                        properties:
+                                          name: {}
+                                          namespace: {}
+                                        required:
+                                          - name
+                                          - namespace
+                                    required:
+                                      - deployment
+                              labels:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        service:
+                                          properties:
+                                            name: {}
+                                            namespace: {}
+                                          required:
+                                            - name
+                                            - namespace
+                                      required:
+                                        - service
+                                    - properties:
+                                        label:
+                                          properties:
+                                            key: {}
+                                            value: {}
+                                          required:
+                                            - key
+                                            - value
+                                      required:
+                                        - label
+                              mutations:
+                                items:
+                                  oneOf:
+                                    - properties:
+                                        tc:
+                                          properties:
+                                            command:
+                                              items: {}
+                                            args:
+                                              items: {}
+                                            user:
+                                              minimum: 0
+                                            image: {}
+                                          required:
+                                            - command
+                                      required:
+                                        - tc
+                                    - properties:
+                                        toxiproxy:
+                                          properties:
+                                            user:
+                                              minimum: 0
+                                            imageIptables: {}
+                                            imageToxiproxy: {}
+                                            toxiproxyCli: {}
+                                            proxies:
+                                              items:
+                                                properties:
+                                                  name: {}
+                                                  listen: {}
+                                                  upstream: {}
+                                                required:
+                                                  - name
+                                                  - listen
+                                                  - upstream
+                                            toxics:
+                                              items:
+                                                properties:
+                                                  targetProxy: {}
+                                                  toxicType: {}
+                                                  toxicAttributes:
+                                                    items:
+                                                      properties:
+                                                        name: {}
+                                                        value: {}
+                                                      required:
+                                                        - name
+                                                        - value
+                                                required:
+                                                  - targetProxy
+                                                  - toxicType
+                                      required:
+                                        - toxiproxy
+                                    - properties:
+                                        environment:
+                                          properties:
+                                            name: {}
+                                            value: {}
+                                          required:
+                                            - name
+                                            - value
+                                      required:
+                                        - environment
+                            required:
+                              - source
+                        required:
+                          - clone
+                      - properties:
+                          alertManagerAction:
+                            targets:
+                              items:
+                                oneOf:
+                                  - properties:
+                                      url: {}
+                                    required:
+                                      - url
+                            actions:
+                              items:
+                                oneOf:
+                                  - properties:
+                                      mute:
+                                        properties:
+                                          duration:
+                                            minimum: 60
+                                            maximum: 86400
+                                          autoUnmute: {}
+                                    required:
+                                      - mute
+                            retries:
+                              oneOf:
+                                - properties:
+                                    retriesCount:
                                       properties:
                                         count:
-                                          type: number
+                                          minimum: 0
+                                        sleep:
+                                          minimum: 0
                                       required:
                                         - count
                                   required:
-                                    - checkPodCount
-                        required:
-                          - matches
-                          - actions
-                    required:
-                      - podAction
-                  - description: >
-                      Match, filter and action on nodes in your kubernetes
-                      cluster. It can integrate with your cloud provider and
-                      take nodes up and down to simulate VMs going down. If
-                      you're running in SSH mode, it can also execute various
-                      commands on hosts. And much more! See below for mode
-                      details.
-                    type: object
-                    properties:
-                      nodeAction:
-                        type: object
-                        properties:
-                          matches:
-                            type: array
-                            description: >
-                              An array of match criteria to select a set of
-                              nodes. Will be deduplicated.
-                            items:
-                              oneOf:
-                                - type: object
-                                  description: |
-                                    Select nodes by property values.
-                                  properties:
-                                    property:
-                                      type: object
+                                    - retriesCount
+                                - properties:
+                                    retriesTimeout:
                                       properties:
-                                        name:
-                                          type: string
-                                          enum:
-                                            - name
-                                            - ip
-                                            - group
-                                            - az
-                                            - state
-                                        value:
-                                          type: string
-                                        negative:
-                                          type: boolean
-                                          description: >-
-                                            Set to true to negate the match (logical
-                                            NOT)
-                                      required:
-                                        - name
-                                        - value
-                                  required:
-                                    - property
-                          filters:
-                            type: array
-                            description: >
-                              An array of filters, which will be applied in the
-                              defined order.
-                            items:
-                              type: object
-                              oneOf:
-                                - type: object
-                                  description: |
-                                    Select nodes by property values.
-                                  properties:
-                                    property:
-                                      type: object
-                                      properties:
-                                        name:
-                                          type: string
-                                          enum:
-                                            - name
-                                            - ip
-                                            - group
-                                            - az
-                                            - state
-                                        value:
-                                          type: string
-                                        negative:
-                                          type: boolean
-                                          description: >-
-                                            Set to true to negate the match (logical
-                                            NOT)
-                                      required:
-                                        - name
-                                        - value
-                                  required:
-                                    - property
-                                - type: object
-                                  description: >
-                                    Only pass the filter during specific time of
-                                    the day and week.
-                                  properties:
-                                    dayTime:
-                                      type: object
-                                      properties:
-                                        onlyDays:
-                                          type: array
-                                          items:
-                                            type: string
-                                            enum:
-                                              - monday
-                                              - tuesday
-                                              - wednesday
-                                              - thursday
-                                              - friday
-                                              - saturday
-                                              - sunday
-                                        startTime:
-                                          type: object
-                                          description: >
-                                            Describes a time of the day, in the
-                                            local timezone.
-                                          properties:
-                                            hour:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 23
-                                            minute:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                            second:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                          required:
-                                            - hour
-                                            - minute
-                                            - second
-                                        endTime:
-                                          type: object
-                                          description: >
-                                            Describes a time of the day, in the
-                                            local timezone.
-                                          properties:
-                                            hour:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 23
-                                            minute:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                            second:
-                                              type: number
-                                              minimum: 0
-                                              maximum: 59
-                                          required:
-                                            - hour
-                                            - minute
-                                            - second
-                                      required:
-                                        - onlyDays
-                                        - startTime
-                                        - endTime
-                                  required:
-                                    - dayTime
-                                - type: object
-                                  description: >
-                                    Take a random sample. Either a specific size
-                                    (up to N), or a ratio (0.5 == 50%) of the
-                                    initial size.
-                                  properties:
-                                    randomSample:
-                                      type: object
-                                      properties:
-                                        size:
-                                          type: number
-                                          minimum: 1
-                                        ratio:
-                                          type: number
+                                        timeout:
                                           minimum: 0
-                                          maximum: 1
-                                  required:
-                                    - randomSample
-                                - type: object
-                                  description: >
-                                    Only pass the filter with a desired
-                                    probability.
-                                  properties:
-                                    probability:
-                                      type: number
-                                      minimum: 0
-                                      maximum: 1
-                                  required:
-                                    - probability
-                          actions:
-                            type: array
-                            description: >
-                              An array of actions, which will be executed on
-                              each node.
-                            items:
-                              type: object
-                              oneOf:
-                                - type: object
-                                  description: |
-                                    Start a node.
-                                  properties:
-                                    start:
-                                      type: object
-                                      nullable: true
-                                  required:
-                                    - start
-                                - type: object
-                                  description: |
-                                    Stop a node.
-                                  properties:
-                                    stop:
-                                      type: object
-                                      properties:
-                                        force:
-                                          type: boolean
-                                        autoRestart:
-                                          type: boolean
-                                          description: >-
-                                            When set to true, the node will be
-                                            restarted at the end of the scenario.
-                                  required:
-                                    - stop
-                                - type: object
-                                  description: >
-                                    Executes arbitrary command on a particular
-                                    node. Use with caution.
-                                  properties:
-                                    execute:
-                                      type: object
-                                      properties:
-                                        cmd:
-                                          type: string
-                                      required:
-                                        - cmd
-                                  required:
-                                    - execute
-                                - type: object
-                                  description: |
-                                    Wait some seconds.
-                                  properties:
-                                    wait:
-                                      type: object
-                                      properties:
-                                        seconds:
-                                          type: number
+                                        sleep:
                                           minimum: 0
                                       required:
-                                        - seconds
+                                        - timeout
                                   required:
-                                    - wait
+                                    - retriesTimeout
+                            proxies:
+                              properties:
+                                http: {}
+                                https: {}
+                            required:
+                              - targets
+                              - actions
                         required:
-                          - matches
-                          - actions
-                    required:
-                      - nodeAction
-                  - description: |
-                      Allows to wait a number of seconds.
+                          - alertManagerAction
                     type: object
-                    properties:
-                      wait:
-                        type: object
-                        properties:
-                          seconds:
-                            type: number
-                            minimum: 0
-                        required:
-                          - seconds
-                    required:
-                      - wait
-          required:
-            - name
-            - steps
+              required:
+                - name
+                - steps

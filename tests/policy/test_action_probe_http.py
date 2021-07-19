@@ -80,6 +80,75 @@ def test_get_url_all_params(action_probe_http):
     assert args.args == ('POST', 'http://10.10.10.10:80/')
     assert args.kwargs == dict(headers={'TEST': 'SOMETHING'}, verify=False, timeout=2.0, data=b'SOMEBODY here!', proxies={'http': '', 'https': ''})
 
+def test_get_url_code_matches(action_probe_http):
+    schema = dict(
+        target=dict(
+            url="http://10.10.10.10:80"
+        ),
+        headers=[dict(name="TEST", value="SOMETHING")],
+        method="POST",
+        body="SOMEBODY here!",
+        code=404,
+        timeout=2000,
+        insecure=True,
+    )
+    action_probe_http.schema = schema
+    mock_response = MagicMock()
+    mock_response.status_code = 404
+    mock_response.text = "some response"
+    mock_request = MagicMock(return_value=mock_response)
+
+    with patch("requests.request", mock_request):
+        execute_result = action_probe_http.execute()
+
+    assert mock_request.call_count == 1
+    assert execute_result is True
+
+def test_get_url_code_does_not_match(action_probe_http):
+    schema = dict(
+        target=dict(
+            url="http://10.10.10.10:80"
+        ),
+        headers=[dict(name="TEST", value="SOMETHING")],
+        method="POST",
+        body="SOMEBODY here!",
+        code=200,
+        timeout=2000,
+        insecure=True,
+    )
+    action_probe_http.schema = schema
+    mock_response = MagicMock()
+    mock_response.status_code = 404
+    mock_response.text = "some response"
+    mock_request = MagicMock(return_value=mock_response)
+
+    with patch("requests.request", mock_request):
+        execute_result = action_probe_http.execute()
+
+    assert mock_request.call_count == 1
+    assert execute_result is False
+
+def test_get_url_throws_exception(action_probe_http):
+    schema = dict(
+        target=dict(
+            url="http://10.10.10.10:80"
+        ),
+        headers=[dict(name="TEST", value="SOMETHING")],
+        method="POST",
+        body="SOMEBODY here!",
+        code=200,
+        timeout=2000,
+        insecure=True,
+    )
+    action_probe_http.schema = schema
+    mock_request = MagicMock(side_effect=Exception("something went wrong"))
+
+    with patch("requests.request", mock_request):
+        execute_result = action_probe_http.execute()
+
+    assert mock_request.call_count == 1
+    assert execute_result is False
+
 def test_get_url_proxy(action_probe_http):
     schema = dict(
         target=dict(

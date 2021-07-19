@@ -91,12 +91,19 @@ class ActionProbeHTTP(ActionAbstract):
                 ),
                 verify=verify,
             )
-            resp.raise_for_status()
-            self.logger.info("Response: %s", resp.text)
-            return True
         except:
             self.logger.exception("Exception while calling %s", url)
-        return False
+            return False
+        if resp.status_code != code:
+            self.logger.error(
+                "Expected response code %s, got %s instead. Response: %s",
+                code,
+                resp.status_code,
+                resp.text
+            )
+            return False
+        self.logger.info("Response: %s", resp.text)
+        return True
 
     def execute(self):
         count = self.schema.get("count", 1)

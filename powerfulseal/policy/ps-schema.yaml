@@ -448,7 +448,7 @@ definitions:
               The object to clone. It must exist on the cluster. Its specs will be used for the clone.
             oneOf:
             - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
-          services:
+          servicesToRetarget:
             type: array
             description: >
               Services to add the guaranteed label "chaos=true" to the selector

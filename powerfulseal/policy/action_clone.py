@@ -120,7 +120,7 @@ class ActionClone(ActionAbstract):
 
   def modify_services(self):
     # If we're routing all traffic to chaos replacement, modify the selector
-    for service in self.schema.get("services", []):
+    for service in self.schema.get("servicesToRetarget", []):
       # handle the service selector lookup
       spec = service.get("service")
       if spec is not None:

@@ -37,7 +37,7 @@ class ModifyServiceAction:
     self.logger = logger or makeLogger(__name__)
 
   def execute(self):
-    body = [{"op": type, "path": "/spec/selector/chaos", "value": "true"}]
+    body = [{"op": self.type, "path": "/spec/selector/chaos", "value": "true"}]
     try:
       response = self.k8s_inventory.k8s_client.client_corev1api.patch_namespaced_service(name, namespace, body)
       self.logger.debug("Response %s", response)

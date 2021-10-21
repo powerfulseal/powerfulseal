@@ -62,61 +62,6 @@ class K8sClient():
         if payload:
             return ",".join(self.make_selector(*item) for item in payload.items())
 
-    def selector_or_labels(self, labels, selector):
-        """ Helper to select labels over selector.
-        """
-        if selector is None:
-            selector = ""
-        if labels is not None:
-            selector = self.dict_to_selector(labels)
-        return selector
-
-    def list_pods(self, namespace, labels=None, selector=None):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            CoreV1Api.md#list_namespaced_pod
-            Get pods by label first, then selector
-        """
-        try:
-            selector = self.selector_or_labels(labels, selector)
-            return self.client_corev1api.list_namespaced_pod(
-                namespace=namespace,
-                label_selector=selector,
-            ).items
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def delete_pods(self, pods):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            CoreV1Api.md#delete_namespaced_pod
-            Delete all pods synchronously
-        """
-        for pod in pods:
-            try:
-                self.client_corev1api.delete_namespaced_pod(
-                    name=pod.name,
-                    namespace=pod.namespace,
-                    grace_period_seconds=0
-                )
-            except ApiException as e:
-                self.logger.exception(e)
-                return False
-        return True
-
-    def list_nodes(self):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            CoreV1Api.md##list_node
-        """
-        try:
-            resp = self.client_corev1api.list_node()
-            return resp.items
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
     def get_nodes_groups(self):
         """ Returns an inventory of nodes which form the Kubernetes cluster.
             Returns a dict of group name -> list of nodes.
@@ -137,6 +82,18 @@ class K8sClient():
                 groups[value] = group
         return groups
 
+    def list_nodes(self):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md##list_node
+        """
+        try:
+            resp = self.client_corev1api.list_node()
+            return resp.items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
     def list_namespaces(self):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
@@ -145,6 +102,30 @@ class K8sClient():
         try:
             resp = self.client_corev1api.list_namespace()
             return resp.items
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
+
+    def selector_or_labels(self, labels, selector):
+        """ Helper to select labels over selector.
+        """
+        if selector is None:
+            selector = ""
+        if labels is not None:
+            selector = self.dict_to_selector(labels)
+        return selector
+
+    def list_deployments(self, namespace, labels=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            AppsV1Api.md#list_namespaced_deployment
+        """
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            return self.client_appsv1api.list_namespaced_deployment(
+                namespace=namespace,
+                label_selector=selector,
+            ).items
         except ApiException as e:
             self.logger.exception(e)
             raise
@@ -159,21 +140,6 @@ class K8sClient():
                 namespace=namespace,
                 name=name,
             )
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def list_deployments(self, namespace, labels=None, selector=None):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            AppsV1Api.md#list_namespaced_deployment
-        """
-        try:
-            selector = self.selector_or_labels(labels, selector)
-            return self.client_appsv1api.list_namespaced_deployment(
-                namespace=namespace,
-                label_selector=selector,
-            ).items
         except ApiException as e:
             self.logger.exception(e)
             raise
@@ -223,76 +189,18 @@ class K8sClient():
             self.logger.exception(e)
             raise
 
-    def get_stateful_set(self, namespace, name):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            AppsV1Api.md#read_namespaced_stateful_set
-        """
-        try:
-            return self.client_appsv1api.read_namespaced_stateful_set(
-                namespace=namespace,
-                name=name,
-            )
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def list_stateful_set(self, namespace, labels=None, selector=None):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            AppsV1Api.md#list_namespaced_stateful_set
-        """
-        try:
-            selector = self.selector_or_labels(labels, selector)
-            return self.client_appsv1api.list_namespaced_stateful_set(
-                namespace=namespace,
-                label_selector=selector,
-            ).items
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def list_stateful_set_pods(self, namespace, labels=None, name=None, selector=None):
+    def list_pods(self, namespace, labels=None, selector=None):
         """
             https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
             CoreV1Api.md#list_namespaced_pod
-            If stateful_set name is provided, it will ignore selector and label, and use the stateful_set's
+            Get pods by label first, then selector
         """
         try:
             selector = self.selector_or_labels(labels, selector)
-            if name:
-                stateful_set = self.get_stateful_set(namespace, name)
-                selector = self.dict_to_selector(stateful_set.spec.selector.match_labels)
-            return self.list_pods(namespace, None, selector) # Prefer stateful_set selector over labels
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-    def create_stateful_set(self, namespace, body):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            AppsV1Api.md#create_namespaced_stateful_set
-        """
-        try:
-            return self.client_appsv1api.create_namespaced_stateful_set(
+            return self.client_corev1api.list_namespaced_pod(
                 namespace=namespace,
-                body=body,
-            )
-        except ApiException as e:
-            self.logger.exception(e)
-            raise
-
-
-    def delete_stateful_set(self, namespace, name):
-        """
-            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
-            AppsV1Api.md#delete_namespaced_stateful_set
-        """
-        try:
-            return self.client_appsv1api.delete_namespaced_stateful_set(
-                namespace=namespace,
-                name=name,
-            )
+                label_selector=selector,
+            ).items
         except ApiException as e:
             self.logger.exception(e)
             raise
@@ -355,6 +263,24 @@ class K8sClient():
         except ApiException as e:
             self.logger.exception(e)
             raise
+
+    def delete_pods(self, pods):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#delete_namespaced_pod
+            Delete all pods synchronously
+        """
+        for pod in pods:
+            try:
+                self.client_corev1api.delete_namespaced_pod(
+                    name=pod.name,
+                    namespace=pod.namespace,
+                    grace_period_seconds=0
+                )
+            except ApiException as e:
+                self.logger.exception(e)
+                return False
+        return True
 
     def get_service(self, namespace, name):
         """

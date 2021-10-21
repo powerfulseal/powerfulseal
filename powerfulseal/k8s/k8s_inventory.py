@@ -109,21 +109,6 @@ class K8sInventory():
                 self.logger.exception(e)
         return deployments
 
-    def find_stateful_sets(self, namespace=None, labels=None):
-        """ Find stateful_sets for a namespace (default to "default" namespace).
-        """
-        stateful_sets = []
-        for ns in self.preprocess_namespace(namespace):
-            try:
-                for item in self.k8s_client.list_stateful_sets(
-                    namespace=ns,
-                    labels=labels,
-                ):
-                    stateful_sets.append(item.metadata.name)
-            except Exception as e:
-                self.logger.exception(e)
-        return stateful_sets
-
     def find_pods(self, namespace, selector=None, app=None, name=None):
         """ Find pods in a namespace, for an app or selector.
         """
@@ -178,6 +163,21 @@ class K8sInventory():
                         ))
         self.last_pods = pod_objects
         return pod_objects
+
+    def find_stateful_sets(self, namespace=None, labels=None):
+        """ Find stateful_sets for a namespace (default to "default" namespace).
+        """
+        stateful_sets = []
+        for ns in self.preprocess_namespace(namespace):
+            try:
+                for item in self.k8s_client.list_stateful_sets(
+                    namespace=ns,
+                    labels=labels,
+                ):
+                    stateful_sets.append(item.metadata.name)
+            except Exception as e:
+                self.logger.exception(e)
+        return stateful_sets
 
     def get_all_pods(self):
         """

@@ -118,6 +118,40 @@ class ActionClone(ActionAbstract):
 
     return body
 
+  def modify_services(self):
+    # If we're routing all traffic to chaos replacement, modify the selector
+    for service in self.schema.get("services", []):
+      # handle the service selector lookup
+      spec = service.get("service")
+      if spec is not None:
+        try:
+          # get the service we're after
+          name = spec.get("name")
+          namespace = spec.get("namespace")
+          service = self.k8s_inventory.k8s_client.get_service(
+            name=name,
+            namespace=namespace,
+          )
+
+          ModifyServiceAction(
+            type="add",
+            name=name,
+            namespace=namespace,
+            k8s_inventory=self.k8s_inventory,
+          ).execute()
+
+          # add a cleanup action to revert the service when we're done
+          self.cleanup_actions.append(
+            ModifyServiceAction(
+              type="remove",
+              name=name,
+              namespace=namespace,
+              k8s_inventory=self.k8s_inventory,
+            )
+          )
+        except:
+          return False
+  
   def execute(self):
     # get the source deployment
     try:
@@ -197,38 +231,8 @@ class ActionClone(ActionAbstract):
     except:
       return False
 
-    # If we're routing all traffic to chaos replacement, modify the selector
-    for service in self.schema.get("services", []):
-      # handle the service selector lookup
-      spec = service.get("service")
-      if spec is not None:
-        try:
-          # get the service we're after
-          name = spec.get("name")
-          namespace = spec.get("namespace")
-          service = self.k8s_inventory.k8s_client.get_service(
-            name=name,
-            namespace=namespace,
-          )
-
-          ModifyServiceAction(
-            type="add",
-            name=name,
-            namespace=namespace,
-            k8s_inventory=self.k8s_inventory,
-          ).execute()
-
-          # add a cleanup action to revert the service when we're done
-          self.cleanup_actions.append(
-            ModifyServiceAction(
-              type="remove",
-              name=name,
-              namespace=namespace,
-              k8s_inventory=self.k8s_inventory,
-            )
-          )
-        except:
-          return False
+    # re-route services to target chaos labeled k8s kinds
+    self.modify_services()
 
     # add a cleanup action to remove the clone when we're done
     self.cleanup_actions.append(

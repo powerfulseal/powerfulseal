@@ -131,7 +131,7 @@ class ActionClone(ActionAbstract):
           service = self.k8s_inventory.k8s_client.get_service(
             name=name,
             namespace=namespace,
-          )
+          )  # Validates service exists
 
           ModifyServiceAction(
             type="add",
@@ -229,10 +229,14 @@ class ActionClone(ActionAbstract):
       self.logger.debug("Response %s", response)
       self.logger.info("Clone deployment created successfully")
     except:
+      self.logger.exception("Failed create deploy response %s", response)
       return False
 
     # re-route services to target chaos labeled k8s kinds
-    self.modify_services()
+    if not self.modify_services():
+      # We want to modify services after we start the chaos clone,
+      # but we want to cleanup services to point to the original before we delete the clones
+      return False
 
     # add a cleanup action to remove the clone when we're done
     self.cleanup_actions.append(

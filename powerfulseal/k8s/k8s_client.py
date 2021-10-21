@@ -28,14 +28,18 @@ class K8sClient():
     """
 
     def __init__(self, kube_config=None, logger=None):
-        if kube_config:
+        if isinstance(kube_config, str):
             kubernetes.config.load_kube_config(config_file=kube_config)
+        elif isinstance(kube_config, dict):
+            kubernetes.config.load_kube_config_from_dict(config_dict=kube_config)
         else:
+
             kubernetes.config.load_incluster_config()
+
         self.kube_config = kube_config
         self.client_corev1api = kubernetes.client.CoreV1Api()
         self.client_appsv1api = kubernetes.client.AppsV1Api()
-        self.client_extensionsApi = kubernetes.client.ApiextensionsV1beta1Api()
+        self.client_extensionsApi = kubernetes.client.ApiextensionsV1Api()
         self.client_customObjectsApi = kubernetes.client.CustomObjectsApi()
 
         self.logger = logger or makeLogger(__name__)

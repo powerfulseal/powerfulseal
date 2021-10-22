@@ -170,7 +170,7 @@ class K8sInventory():
         stateful_sets = []
         for ns in self.preprocess_namespace(namespace):
             try:
-                for item in self.k8s_client.list_stateful_sets(
+                for item in self.k8s_client.list_stateful_set(
                     namespace=ns,
                     labels=labels,
                 ):

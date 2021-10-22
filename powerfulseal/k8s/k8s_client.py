@@ -234,6 +234,21 @@ class K8sClient():
             self.logger.exception(e)
             raise
 
+    def list_stateful_set_pods(self, namespace, labels=None, name=None, selector=None):
+        """
+            https://github.com/kubernetes-incubator/client-python/blob/master/kubernetes/docs/
+            CoreV1Api.md#list_namespaced_pod
+            If stateful_set name is provided, it will ignore selector and label, and use the stateful_set's
+        """
+        try:
+            selector = self.selector_or_labels(labels, selector)
+            if name:
+                stateful_set = self.get_stateful_set(namespace, name)
+                selector = self.dict_to_selector(stateful_set.spec.selector.match_labels)
+            return self.list_pods(namespace, None, selector) # Prefer stateful_set selector over labels
+        except ApiException as e:
+            self.logger.exception(e)
+            raise
 
     def create_stateful_set(self, namespace, body):
         """

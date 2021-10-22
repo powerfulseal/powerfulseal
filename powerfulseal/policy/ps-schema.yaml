@@ -448,6 +448,7 @@ definitions:
               The object to clone. It must exist on the cluster. Its specs will be used for the clone.
             oneOf:
             - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
+            - "$ref": "#/definitions/matchPodStatefulSetAndNamespace"
           servicesToRetarget:
             type: array
             description: >
@@ -543,6 +544,26 @@ definitions:
         type: string
     required:
     - namespace
+
+  matchPodStatefulSetAndNamespace:
+    type: object
+    description: >
+      Pick all pods for a statefulset in a namespace.
+    additionalProperties: false
+    properties:
+      statefulset:
+        type: object
+        additionalProperties: false
+        properties:
+          name:
+            type: string
+          namespace:
+            type: string
+        required:
+        - name
+        - namespace
+    required:
+    - statefulset
 
   matchPodDeploymentAndNamespace:
     type: object

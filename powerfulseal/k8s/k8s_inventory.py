@@ -109,17 +109,31 @@ class K8sInventory():
                 self.logger.exception(e)
         return deployments
 
-    def find_pods(self, namespace, selector=None, deployment_name=None):
-        """ Find pods in a namespace, for a deployment or selector.
+    def find_pods(self, namespace, selector=None, app=None, name=None):
+        """ Find pods in a namespace, for an app or selector.
         """
         pods = []
         for ns in self.preprocess_namespace(namespace):
             try:
-                for pod in self.k8s_client.list_pods(
-                    namespace=ns,
-                    selector=selector,
-                    deployment_name=deployment_name,
-                ):
+                ns_pods = []
+                if app == "deployment":
+                    ns_pods = self.k8s_client.list_deployment_pods(
+                        namespace=ns,
+                        selector=selector,
+                        name=name,
+                    )
+                elif app == "stateful_set":
+                    ns_pods = self.k8s_client.list_stateful_set_pods(
+                        namespace=ns,
+                        selector=selector,
+                        name=name,
+                    )
+                else:
+                    ns_pods = self.k8s_client.list_pods(
+                        namespace=ns,
+                        selector=selector,
+                    )
+                for pod in ns_pods:
                     pods.append(pod)
             except Exception as e:
                 self.logger.exception(e)
@@ -149,6 +163,21 @@ class K8sInventory():
                         ))
         self.last_pods = pod_objects
         return pod_objects
+
+    def find_stateful_sets(self, namespace=None, labels=None):
+        """ Find stateful_sets for a namespace (default to "default" namespace).
+        """
+        stateful_sets = []
+        for ns in self.preprocess_namespace(namespace):
+            try:
+                for item in self.k8s_client.list_stateful_set(
+                    namespace=ns,
+                    labels=labels,
+                ):
+                    stateful_sets.append(item.metadata.name)
+            except Exception as e:
+                self.logger.exception(e)
+        return stateful_sets
 
     def get_all_pods(self):
         """

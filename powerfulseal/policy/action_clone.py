@@ -25,6 +25,26 @@ from .action_abstract import ActionAbstract
 DEFAULT_TOXIPROXY_IMAGE = "docker.io/shopify/toxiproxy:2.1.4"
 DEFAULT_IPTABLES_IMAGE = "gaiadocker/iproute2:latest"
 
+class ModifyServiceAction:
+  """
+  Executes a http://jsonpatch.com/ object modify on a service
+  """
+  def __init__(self, type, name, namespace, k8s_inventory, logger=None):
+    self.type = type
+    self.name = name
+    self.namespace = namespace
+    self.k8s_inventory = k8s_inventory
+    self.logger = logger or makeLogger(__name__)
+
+  def execute(self):
+    body = [{"op": self.type, "path": "/spec/selector/chaos", "value": "true"}]
+    try:
+      response = self.k8s_inventory.k8s_client.client_corev1api.patch_namespaced_service(name, namespace, body)
+      self.logger.debug("Response %s", response)
+      self.logger.info("Service modified successfully: %s %s in %s", self.type, self.name, self.namespace)
+    except:
+      self.logger.exception("Error modifying service: %s %s in %s", self.type, self.name, self.namespace)
+      return False
 
 class DeleteDeploymentAction():
   def __init__(self, name, namespace, k8s_inventory, logger=None):
@@ -98,6 +118,40 @@ class ActionClone(ActionAbstract):
 
     return body
 
+  def modify_services(self):
+    # If we're routing all traffic to chaos replacement, modify the selector
+    for service in self.schema.get("servicesToRetarget", []):
+      # handle the service selector lookup
+      spec = service.get("service")
+      if spec is not None:
+        try:
+          # get the service we're after
+          name = spec.get("name")
+          namespace = spec.get("namespace")
+          service = self.k8s_inventory.k8s_client.get_service(
+            name=name,
+            namespace=namespace,
+          )  # Validates service exists
+
+          ModifyServiceAction(
+            type="add",
+            name=name,
+            namespace=namespace,
+            k8s_inventory=self.k8s_inventory,
+          ).execute()
+
+          # add a cleanup action to revert the service when we're done
+          self.cleanup_actions.append(
+            ModifyServiceAction(
+              type="remove",
+              name=name,
+              namespace=namespace,
+              k8s_inventory=self.k8s_inventory,
+            )
+          )
+        except:
+          return False
+  
   def execute(self):
     # get the source deployment
     try:
@@ -175,6 +229,13 @@ class ActionClone(ActionAbstract):
       self.logger.debug("Response %s", response)
       self.logger.info("Clone deployment created successfully")
     except:
+      self.logger.exception("Failed create deploy response %s", response)
+      return False
+
+    # re-route services to target chaos labeled k8s kinds
+    if not self.modify_services():
+      # We want to modify services after we start the chaos clone,
+      # but we want to cleanup services to point to the original before we delete the clones
       return False
 
     # add a cleanup action to remove the clone when we're done

@@ -449,6 +449,14 @@ definitions:
             oneOf:
             - "$ref": "#/definitions/matchPodDeploymentAndNamespace"
             - "$ref": "#/definitions/matchPodStatefulSetAndNamespace"
+          servicesToRetarget:
+            type: array
+            description: >
+              Services to add the guaranteed label "chaos=true" to the selector
+            items:
+              type: object
+              oneOf:
+              - "$ref": "#/definitions/matchService"
           labels:
             type: array
             description: >

@@ -56,14 +56,16 @@ class ActionNodesPods(ActionAbstract):
             self.logger.debug("Filtered set: %r", filtered_set)
             self.logger.info("Filtered set length: %d", len(filtered_set))
             if not filtered_set:
-                return True
+                return 0
             ret = self.act(filtered_set)
             if not ret:
-                return False
+                return -1
+            else:
+                return len(filtered_set)
         else:
             self.metric_collector.add_filtered_to_empty_set_metric()
         self.logger.debug("Done")
-        return True
+        return 0
 
     def match(self):
         """ Reads the policy and returns the initial set of items.

@@ -953,12 +953,11 @@ definitions:
         type: object
         additionalProperties: false
         properties:
-          delay:
-            type: integer
-            description:
-              When set to > 0, the tc attack container will create a side car container and inject a sleep in front of the command
-              When set to 0 or < 0, this will create an init container
-            default: 0
+          is_init:
+            type: boolean
+            description: >
+              should this be an init container or sidecar container?
+            default: True
           command:
             type: array
             description: >

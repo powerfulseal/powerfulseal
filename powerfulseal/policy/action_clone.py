@@ -255,13 +255,13 @@ class ActionClone(ActionAbstract):
       It will use an init container if the aim is to inherit a degraded environment
       and will create a side-car that can be delayed to wait for startup
     """
-    delay = max(spec.get("delay", 0), 0)  # used for initialDelaySeconds
-    if delay == 0:  # default init for backwards compatibility
+    is_init = spec.get("is_init", True)
+    if is_init:  # default init for backwards compatibility
       containers_ref = body.spec.template.spec.init_containers
       if containers_ref is None:
         containers_ref = []
       chaos_name = "chaos-setup-"+str(1+len(containers_ref))
-    else:  # create sidecar container with delay
+    else:  # create sidecar container
       containers_ref = body.spec.template.spec.containers
       chaos_name = "chaos-tc-"+str(1+len(containers_ref)) # assumes we only ever append to our containers!
 
@@ -275,7 +275,6 @@ class ActionClone(ActionAbstract):
           command=spec.get("command"),
           args=spec.get("args"),
           image=spec.get("image"),
-          # initialDelaySeconds=delay,
           security_context=kubernetes.client.V1SecurityContext(
             run_as_user=spec.get("user"),
             capabilities=kubernetes.client.V1Capabilities(

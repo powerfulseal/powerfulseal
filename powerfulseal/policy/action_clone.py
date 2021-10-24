@@ -250,36 +250,32 @@ class ActionClone(ActionAbstract):
     return True
 
   def mutate_traffic_control(self, body, spec):
-    """ Adds an init container with tc setup """
-    if body.spec.template.spec.init_containers is None:
-      body.spec.template.spec.init_containers = []
-    setup_spec = spec.get("setup")
-    if setup_spec:
-      body.spec.template.spec.init_containers.append(
-        kubernetes.client.V1Container(
-          name="chaos-setup-"+str(1+len(body.spec.template.spec.init_containers)),
-          command=setup_spec.get("command", "/bin/sh"),
-          args=setup_spec.get("args", "tc qdisc ls"),
-          image=setup_spec.get("image",spec.get("image")),
-          security_context=kubernetes.client.V1SecurityContext(
-            run_as_user=setup_spec.get("user",spec.get("user")),
-            capabilities=kubernetes.client.V1Capabilities(
-              add=[
-                "NET_ADMIN"
-              ]
-            )
-          )
-        )
-      )
+    """
+      This will modify only the container's networking (not the host) using the linux tc utility
+      It will use an init container if the aim is to inherit a degraded environment
+      and will create a side-car that can be delayed to wait for startup
+    """
+    delay = max(spec.get("delay", 0), 0)  # used for initialDelaySeconds
+    if delay == 0:  # default init for backwards compatibility
+      containers_ref = body.spec.template.spec.init_containers
+      if containers_ref is None:
+        containers_ref = []
+      chaos_name = "chaos-setup-"+str(1+len(containers_ref))
+    else:  # create sidecar container with delay
+      containers_ref = body.spec.template.spec.containers
+      chaos_name = "chaos-tc-"+str(1+len(containers_ref)) # assumes we only ever append to our containers!
 
-    # add the delayed tc side-car container
+    # TODO: add capability to overload probes to add wait_for scripts
+
+    # add the tc attack to either init or containers
     if spec.get("command"):
-      body.spec.template.spec.containers.append(
+      containers_ref.append(
         kubernetes.client.V1Container(
-          name="chaos-tc",
+          name=chaos_name,
           command=spec.get("command"),
           args=spec.get("args"),
           image=spec.get("image"),
+          # initialDelaySeconds=delay,
           security_context=kubernetes.client.V1SecurityContext(
             run_as_user=spec.get("user"),
             capabilities=kubernetes.client.V1Capabilities(

@@ -250,12 +250,27 @@ class ActionClone(ActionAbstract):
     return True
 
   def mutate_traffic_control(self, body, spec):
-    """ Adds an init container with tc """
-    if body.spec.template.spec.init_containers is None:
-      body.spec.template.spec.init_containers = []
-    body.spec.template.spec.init_containers.append(
+    """
+      This will modify only the container's networking (not the host) using the linux tc utility
+      It will create an init container if the aim is to inherit a degraded environment
+      and will create a side-car that can be delayed to wait for startup
+    """
+    is_init = spec.get("is_init", True)
+    if is_init:  # default init for backwards compatibility
+      containers_ref = body.spec.template.spec.init_containers
+      if containers_ref is None:
+        containers_ref = []
+      chaos_name = "chaos-setup-"+str(1+len(containers_ref))
+    else:  # create sidecar container
+      containers_ref = body.spec.template.spec.containers
+      chaos_name = "chaos-tc-"+str(1+len(containers_ref)) # assumes we only ever append to our containers!
+
+    # TODO: add capability to overload probes to add wait_for scripts
+
+    # add the tc attack to either init or containers
+    containers_ref.append(
       kubernetes.client.V1Container(
-        name="chaos"+str(1+len(body.spec.template.spec.init_containers)),
+        name=chaos_name,
         command=spec.get("command"),
         args=spec.get("args"),
         image=spec.get("image"),

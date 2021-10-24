@@ -953,6 +953,11 @@ definitions:
         type: object
         additionalProperties: false
         properties:
+          is_init:
+            type: boolean
+            description: >
+              should this be an init container or sidecar container?
+            default: True
           command:
             type: array
             description: >

@@ -252,7 +252,7 @@ class ActionClone(ActionAbstract):
   def mutate_traffic_control(self, body, spec):
     """
       This will modify only the container's networking (not the host) using the linux tc utility
-      It will use an init container if the aim is to inherit a degraded environment
+      It will create an init container if the aim is to inherit a degraded environment
       and will create a side-car that can be delayed to wait for startup
     """
     is_init = spec.get("is_init", True)

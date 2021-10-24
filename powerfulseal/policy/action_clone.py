@@ -268,23 +268,22 @@ class ActionClone(ActionAbstract):
     # TODO: add capability to overload probes to add wait_for scripts
 
     # add the tc attack to either init or containers
-    if spec.get("command"):
-      containers_ref.append(
-        kubernetes.client.V1Container(
-          name=chaos_name,
-          command=spec.get("command"),
-          args=spec.get("args"),
-          image=spec.get("image"),
-          security_context=kubernetes.client.V1SecurityContext(
-            run_as_user=spec.get("user"),
-            capabilities=kubernetes.client.V1Capabilities(
-              add=[
-                "NET_ADMIN"
-              ]
-            )
+    containers_ref.append(
+      kubernetes.client.V1Container(
+        name=chaos_name,
+        command=spec.get("command"),
+        args=spec.get("args"),
+        image=spec.get("image"),
+        security_context=kubernetes.client.V1SecurityContext(
+          run_as_user=spec.get("user"),
+          capabilities=kubernetes.client.V1Capabilities(
+            add=[
+              "NET_ADMIN"
+            ]
           )
         )
       )
+    )
 
   def mutate_toxiproxy(self, body, spec):
     """

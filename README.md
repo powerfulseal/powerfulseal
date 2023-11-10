@@ -21,7 +21,7 @@ Please refer to the [Powerfulseal documentation](https://powerfulseal.github.io/
 - works with `Kubernetes`, `OpenStack`, `AWS`, `Azure`, `GCP` and local machines
 - `yaml` [policies](https://powerfulseal.github.io/powerfulseal/policies) describing complete chaos experiments
 - `Prometheus` and `Datadog` metrics collection
-- multiple [modes](https://powerfulseal.github.io/powerfulseal/modes) for differnt use cases
+- multiple [modes](https://powerfulseal.github.io/powerfulseal/modes) for different use cases
 
 
 ## Hello world!
